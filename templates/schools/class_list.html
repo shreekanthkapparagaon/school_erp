@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block page_heading %}Classes{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="table-header">
+    <div>
+      <p class="eyebrow">Latest first</p>
+      <h2>Classes</h2>
+    </div>
+    <div class="table-actions">
+      <input data-filter="classes" placeholder="Filter classes">
+      <a class="btn" href="{% url 'schools:create_class' %}">Add Class</a>
+    </div>
+  </div>
+  <table data-table="classes" data-page-size="12">
+    <thead><tr><th data-sort>Class</th><th data-sort>Section</th><th data-sort>Subjects</th><th data-sort>School</th></tr></thead>
+    <tbody>
+      {% for school_class in classes %}
+        <tr>
+          <td>{{ school_class.name }}</td>
+          <td>{{ school_class.section|default:"-" }}</td>
+          <td>{% for subject in school_class.subjects.all %}{{ subject.name }}{% if not forloop.last %}, {% endif %}{% empty %}-{% endfor %}</td>
+          <td>{{ school_class.school.name }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="4">No classes yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="pager" data-pager="classes"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+</section>
+{% endblock %}

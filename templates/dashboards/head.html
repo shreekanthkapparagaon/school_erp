@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block page_heading %}{{ user.school.name|default:"Head Dashboard" }}{% endblock %}
+{% block content %}
+<div class="action-row">
+  <a class="btn" href="{% url 'accounts:user_list' 'student' %}">Students</a>
+  <a class="btn btn-muted" href="{% url 'accounts:user_list' 'teacher' %}">Teachers</a>
+  <a class="btn btn-muted" href="{% url 'schools:subject_list' %}">Subjects</a>
+  <a class="btn btn-muted" href="{% url 'schools:assignment_list' %}">Assignments</a>
+</div>
+<section class="stat-grid">
+  <article class="stat-card"><span>Students</span><strong>{{ students.count }}</strong><small>School accounts</small></article>
+  <article class="stat-card success"><span>Teachers</span><strong>{{ teachers.count }}</strong><small>Faculty accounts</small></article>
+  <article class="stat-card warning"><span>Subjects</span><strong>{{ subjects.count }}</strong><small>School catalog</small></article>
+  <article class="stat-card danger"><span>Classes</span><strong>{{ classes.count }}</strong><small>Managed sections</small></article>
+</section>
+<section class="card">
+  <div class="table-header"><h2>Teacher Assignments</h2><input data-filter="assignments" placeholder="Filter assignments"></div>
+  <table data-table="assignments" data-page-size="12"><thead><tr><th data-sort>Teacher</th><th data-sort>Subject</th><th data-sort>Class</th><th data-sort>School</th></tr></thead><tbody>
+  {% for item in assignments %}<tr><td>{{ item.teacher }}</td><td>{{ item.subject.name }}</td><td>{{ item.school_class.name }} {{ item.school_class.section }}</td><td>{{ item.school.name }}</td></tr>{% empty %}<tr><td colspan="4">No assignments yet.</td></tr>{% endfor %}
+  </tbody></table>
+  <div class="pager" data-pager="assignments"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+</section>
+<section class="grid-two">
+  <div class="card"><h2>Students</h2><div class="compact-list">{% for student in students %}<span>{{ student }} · {{ student.school_class|default:"No class" }}</span>{% empty %}<span>No students yet.</span>{% endfor %}</div></div>
+  <div class="card"><h2>Teachers</h2><div class="compact-list">{% for teacher in teachers %}<span>{{ teacher.email }}</span>{% empty %}<span>No teachers yet.</span>{% endfor %}</div></div>
+</section>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block page_heading %}{{ user.school.name|default:"Teacher Dashboard" }}{% endblock %}
+{% block content %}
+<section class="stat-grid">
+  <article class="stat-card"><span>Subjects</span><strong>{{ assignments.count }}</strong><small>Assigned classes</small></article>
+  <article class="stat-card success"><span>Students</span><strong>{{ students.count }}</strong><small>In assigned classes</small></article>
+</section>
+<section class="card">
+  <div class="table-header"><h2>My Subjects</h2><input data-filter="subjects" placeholder="Filter subjects"></div>
+  <table data-table="subjects" data-page-size="12"><thead><tr><th data-sort>Subject</th><th data-sort>Code</th><th data-sort>Class</th><th data-sort>School</th></tr></thead><tbody>
+  {% for item in assignments %}<tr><td>{{ item.subject.name }}</td><td>{{ item.subject.code }}</td><td>{{ item.school_class.name }} {{ item.school_class.section }}</td><td>{{ item.school.name }}</td></tr>{% empty %}<tr><td colspan="4">No assigned subjects yet.</td></tr>{% endfor %}
+  </tbody></table>
+  <div class="pager" data-pager="subjects"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+</section>
+<section class="card">
+  <div class="table-header"><h2>Students In My Classes</h2><input data-filter="students" placeholder="Filter students"></div>
+  <table data-table="students" data-page-size="12"><thead><tr><th data-sort>Name</th><th data-sort>Email</th><th data-sort>Class</th></tr></thead><tbody>
+  {% for student in students %}<tr><td>{{ student }}</td><td>{{ student.email }}</td><td>{{ student.school_class }}</td></tr>{% empty %}<tr><td colspan="3">No students found.</td></tr>{% endfor %}
+  </tbody></table>
+  <div class="pager" data-pager="students"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+</section>
+{% endblock %}

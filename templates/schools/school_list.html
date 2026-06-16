@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block page_heading %}Schools{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="table-header">
+    <div>
+      <p class="eyebrow">Latest first</p>
+      <h2>Schools</h2>
+    </div>
+    <div class="table-actions">
+      <input data-filter="schools" placeholder="Filter schools">
+      <a class="btn" href="{% url 'schools:create_school' %}">Add School</a>
+    </div>
+  </div>
+  <table data-table="schools" data-page-size="12">
+    <thead><tr><th data-sort>Name</th><th data-sort>Code</th><th data-sort>Phone</th><th data-sort>Address</th></tr></thead>
+    <tbody>
+      {% for school in schools %}
+        <tr><td>{{ school.name }}</td><td>{{ school.code }}</td><td>{{ school.phone }}</td><td>{{ school.address|truncatechars:90 }}</td></tr>
+      {% empty %}
+        <tr><td colspan="4">No schools yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="pager" data-pager="schools"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+</section>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block page_heading %}Student Dashboard{% endblock %}
+{% block content %}
+<section class="grid-two">
+  <article class="card profile-card">
+    <h2>My Profile</h2>
+    <p><strong>Name:</strong> {{ user }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>School:</strong> {{ user.school|default:"Not assigned" }}</p>
+    <p><strong>Class:</strong> {{ user.school_class|default:"Not assigned" }}</p>
+  </article>
+  <article class="card">
+    <h2>Subjects</h2>
+    <div class="compact-list">{% for subject in subjects %}<span>{{ subject.name }} · {{ subject.code }}</span>{% empty %}<span>No subjects assigned.</span>{% endfor %}</div>
+  </article>
+</section>
+<section class="card">
+  <div class="table-header"><h2>Teachers</h2><input data-filter="teachers" placeholder="Filter teachers"></div>
+  <table data-table="teachers" data-page-size="12"><thead><tr><th data-sort>Subject</th><th data-sort>Teacher</th><th data-sort>Email</th></tr></thead><tbody>
+  {% for item in assignments %}<tr><td>{{ item.subject.name }}</td><td>{{ item.teacher }}</td><td>{{ item.teacher.email }}</td></tr>{% empty %}<tr><td colspan="3">No teacher assignments yet.</td></tr>{% endfor %}
+  </tbody></table>
+  <div class="pager" data-pager="teachers"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+</section>
+{% endblock %}

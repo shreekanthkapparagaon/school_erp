@@ -1,0 +1,9 @@
+Django>=5.0,<6.0
+python-dotenv        # environment variables
+whitenoise           # static files in production
+psycopg[binary]      # PostgreSQL database
+django-filter        # advanced filtering
+django-widget-tweaks # easier form styling
+openpyxl             # Excel reports
+reportlab            # PDF reports
+Pillow               # profile/photo uploads

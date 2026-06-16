@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Home | School ERP{% endblock %}
+{% block page_heading %}School ERP Administration{% endblock %}
+{% block content %}
+<div class="hero-panel">
+  <div>
+    <p class="eyebrow">Modern academic operations</p>
+    <h2>Manage schools, users, classes, subjects, and assignments from one clean workspace.</h2>
+    <p>Built for principals, heads, teachers, and students with role-based dashboards and school-scoped data.</p>
+    <div class="action-row">
+      <a class="btn" href="{% url 'accounts:login' %}">Sign in</a>
+      <a class="btn btn-muted" href="{% url 'core:about' %}">About</a>
+    </div>
+  </div>
+</div>
+<div class="stat-grid">
+  <article class="stat-card"><span>Dashboard</span><strong>Responsive</strong><small>Academic SaaS layout</small></article>
+  <article class="stat-card success"><span>Roles</span><strong>4+</strong><small>Student, teacher, head, principal</small></article>
+  <article class="stat-card warning"><span>Scope</span><strong>School</strong><small>Subjects and classes per school</small></article>
+</div>
+{% endblock %}

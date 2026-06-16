@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block page_heading %}{{ title }}{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="table-header">
+    <div>
+      <p class="eyebrow">Latest first</p>
+      <h2>{{ title }}</h2>
+    </div>
+    <div class="table-actions">
+      <input data-filter="users" placeholder="Filter {{ title|lower }}">
+      {% if managed_role == "principle" %}
+        <a class="btn btn-muted" href="{% url 'accounts:assign_principal_school' %}">Assign school</a>
+      {% endif %}
+      <a class="btn" href="{% url 'accounts:create_user' %}?role={{ managed_role }}">Add {{ title|slice:":-1" }}</a>
+    </div>
+  </div>
+  <table data-table="users" data-page-size="12">
+    <thead>
+      <tr>
+        <th data-sort>Name</th>
+        <th data-sort>Email</th>
+        <th data-sort>Phone</th>
+        <th data-sort>School</th>
+        <th data-sort>Class</th>
+        <th data-sort>Joined</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for account in users %}
+        <tr>
+          <td>{{ account }}</td>
+          <td>{{ account.email }}</td>
+          <td>{{ account.phone|default:"-" }}</td>
+          <td>{{ account.school|default:"Not assigned" }}</td>
+          <td>{{ account.school_class|default:"-" }}</td>
+          <td>{{ account.date_joined|date:"M d, Y" }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6">No records yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="pager" data-pager="users"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+</section>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block page_heading %}Manager Dashboard{% endblock %}
+{% block content %}
+<div class="action-row">
+  <a class="btn" href="{% url 'schools:school_list' %}">View schools</a>
+  <a class="btn btn-muted" href="{% url 'accounts:user_list' 'principle' %}">View principals</a>
+</div>
+<section class="stat-grid">
+  <article class="stat-card"><span>Schools</span><strong>{{ schools.count }}</strong><small>Managed institutions</small></article>
+  <article class="stat-card success"><span>Principals</span><strong>{{ principals.count }}</strong><small>Assigned leaders</small></article>
+</section>
+<section class="grid-two">
+  <div class="card">
+    <div class="table-header"><h2>Recent Schools</h2><a class="btn btn-muted" href="{% url 'schools:create_school' %}">Add School</a></div>
+    <div class="compact-list">{% for school in schools|slice:":6" %}<span>{{ school.name }} · {{ school.code }}</span>{% empty %}<span>No schools yet.</span>{% endfor %}</div>
+  </div>
+  <div class="card">
+    <div class="table-header"><h2>Recent Principals</h2><a class="btn btn-muted" href="{% url 'accounts:create_user' %}?role=principle">Add Principal</a></div>
+    <div class="compact-list">{% for principal in principals|slice:":6" %}<span>{{ principal.email }} · {{ principal.school|default:"No school" }}</span>{% empty %}<span>No principals yet.</span>{% endfor %}</div>
+  </div>
+</section>
+{% endblock %}

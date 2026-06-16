@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block page_heading %}Teacher Assignments{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="table-header">
+    <div>
+      <p class="eyebrow">Latest first</p>
+      <h2>Teacher Assignments</h2>
+    </div>
+    <div class="table-actions">
+      <input data-filter="assignments" placeholder="Filter assignments">
+      <a class="btn" href="{% url 'schools:create_assignment' %}">Add Assignment</a>
+    </div>
+  </div>
+  <table data-table="assignments" data-page-size="12">
+    <thead><tr><th data-sort>Teacher</th><th data-sort>Subject</th><th data-sort>Class</th><th data-sort>School</th><th data-sort>Assigned</th></tr></thead>
+    <tbody>
+      {% for item in assignments %}
+        <tr>
+          <td>{{ item.teacher }}</td>
+          <td>{{ item.subject.name }}</td>
+          <td>{{ item.school_class.name }} {{ item.school_class.section }}</td>
+          <td>{{ item.school.name }}</td>
+          <td>{{ item.created_at|date:"M d, Y" }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5">No assignments yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="pager" data-pager="assignments"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+</section>
+{% endblock %}
