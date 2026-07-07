@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block page_heading %}Fee Structures{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="table-header">
+    <div>
+      <p class="eyebrow">Class-wide schedules</p>
+      <h2>Fee Structures</h2>
+    </div>
+    <div class="table-actions">
+      {% if perms.plans.feature_fees_manage %}
+        <a class="btn" href="{% url 'fees:create_fee_structure' %}">Add Structure</a>
+      {% endif %}
+    </div>
+  </div>
+  <table data-table="fee-structures" data-page-size="12">
+    <thead>
+      <tr>
+        <th data-sort>Class</th>
+        <th data-sort>Title</th>
+        <th data-sort>Academic Year</th>
+        <th data-sort>Total</th>
+        <th data-sort>Due Date</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for structure in structures %}
+        <tr>
+          <td>{{ structure.school_class.name }} {{ structure.school_class.section|default:"" }}</td>
+          <td>{{ structure.title }}</td>
+          <td>{{ structure.academic_year }}</td>
+          <td>INR {{ structure.total_amount|floatformat:2 }}</td>
+          <td>{{ structure.due_date|date:'M d, Y'|default:'-' }}</td>
+          <td>
+            <div class="row-actions">
+              <a class="btn btn-sm btn-muted" href="{% url 'fees:fee_structure_detail' structure.pk %}">View</a>
+            </div>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6">No fee structures yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="pager" data-pager="fee-structures"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+</section>
+{% endblock %}

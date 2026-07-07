@@ -15,8 +15,8 @@
 </section>
 <section class="card">
   <div class="table-header"><h2>Teacher Assignments</h2><input data-filter="assignments" placeholder="Filter assignments"></div>
-  <table data-table="assignments" data-page-size="12"><thead><tr><th data-sort>Teacher</th><th data-sort>Subject</th><th data-sort>Class</th><th data-sort>School</th></tr></thead><tbody>
-  {% for item in assignments %}<tr><td>{{ item.teacher }}</td><td>{{ item.subject.name }}</td><td>{{ item.school_class.name }} {{ item.school_class.section }}</td><td>{{ item.school.name }}</td></tr>{% empty %}<tr><td colspan="4">No assignments yet.</td></tr>{% endfor %}
+  <table data-table="assignments" data-page-size="12"><thead><tr><th data-sort>Teacher</th><th data-sort>Subject</th><th data-sort>Class</th><th data-sort>School</th><th>Action</th></tr></thead><tbody>
+  {% for item in assignments %}<tr><td>{{ item.teacher }}</td><td>{{ item.subject.name }}</td><td>{{ item.school_class.name }} {{ item.school_class.section }}</td><td>{{ item.school.name }}</td><td><div class="row-actions"><a class="btn btn-sm btn-muted" href="{% url 'schools:assignment_detail' item.pk %}">View</a><a class="btn btn-sm" href="{% url 'schools:update_assignment' item.pk %}">Edit</a><a class="btn btn-sm btn-danger" href="{% url 'schools:delete_assignment' item.pk %}">Delete</a></div></td></tr>{% empty %}<tr><td colspan="5">No assignments yet.</td></tr>{% endfor %}
   </tbody></table>
   <div class="pager" data-pager="assignments"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
 </section>

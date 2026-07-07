@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block page_heading %}Plans{% endblock %}
+
+{% block content %}
+<div class="action-row">
+  <a class="btn" href="{% url 'plans:plan_create' %}">Create Plan</a>
+  <a class="btn btn-muted" href="{% url 'plans:service_management' %}">Service Management</a>
+</div>
+<section class="card">
+  <div class="table-header"><h2>Plan Catalog</h2></div>
+  <table data-table="plans" data-page-size="10">
+    <thead>
+      <tr>
+        <th data-sort="true">Name</th>
+        <th data-sort="true">Monthly</th>
+        <th data-sort="true">Yearly</th>
+        <th data-sort="true">Status</th>
+        <th data-sort="true">Features</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for plan in plans %}
+      <tr>
+        <td>{{ plan.name }}</td>
+        <td>${{ plan.price_monthly }}</td>
+        <td>${{ plan.price_yearly }}</td>
+        <td>{{ plan.is_active|yesno:"Active,Inactive" }}</td>
+        <td>{{ plan.feature_count }}</td>
+        <td class="row-actions">
+          <a class="btn btn-sm" href="{% url 'plans:plan_update' plan.id %}">Edit</a>
+          <a class="btn btn-sm btn-danger" href="{% url 'plans:plan_delete' plan.id %}">Delete</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6">No plans available.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

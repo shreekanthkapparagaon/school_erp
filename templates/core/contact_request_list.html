@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block page_heading %}Contact Requests{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="table-header">
+    <div>
+      <h2>Contact Requests</h2>
+      <p>Filter and review messages sent by authenticated users.</p>
+    </div>
+    <div class="row-actions">
+      <form method="get" class="inline-form">
+        <input type="search" name="q" placeholder="Search subject, message, email" value="{{ query }}" />
+        <select name="status">
+          <option value="all" {% if status == "all" %}selected{% endif %}>All</option>
+          <option value="read" {% if status == "read" %}selected{% endif %}>Read</option>
+          <option value="unread" {% if status == "unread" %}selected{% endif %}>Unread</option>
+        </select>
+        <button class="btn btn-sm">Filter</button>
+      </form>
+    </div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>From</th>
+        <th>Subject</th>
+        <th>Received</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in requests %}
+      <tr>
+        <td>{{ item.user.email }}</td>
+        <td>{{ item.subject }}</td>
+        <td>{{ item.created_at|date:"M d, Y H:i" }}</td>
+        <td>{{ item.is_read|yesno:"Read,Unread" }}</td>
+        <td>
+          <a class="btn btn-sm" href="{% url 'core:contact_request_detail' item.id %}">View</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5">No contact requests found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

@@ -1,5 +1,5 @@
 venv/
-.env
+.venv
 __pycache__/
 *.pyc
 db.sqlite3
@@ -7,3 +7,5 @@ media/
 staticfiles/
 .idea/
 .vscode/
+.agents/
+demo_credentials*.txt

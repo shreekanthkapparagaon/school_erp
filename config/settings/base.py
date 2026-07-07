@@ -14,9 +14,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "import_export",
     "apps.accounts",
     "apps.schools",
+    "apps.fees",
+    "apps.results",
     "apps.core",
+    "apps.plans",
+    "apps.document",
 ]
 
 MIDDLEWARE = [
@@ -84,9 +89,14 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "accounts.User"
 LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "accounts:role_redirect"
 LOGOUT_REDIRECT_URL = "core:home"
+
+# Jazzmin admin customization is isolated in a dedicated settings module.
+# from .jazz import *

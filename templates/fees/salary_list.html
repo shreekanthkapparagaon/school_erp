@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block page_heading %}Teacher Salaries{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="table-header">
+    <div>
+      <p class="eyebrow">Principal access</p>
+      <h2>Teacher Salaries</h2>
+    </div>
+    <div class="table-actions">
+      <input data-filter="teacher-salaries" placeholder="Filter salaries">
+      {% if perms.plans.feature_payroll_manage %}
+        <a class="btn" href="{% url 'fees:create_salary' %}">Add Salary</a>
+      {% endif %}
+    </div>
+  </div>
+  <table data-table="teacher-salaries" data-page-size="12">
+    <thead><tr><th data-sort>Teacher</th><th data-sort>Month</th><th data-sort>Amount</th><th data-sort>Status</th><th data-sort>Paid On</th><th>Action</th></tr></thead>
+    <tbody>
+      {% for salary in salaries %}
+        <tr>
+          <td>{{ salary.teacher }}</td>
+          <td>{{ salary.salary_month|date:"F Y" }}</td>
+          <td>INR {{ salary.amount|floatformat:2 }}</td>
+          <td><span class="status status-{{ salary.status }}">{{ salary.get_status_display }}</span></td>
+          <td>{{ salary.paid_on|date:"M d, Y"|default:"-" }}</td>
+          <td>
+            <div class="row-actions">
+              <a class="btn btn-sm btn-muted" href="{% url 'fees:salary_detail' salary.pk %}">View</a>
+              <a class="btn btn-sm" href="{% url 'fees:update_salary' salary.pk %}">Edit</a>
+              <a class="btn btn-sm btn-danger" href="{% url 'fees:delete_salary' salary.pk %}">Delete</a>
+            </div>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6">No salary records yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="pager" data-pager="teacher-salaries"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+</section>
+{% endblock %}

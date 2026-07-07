@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block page_heading %}{{ title }}{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="table-header">
+    <div>
+      <p class="eyebrow">{{ school_class.school.name }}</p>
+      <h2>{{ title }}</h2>
+    </div>
+    <div class="row-actions">
+      <a class="btn btn-sm btn-muted" href="{{ back_url }}">Back</a>
+      {% if edit_url %}
+        <a class="btn btn-sm" href="{{ edit_url }}">Edit Class</a>
+      {% endif %}
+      {% if delete_url %}
+        <a class="btn btn-sm btn-danger" href="{{ delete_url }}">Delete Class</a>
+      {% endif %}
+    </div>
+  </div>
+  <dl class="detail-list">
+    <div><dt>Section</dt><dd>{{ school_class.section|default:"-" }}</dd></div>
+    <div><dt>Subjects</dt><dd>{{ subjects }}</dd></div>
+    <div><dt>Students</dt><dd>{{ students.count }}</dd></div>
+    <div><dt>Teacher assignments</dt><dd>{{ assignment_count }}</dd></div>
+  </dl>
+</section>
+
+<section class="card">
+  <div class="table-header">
+    <h2>Students</h2>
+    <div class="table-actions">
+      <input data-filter="class-students" placeholder="Filter students">
+      {% if can_manage_students and perms.plans.feature_schools_manage %}
+        <a class="btn" href="{% url 'accounts:create_user' %}?role=student">Add Student</a>
+      {% endif %}
+    </div>
+  </div>
+  <table data-table="class-students" data-page-size="12">
+    <thead>
+      <tr>
+        <th data-sort>Name</th>
+        <th data-sort>Email</th>
+        <th data-sort>Phone</th>
+        <th data-sort>Joined</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for student in students %}
+        <tr>
+          <td>{{ student }}</td>
+          <td>{{ student.email }}</td>
+          <td>{{ student.phone|default:"-" }}</td>
+          <td>{{ student.date_joined|date:"M d, Y" }}</td>
+          <td>
+            <div class="row-actions">
+              <a class="btn btn-sm btn-muted" href="{% url 'accounts:user_detail' student.pk %}">View</a>
+              {% if can_manage_students %}
+                <a class="btn btn-sm" href="{% url 'accounts:update_user' student.pk %}">Edit</a>
+                <a class="btn btn-sm btn-danger" href="{% url 'accounts:delete_user' student.pk %}">Delete</a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5">No students assigned to this class.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="pager" data-pager="class-students"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+</section>
+{% endblock %}

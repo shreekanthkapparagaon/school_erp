@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block page_heading %}Document Detail{% endblock %}
+{% block content %}
+<section class="card detail-card">
+  <div class="table-header">
+    <div>
+      <h2>{{ document.document_type.name }}</h2>
+      <p>For {{ document.user.email }} · {{ document.role }}</p>
+    </div>
+    <div class="row-actions">
+      <a class="btn btn-muted" href="{% url 'document:document_list' %}">Back</a>
+      <a class="btn btn-sm" href="{% url 'document:document_update' document.pk %}">Edit</a>
+      <a class="btn btn-sm btn-danger" href="{% url 'document:document_delete' document.pk %}">Delete</a>
+    </div>
+  </div>
+  <dl class="detail-list">
+    <div>
+      <dt>Document Type</dt>
+      <dd>{{ document.document_type.name }}</dd>
+    </div>
+    <div>
+      <dt>User</dt>
+      <dd>{{ document.user.email }}</dd>
+    </div>
+    <div>
+      <dt>Role</dt>
+      <dd>{{ document.get_role_display }}</dd>
+    </div>
+    <div>
+      <dt>Uploaded By</dt>
+      <dd>{{ document.uploaded_by.email }}</dd>
+    </div>
+    <div>
+      <dt>Uploaded On</dt>
+      <dd>{{ document.created_at|date:"M d, Y H:i" }}</dd>
+    </div>
+    <div>
+      <dt>File</dt>
+      <dd><a href="{{ document.file.url }}" target="_blank">Download file</a></dd>
+    </div>
+  </dl>
+</section>
+{% endblock %}

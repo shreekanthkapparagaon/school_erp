@@ -11,7 +11,7 @@ class SchoolAdmin(admin.ModelAdmin):
 
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
-    list_display = ("name", "code", "school")
+    list_display = ("name", "code", "school", "created_by")
     list_filter = ("school",)
     search_fields = ("name", "code")
 

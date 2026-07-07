@@ -1,30 +1,104 @@
-{% extends "base.html" %}
-{% block page_heading %}Principal Dashboard{% endblock %}
-{% block content %}
+{% extends "base.html" %} {% block page_heading %}Principal Dashboard{% endblock%} {% block content %}
 <div class="action-row">
   <a class="btn" href="{% url 'accounts:user_list' 'student' %}">Students</a>
-  <a class="btn btn-muted" href="{% url 'accounts:user_list' 'head' %}">Heads</a>
-  <a class="btn btn-muted" href="{% url 'accounts:user_list' 'teacher' %}">Teachers</a>
-  <a class="btn btn-muted" href="{% url 'schools:assignment_list' %}">Assignments</a>
+  <a class="btn btn-muted" href="{% url 'accounts:user_list' 'head' %}"
+    >Heads</a
+  >
+  <a class="btn btn-muted" href="{% url 'accounts:user_list' 'teacher' %}"
+    >Teachers</a
+  >
+  <a class="btn btn-muted" href="{% url 'schools:assignment_list' %}"
+    >Assignments</a
+  >
 </div>
 <section class="stat-grid">
-  <article class="stat-card"><span>School</span><strong>{{ schools.count }}</strong><small>Assigned institution</small></article>
-  <article class="stat-card success"><span>Teachers</span><strong>{{ teachers.count }}</strong><small>School faculty</small></article>
-  <article class="stat-card warning"><span>Students</span><strong>{{ students.count }}</strong><small>School learners</small></article>
-  <article class="stat-card danger"><span>Heads</span><strong>{{ heads.count }}</strong><small>School admins</small></article>
+  <article class="stat-card">
+    <span>School</span><strong>{{ schools.count }}</strong
+    ><small>Assigned institution</small>
+  </article>
+  <article class="stat-card success">
+    <span>Teachers</span><strong>{{ teachers.count }}</strong
+    ><small>School faculty</small>
+  </article>
+  <article class="stat-card warning">
+    <span>Students</span><strong>{{ students.count }}</strong
+    ><small>School learners</small>
+  </article>
+  <article class="stat-card danger">
+    <span>Heads</span><strong>{{ heads.count }}</strong
+    ><small>School admins</small>
+  </article>
 </section>
 <section class="card">
-  <div class="table-header"><h2>Schools</h2><input data-filter="schools" placeholder="Filter schools"></div>
-  <table data-table="schools" data-page-size="12"><thead><tr><th data-sort>Name</th><th data-sort>Code</th><th data-sort>Phone</th><th data-sort>Address</th></tr></thead><tbody>
-  {% for school in schools %}<tr><td>{{ school.name }}</td><td>{{ school.code }}</td><td>{{ school.phone }}</td><td>{{ school.address }}</td></tr>{% empty %}<tr><td colspan="4">No schools yet.</td></tr>{% endfor %}
-  </tbody></table>
-  <div class="pager" data-pager="schools"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+  <div class="table-header">
+    <h2>Schools</h2>
+    <input data-filter="schools" placeholder="Filter schools" />
+  </div>
+  <table data-table="schools" data-page-size="12">
+    <thead>
+      <tr>
+        <th data-sort>Name</th>
+        <th data-sort>Code</th>
+        <th data-sort>Phone</th>
+        <th data-sort>Address</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for school in schools %}
+      <tr>
+        <td>{{ school.name }}</td>
+        <td>{{ school.code }}</td>
+        <td>{{ school.phone }}</td>
+        <td>{{ school.address }}</td>
+        <td><div class="row-actions"><a class="btn btn-sm btn-muted" href="{% url 'schools:school_detail' school.pk %}">View</a></div></td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5">No schools yet.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="pager" data-pager="schools">
+    <button data-prev>Previous</button><span data-page></span
+    ><button data-next>Next</button>
+  </div>
 </section>
 <section class="card">
-  <div class="table-header"><h2>Assignments</h2><input data-filter="assignments" placeholder="Filter assignments"></div>
-  <table data-table="assignments" data-page-size="12"><thead><tr><th data-sort>School</th><th data-sort>Teacher</th><th data-sort>Subject</th><th data-sort>Class</th></tr></thead><tbody>
-  {% for item in assignments %}<tr><td>{{ item.school.name }}</td><td>{{ item.teacher.email }}</td><td>{{ item.subject.name }}</td><td>{{ item.school_class.name }} {{ item.school_class.section }}</td></tr>{% empty %}<tr><td colspan="4">No assignments yet.</td></tr>{% endfor %}
-  </tbody></table>
-  <div class="pager" data-pager="assignments"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+  <div class="table-header">
+    <h2>Assignments</h2>
+    <input data-filter="assignments" placeholder="Filter assignments" />
+  </div>
+  <table data-table="assignments" data-page-size="12">
+    <thead>
+      <tr>
+        <th data-sort>School</th>
+        <th data-sort>Teacher</th>
+        <th data-sort>Subject</th>
+        <th data-sort>Class</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in assignments %}
+      <tr>
+        <td>{{ item.school.name }}</td>
+        <td>{{ item.teacher.email }}</td>
+        <td>{{ item.subject.name }}</td>
+        <td>{{ item.school_class.name }} {{ item.school_class.section }}</td>
+        <td><div class="row-actions"><a class="btn btn-sm btn-muted" href="{% url 'schools:assignment_detail' item.pk %}">View</a><a class="btn btn-sm" href="{% url 'schools:update_assignment' item.pk %}">Edit</a><a class="btn btn-sm btn-danger" href="{% url 'schools:delete_assignment' item.pk %}">Delete</a></div></td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5">No assignments yet.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="pager" data-pager="assignments">
+    <button data-prev>Previous</button><span data-page></span
+    ><button data-next>Next</button>
+  </div>
 </section>
 {% endblock %}

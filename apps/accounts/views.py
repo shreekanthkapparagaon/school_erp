@@ -1,9 +1,18 @@
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
-from .forms import EmailAuthenticationForm, ManagedUserCreationForm, PrincipalSchoolAssignmentForm
+from apps.plans.utils import plan_feature_required
+from apps.schools.models import TeacherSubjectAssignment
+
+from .forms import (
+    EmailAuthenticationForm,
+    ManagedUserCreationForm,
+    ManagedUserUpdateForm,
+    PrincipalSchoolAssignmentForm,
+)
 from .models import User
 
 
@@ -28,6 +37,49 @@ def role_redirect(request):
     return redirect(role_routes.get(request.user.role, "core:home"))
 
 
+@login_required
+def profile_detail(request):
+    profile = getattr(request.user, "profile", None)
+    profile_values = []
+    if profile:
+        profile_values = list(
+            profile.values.select_related("field").order_by("field__order", "field__name")
+        )
+
+    fields = [
+        ("Name", str(request.user)),
+        ("Email", request.user.email),
+        ("Role", request.user.get_role_display()),
+        ("Phone", request.user.phone or "Not provided"),
+        ("School", request.user.school or "Not assigned"),
+        ("Class", request.user.school_class or "Not assigned"),
+        ("Joined", request.user.date_joined.strftime("%b %d, %Y")),
+    ]
+
+    if profile and profile.metadata:
+        fields.append(("Profile Metadata", profile.metadata))
+
+    for value in profile_values:
+        label = value.field.name
+        if value.field.field_type == "file" and value.file:
+            fields.append((label, value.file.url if value.file else "No file uploaded"))
+        else:
+            fields.append((label, value.value or "—"))
+
+    return render(
+        request,
+        "shared/detail.html",
+        {
+            "title": "My Profile",
+            "eyebrow": "Profile Details",
+            "fields": fields,
+            "back_url": reverse("accounts:role_redirect"),
+            "edit_url": "",
+            "delete_url": "",
+        },
+    )
+
+
 def manageable_roles(user):
     if user.role == User.Role.MANAGER:
         return [User.Role.PRINCIPAL]
@@ -46,6 +98,36 @@ def needs_assigned_school(user):
     return user.role in [User.Role.HEAD, User.Role.PRINCIPAL] and not user.school_id
 
 
+def can_manage_user(actor, target):
+    if actor.pk == target.pk or target.role not in manageable_roles(actor):
+        return False
+    if actor.role == User.Role.MANAGER:
+        return True
+    return bool(actor.school_id and target.school_id == actor.school_id)
+
+
+def can_view_user(actor, target):
+    if actor.pk == target.pk or can_manage_user(actor, target):
+        return True
+    if actor.role == User.Role.TEACHER and target.role == User.Role.STUDENT:
+        return bool(
+            target.school_class_id
+            and TeacherSubjectAssignment.objects.filter(
+                teacher=actor,
+                school_class_id=target.school_class_id,
+            ).exists()
+        )
+    if actor.role == User.Role.STUDENT and target.role == User.Role.TEACHER:
+        return bool(
+            actor.school_class_id
+            and TeacherSubjectAssignment.objects.filter(
+                teacher=target,
+                school_class_id=actor.school_class_id,
+            ).exists()
+        )
+    return False
+
+
 
 def role_queryset_for(user, role):
     queryset = User.objects.filter(role=role).select_related("school", "school_class")
@@ -55,6 +137,10 @@ def role_queryset_for(user, role):
 
 
 @login_required
+@plan_feature_required(
+    "schools.manage",
+    "Your current subscription does not include access to school and user management.",
+)
 def user_list(request, role):
     allowed_roles = [r.value for r in manageable_roles(request.user)]
     if role not in allowed_roles:
@@ -77,6 +163,10 @@ def user_list(request, role):
 
 
 @login_required
+@plan_feature_required(
+    "schools.manage",
+    "Your current subscription does not include access to school and user management.",
+)
 def create_user(request):
     allowed_roles = manageable_roles(request.user)
     if not allowed_roles:
@@ -116,6 +206,114 @@ def create_user(request):
 
 
 @login_required
+@plan_feature_required(
+    "schools.manage",
+    "Your current subscription does not include access to school and user management.",
+)
+def user_detail(request, user_id):
+    account = get_object_or_404(
+        User.objects.select_related("school", "school_class"),
+        pk=user_id,
+    )
+    if not can_view_user(request.user, account):
+        messages.error(request, "You do not have permission to view that account.")
+        return redirect("accounts:role_redirect")
+
+    can_edit = can_manage_user(request.user, account)
+    return render(
+        request,
+        "shared/detail.html",
+        {
+            "title": str(account),
+            "eyebrow": account.get_role_display(),
+            "fields": [
+                ("Email", account.email),
+                ("Phone", account.phone or "-"),
+                ("School", account.school or "Not assigned"),
+                ("Class", account.school_class or "-"),
+                ("Status", "Active" if account.is_active else "Inactive"),
+                ("Joined", account.date_joined.strftime("%b %d, %Y")),
+            ],
+            "back_url": (
+                reverse("accounts:user_list", kwargs={"role": account.role})
+                if can_edit
+                else reverse("accounts:role_redirect")
+            ),
+            "edit_url": reverse("accounts:update_user", args=[account.pk]) if can_edit else "",
+            "delete_url": reverse("accounts:delete_user", args=[account.pk]) if can_edit else "",
+        },
+    )
+
+
+@login_required
+@plan_feature_required(
+    "schools.manage",
+    "Your current subscription does not include access to school and user management.",
+)
+def update_user(request, user_id):
+    account = get_object_or_404(User, pk=user_id)
+    if not can_manage_user(request.user, account):
+        messages.error(request, "You do not have permission to edit that account.")
+        return redirect("accounts:role_redirect")
+
+    form = ManagedUserUpdateForm(
+        request.POST or None,
+        instance=account,
+        manager=request.user,
+        allowed_roles=[account.role],
+    )
+    if request.method == "POST" and form.is_valid():
+        account = form.save()
+        messages.success(request, f"Updated {account.email}.")
+        return redirect("accounts:user_detail", user_id=account.pk)
+
+    return render(
+        request,
+        "schools/form.html",
+        {
+            "form": form,
+            "title": f"Edit {role_label(account.role)}",
+            "submit_label": "Save changes",
+            "cancel_url": reverse("accounts:user_detail", args=[account.pk]),
+        },
+    )
+
+
+@login_required
+@plan_feature_required(
+    "schools.manage",
+    "Your current subscription does not include access to school and user management.",
+)
+def delete_user(request, user_id):
+    account = get_object_or_404(User, pk=user_id)
+    if not can_manage_user(request.user, account):
+        messages.error(request, "You do not have permission to delete that account.")
+        return redirect("accounts:role_redirect")
+
+    role = account.role
+    if request.method == "POST":
+        label = str(account)
+        account.delete()
+        messages.success(request, f"Deleted {label}.")
+        return redirect("accounts:user_list", role=role)
+
+    return render(
+        request,
+        "shared/confirm_delete.html",
+        {
+            "title": "Delete Account",
+            "object_label": str(account),
+            "warning": "This permanently removes the account and its related assignments.",
+            "cancel_url": reverse("accounts:user_detail", args=[account.pk]),
+        },
+    )
+
+
+@login_required
+@plan_feature_required(
+    "schools.manage",
+    "Your current subscription does not include access to school and user management.",
+)
 def assign_principal_school(request):
     if request.user.role != User.Role.MANAGER:
         messages.error(request, "Only managers can assign schools to principals.")

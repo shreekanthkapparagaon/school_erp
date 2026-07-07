@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load plan_extras %}
+
+{% block page_heading %}Pricing{% endblock %}
+
+{% block content %}
+<section class="card">
+  <div class="table-header">
+    <h2>Subscription Plans</h2>
+    <p>Choose the package that fits your school’s needs. Upgrade anytime for more features.</p>
+  </div>
+  <div class="pricing-grid">
+    {% for plan in plans %}
+      <article class="pricing-card{% if plan.slug == 'intermediate' %} popular{% endif %}{% if not plan.is_active %} coming-soon{% endif %}">
+        <header>
+          <span class="plan-badge">{{ plan.name }}</span>
+          <strong>${{ plan.price_monthly }}<small>/month</small></strong>
+          <p>{{ plan.description }}</p>
+        </header>
+        <ul class="feature-list">
+          {% for feature in features %}
+            {% with enabled_codes=plan_feature_map|get_item:plan.pk %}
+              <li class="{% if feature.code in enabled_codes %}enabled{% else %}disabled{% endif %}">
+                {% if feature.code in enabled_codes %}
+                  <span class="feature-status">✓</span>
+                {% else %}
+                  <span class="feature-status">✕</span>
+                {% endif %}
+                {{ feature.name }}
+              </li>
+            {% endwith %}
+          {% endfor %}
+        </ul>
+        <div class="card-actions">
+          {% if plan.is_active %}
+            <a class="btn" href="{% url 'plans:service_management' %}">View plans</a>
+          {% else %}
+            <span class="btn btn-muted">Coming soon</span>
+          {% endif %}
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

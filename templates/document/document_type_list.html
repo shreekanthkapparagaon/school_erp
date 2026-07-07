@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block page_heading %}Document Types{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="table-header">
+    <h2>Document Types</h2>
+    <div class="row-actions">
+      <a class="btn" href="{% url 'document:document_type_create' %}">Create Type</a>
+      <a class="btn btn-muted" href="{% url 'document:document_list' %}">View Documents</a>
+    </div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Slug</th>
+        <th>Active</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for type in document_types %}
+      <tr>
+        <td>{{ type.name }}</td>
+        <td>{{ type.slug }}</td>
+        <td>{{ type.active|yesno:"Yes,No" }}</td>
+        <td>
+          <a class="btn btn-sm" href="{% url 'document:document_type_update' type.pk %}">Edit</a>
+          <a class="btn btn-sm btn-danger" href="{% url 'document:document_type_delete' type.pk %}">Delete</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="4">No document types defined yet.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

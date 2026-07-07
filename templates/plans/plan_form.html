@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block page_heading %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="form-layout">
+  <form class="card form-card" method="post">
+    {% csrf_token %}
+    <h2>{{ title }}</h2>
+    {% if form.non_field_errors %}
+      <div class="alert alert-error">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <div class="form-group">
+      {{ form.slug.label_tag }}
+      {{ form.slug }}
+      {{ form.slug.errors }}
+    </div>
+
+    <div class="form-group">
+      {{ form.name.label_tag }}
+      {{ form.name }}
+      {{ form.name.errors }}
+    </div>
+
+    <div class="form-group">
+      {{ form.description.label_tag }}
+      {{ form.description }}
+      {{ form.description.errors }}
+    </div>
+
+    <div class="form-group grid-two">
+      <div>
+        {{ form.price_monthly.label_tag }}
+        {{ form.price_monthly }}
+        {{ form.price_monthly.errors }}
+      </div>
+      <div>
+        {{ form.price_yearly.label_tag }}
+        {{ form.price_yearly }}
+        {{ form.price_yearly.errors }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      {{ form.limits.label_tag }}
+      {{ form.limits }}
+      {{ form.limits.errors }}
+    </div>
+
+    <div class="form-group">
+      {{ form.features.label_tag }}
+      {{ form.features }}
+      {{ form.features.errors }}
+      <div class="multi-select-chips" id="selected-features"></div>
+    </div>
+
+    <div class="form-group">
+      {{ form.is_active }} {{ form.is_active.label_tag }}
+      {{ form.is_active.errors }}
+    </div>
+
+    <div class="form-actions">
+      <a class="btn btn-muted" href="{% url 'plans:plan_list' %}">Cancel</a>
+      <button class="btn" type="submit">Save</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  const featureSelect = document.getElementById('id_features');
+  const chipsContainer = document.getElementById('selected-features');
+
+  function renderFeatureChips() {
+    chipsContainer.innerHTML = '';
+    Array.from(featureSelect.options)
+      .filter(option => option.selected)
+      .forEach(option => {
+        const chip = document.createElement('span');
+        chip.className = 'multi-select-chip';
+        chip.textContent = option.text;
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.textContent = '✕';
+        remove.onclick = () => {
+          option.selected = false;
+          renderFeatureChips();
+        };
+        chip.appendChild(remove);
+        chipsContainer.appendChild(chip);
+      });
+  }
+
+  featureSelect.addEventListener('change', renderFeatureChips);
+  renderFeatureChips();
+</script>
+{% endblock %}

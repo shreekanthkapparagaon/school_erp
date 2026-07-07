@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block page_heading %}Contact Request Detail{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="table-header">
+    <div>
+      <h2>{{ contact_request.subject }}</h2>
+      <p>From: {{ contact_request.user.email }} · Sent {{ contact_request.created_at|date:"M d, Y H:i" }}</p>
+    </div>
+    <div class="row-actions">
+      <a class="btn btn-muted" href="{% url 'core:contact_requests' %}">Back to requests</a>
+    </div>
+  </div>
+  <div class="card-body">
+    <p><strong>Status:</strong> {{ contact_request.is_read|yesno:"Read,Unread" }}</p>
+    <p><strong>Message:</strong></p>
+    <div class="panel">{{ contact_request.message|linebreaks }}</div>
+    <form method="post" class="form-actions">
+      {% csrf_token %}
+      {% if contact_request.is_read %}
+      <button class="btn btn-muted" type="submit" name="mark_unread">Mark Unread</button>
+      {% else %}
+      <button class="btn" type="submit" name="mark_read">Mark Read</button>
+      {% endif %}
+    </form>
+  </div>
+</section>
+{% endblock %}

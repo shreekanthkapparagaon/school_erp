@@ -6,7 +6,12 @@
     {% csrf_token %}
     <h2>{{ title }}</h2>
     {{ form.as_p }}
-    <button class="btn full" type="submit">{{ submit_label|default:"Save" }}</button>
+    <div class="form-actions">
+      {% if cancel_url %}
+        <a class="btn btn-muted" href="{{ cancel_url }}">Cancel</a>
+      {% endif %}
+      <button class="btn" type="submit">{{ submit_label|default:"Save" }}</button>
+    </div>
   </form>
 </div>
 {% endblock %}

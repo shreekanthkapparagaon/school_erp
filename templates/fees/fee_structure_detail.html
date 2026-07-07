@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block page_heading %}{{ structure.title }}{% endblock %}
+{% block content %}
+<section class="stat-grid">
+  <article class="stat-card"><span>Class</span><strong>{{ structure.school_class.name }} {{ structure.school_class.section|default:"" }}</strong><small>{{ structure.school.name }}</small></article>
+  <article class="stat-card"><span>Academic Year</span><strong>{{ structure.academic_year }}</strong><small>{{ structure.title }}</small></article>
+  <article class="stat-card warning"><span>Total</span><strong>INR {{ structure.total_amount|floatformat:2 }}</strong><small>Due {{ structure.due_date|date:'M d, Y'|default:'Not set' }}</small></article>
+</section>
+
+<section class="card">
+  <div class="table-header">
+    <div>
+      <p class="eyebrow">Fee Structure Details</p>
+      <h2>{{ structure.title }}</h2>
+    </div>
+    <div class="row-actions">
+      <a class="btn btn-sm btn-muted" href="{% url 'fees:fee_structure_list' %}">Back</a>
+    </div>
+  </div>
+  <dl class="detail-list">
+    <div><dt>Class</dt><dd>{{ structure.school_class }}</dd></div>
+    <div><dt>Academic Year</dt><dd>{{ structure.academic_year }}</dd></div>
+    <div><dt>Due Date</dt><dd>{{ structure.due_date|date:'M d, Y'|default:'-' }}</dd></div>
+    <div><dt>Notes</dt><dd>{{ structure.notes|default:'-' }}</dd></div>
+  </dl>
+</section>
+
+<section class="card">
+  <div class="table-header">
+    <div><h2>Generated Student Fees</h2></div>
+  </div>
+  <table data-table="structure-fees" data-page-size="12">
+    <thead>
+      <tr>
+        <th data-sort>Student</th>
+        <th data-sort>Total</th>
+        <th data-sort>Paid</th>
+        <th data-sort>Balance</th>
+        <th data-sort>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for fee in fees %}
+        <tr>
+          <td>{{ fee.student }}</td>
+          <td>INR {{ fee.total_amount|floatformat:2 }}</td>
+          <td>INR {{ fee.amount_paid|floatformat:2 }}</td>
+          <td>INR {{ fee.balance|floatformat:2 }}</td>
+          <td><span class="status status-{{ fee.payment_status|lower }}">{{ fee.payment_status }}</span></td>
+          <td>
+            <div class="row-actions">
+              <a class="btn btn-sm btn-muted" href="{% url 'fees:fee_detail' fee.pk %}">View</a>
+            </div>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6">No student fees generated yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="pager" data-pager="structure-fees"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+</section>
+{% endblock %}

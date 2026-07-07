@@ -9,11 +9,13 @@
     </div>
     <div class="table-actions">
       <input data-filter="classes" placeholder="Filter classes">
-      <a class="btn" href="{% url 'schools:create_class' %}">Add Class</a>
+      {% if can_manage and perms.plans.feature_schools_manage %}
+        <a class="btn" href="{% url 'schools:create_class' %}">Add Class</a>
+      {% endif %}
     </div>
   </div>
   <table data-table="classes" data-page-size="12">
-    <thead><tr><th data-sort>Class</th><th data-sort>Section</th><th data-sort>Subjects</th><th data-sort>School</th></tr></thead>
+    <thead><tr><th data-sort>Class</th><th data-sort>Section</th><th data-sort>Subjects</th><th data-sort>School</th><th>Action</th></tr></thead>
     <tbody>
       {% for school_class in classes %}
         <tr>
@@ -21,9 +23,18 @@
           <td>{{ school_class.section|default:"-" }}</td>
           <td>{% for subject in school_class.subjects.all %}{{ subject.name }}{% if not forloop.last %}, {% endif %}{% empty %}-{% endfor %}</td>
           <td>{{ school_class.school.name }}</td>
+          <td>
+            <div class="row-actions">
+              <a class="btn btn-sm btn-muted" href="{% url 'schools:class_detail' school_class.pk %}">View Class</a>
+              {% if can_manage %}
+                <a class="btn btn-sm" href="{% url 'schools:update_class' school_class.pk %}">Edit</a>
+                <a class="btn btn-sm btn-danger" href="{% url 'schools:delete_class' school_class.pk %}">Delete</a>
+              {% endif %}
+            </div>
+          </td>
         </tr>
       {% empty %}
-        <tr><td colspan="4">No classes yet.</td></tr>
+        <tr><td colspan="5">No classes yet.</td></tr>
       {% endfor %}
     </tbody>
   </table>

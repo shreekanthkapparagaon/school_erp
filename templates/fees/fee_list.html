@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block page_heading %}{% if can_manage %}Student Fees{% else %}My Fees{% endif %}{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="table-header">
+    <div>
+      <p class="eyebrow">Latest first</p>
+      <h2>{% if can_manage %}Student Fees{% else %}My Fees{% endif %}</h2>
+    </div>
+    <div class="table-actions">
+      <input data-filter="student-fees" placeholder="Filter fees">
+      {% if can_manage and perms.plans.feature_fees_manage %}
+        <a class="btn btn-muted" href="{% url 'fees:fee_structure_list' %}">Fee Structures</a>
+        <a class="btn" href="{% url 'fees:create_fee' %}">Add Fee</a>
+      {% endif %}
+    </div>
+  </div>
+  <table data-table="student-fees" data-page-size="12">
+    <thead>
+      <tr>
+        <th data-sort>Student</th>
+        <th data-sort>Fee</th>
+        <th data-sort>Academic Year</th>
+        <th data-sort>Total</th>
+        <th data-sort>Paid</th>
+        <th data-sort>Balance</th>
+        <th data-sort>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for fee in fees %}
+        <tr>
+          <td>{{ fee.student }}</td>
+          <td>
+            {{ fee.title }}
+            {% if fee.fee_structure %}
+              <div class="meta"><small><a href="{% url 'fees:fee_structure_detail' fee.fee_structure.pk %}">Structure</a></small></div>
+            {% endif %}
+          </td>
+          <td>{{ fee.academic_year }}</td>
+          <td>INR {{ fee.total_amount|floatformat:2 }}</td>
+          <td>INR {{ fee.amount_paid|floatformat:2 }}</td>
+          <td>INR {{ fee.balance|floatformat:2 }}</td>
+          <td><span class="status status-{{ fee.payment_status|lower }}">{{ fee.payment_status }}</span></td>
+          <td>
+            <div class="row-actions">
+              <a class="btn btn-sm btn-muted" href="{% url 'fees:fee_detail' fee.pk %}">View</a>
+              {% if can_manage %}
+                <a class="btn btn-sm" href="{% url 'fees:update_fee' fee.pk %}">Edit</a>
+                <a class="btn btn-sm btn-danger" href="{% url 'fees:delete_fee' fee.pk %}">Delete</a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="8">No fee records yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="pager" data-pager="student-fees"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+</section>
+{% endblock %}

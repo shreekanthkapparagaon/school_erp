@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block page_heading %}{{ school_class.name }} {{ school_class.section }} Results{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="table-header">
+    <div>
+      <p class="eyebrow">{{ school_class.school.name }}</p>
+      <h2>{{ school_class.name }} {{ school_class.section }}</h2>
+    </div>
+    <div class="table-actions">
+      {% if exams %}
+        <select onchange="if (this.value) window.location.href = this.value">
+          <option value="{% url 'results:class_results' school_class.pk %}">All Exams</option>
+          {% for exam_option in exams %}
+            <option value="{% url 'results:exam_class_results' exam_option.pk school_class.pk %}"
+              {% if exam and exam_option.pk == exam.pk %}selected{% endif %}>
+              {{ exam_option.name }} / {{ exam_option.academic_year }}
+            </option>
+          {% endfor %}
+        </select>
+      {% endif %}
+      <input data-filter="class-results" placeholder="Filter results">
+      {% if can_manage and perms.plans.feature_results_manage %}
+        <a class="btn btn-muted" href="{% url 'results:download_template' school_class.pk %}">Template</a>
+        <a class="btn btn-muted" href="{% url 'results:import_results' school_class.pk %}">Import</a>
+        <a class="btn" href="{% url 'results:create_result' school_class.pk %}">Add Result</a>
+      {% endif %}
+      {% if can_export %}
+        <a class="btn btn-muted" href="{% url 'results:export_class' school_class.pk %}">Export</a>
+      {% endif %}
+    </div>
+  </div>
+  <table data-table="class-results" data-page-size="12">
+    <thead>
+      <tr>
+        <th data-sort>Student</th>
+        <th data-sort>Subject</th>
+        <th data-sort>Exam</th>
+        <th data-sort>Year</th>
+        <th data-sort>Marks</th>
+        <th data-sort>Percentage</th>
+        <th data-sort>Grade</th>
+        <th data-sort>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for result in results %}
+        <tr>
+          <td>{{ result.student }}</td>
+          <td>{{ result.subject.name }}</td>
+          <td>{{ result.exam_name }}</td>
+          <td>{{ result.academic_year }}</td>
+          <td>{{ result.marks_obtained|floatformat:2 }} / {{ result.max_marks|floatformat:2 }}</td>
+          <td>{{ result.percentage|floatformat:2 }}%</td>
+          <td>{{ result.grade }}</td>
+          <td><span class="status status-{% if result.published %}paid{% else %}pending{% endif %}">{% if result.published %}Published{% else %}Draft{% endif %}</span></td>
+          <td>
+            <div class="row-actions">
+              <a class="btn btn-sm btn-muted" href="{% url 'results:result_detail' result.pk %}">View</a>
+              {% if can_manage %}
+                <a class="btn btn-sm" href="{% url 'results:update_result' result.pk %}">Edit</a>
+                <a class="btn btn-sm btn-danger" href="{% url 'results:delete_result' result.pk %}">Delete</a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="9">No results available.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="pager" data-pager="class-results"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+</section>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block page_heading %}{{ exam.name }} Results{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="table-header">
+    <div>
+      <p class="eyebrow">{{ exam.school.name }}</p>
+      <h2>{{ exam.name }} — {{ exam.academic_year }}</h2>
+    </div>
+    <div class="table-actions">
+      <input data-filter="exam-classes" placeholder="Filter classes">
+      {% if can_export_all %}
+        <a class="btn" href="{% url 'results:export_all' %}">Export All Classes</a>
+      {% endif %}
+    </div>
+  </div>
+  <table data-table="exam-classes" data-page-size="12">
+    <thead>
+      <tr>
+        <th data-sort>Class</th>
+        <th data-sort>Section</th>
+        <th data-sort>Result Count</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for school_class in classes %}
+        <tr>
+          <td>{{ school_class.name }}</td>
+          <td>{{ school_class.section|default:"-" }}</td>
+          <td>{{ school_class.result_count }}</td>
+          <td>
+            <div class="row-actions">
+              <a class="btn btn-sm btn-muted" href="{% url 'results:exam_class_results' exam.pk school_class.pk %}">View Class</a>
+            </div>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="4">No classes found for this exam.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="pager" data-pager="exam-classes"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+</section>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block page_heading %}{{ title }}{% endblock %}
+{% block content %}
+<div class="form-layout">
+  <section class="card delete-card">
+    <p class="eyebrow">Confirmation required</p>
+    <h2>{{ object_label }}</h2>
+    <p>{{ warning }}</p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="action-row">
+        <a class="btn btn-muted" href="{{ cancel_url }}">Cancel</a>
+        <button class="btn btn-danger" type="submit">Delete permanently</button>
+      </div>
+    </form>
+  </section>
+</div>
+{% endblock %}

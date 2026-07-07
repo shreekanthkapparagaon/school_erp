@@ -27,6 +27,8 @@ class SubjectForm(forms.ModelForm):
         subject = super().save(commit=False)
         if self.manager and self.manager.role in [User.Role.HEAD, User.Role.PRINCIPAL]:
             subject.school = self.manager.school
+            if not subject.created_by_id:
+                subject.created_by = self.manager
         if commit:
             subject.save()
         return subject
@@ -45,7 +47,10 @@ class SchoolClassForm(forms.ModelForm):
         if school and manager.role in [User.Role.HEAD, User.Role.PRINCIPAL]:
             self.fields["school"].initial = school
             self.fields["school"].disabled = True
-            self.fields["subjects"].queryset = Subject.objects.filter(school=school)
+            subjects = Subject.objects.filter(school=school)
+            if manager.role == User.Role.HEAD:
+                subjects = subjects.filter(created_by=manager)
+            self.fields["subjects"].queryset = subjects
 
     def save(self, commit=True):
         school_class = super().save(commit=False)
@@ -72,10 +77,30 @@ class TeacherSubjectAssignmentForm(forms.ModelForm):
             self.fields["teacher"].queryset = self.fields["teacher"].queryset.filter(
                 school=school, role="teacher"
             )
-            self.fields["subject"].queryset = Subject.objects.filter(school=school)
+            subjects = Subject.objects.filter(school=school)
+            if manager.role == User.Role.HEAD:
+                subjects = subjects.filter(created_by=manager)
+            self.fields["subject"].queryset = subjects
             self.fields["school_class"].queryset = SchoolClass.objects.filter(school=school)
         else:
             self.fields["teacher"].queryset = self.fields["teacher"].queryset.filter(role="teacher")
+
+    def clean(self):
+        cleaned_data = super().clean()
+        school = cleaned_data.get("school")
+        teacher = cleaned_data.get("teacher")
+        subject = cleaned_data.get("subject")
+        school_class = cleaned_data.get("school_class")
+
+        related_objects = [teacher, subject, school_class]
+        if school and any(
+            item and item.school_id != school.id
+            for item in related_objects
+        ):
+            raise forms.ValidationError(
+                "The teacher, subject, and class must all belong to the selected school."
+            )
+        return cleaned_data
 
     def save(self, commit=True):
         assignment = super().save(commit=False)

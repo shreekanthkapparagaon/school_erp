@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block page_heading %}{{ fee.title }}{% endblock %}
+{% block content %}
+<section class="stat-grid">
+  <article class="stat-card"><span>Total Fee</span><strong>INR {{ fee.total_amount|floatformat:2 }}</strong><small>{{ fee.academic_year }}</small></article>
+  <article class="stat-card success"><span>Paid</span><strong>INR {{ fee.amount_paid|floatformat:2 }}</strong><small>{{ fee.payment_status }}</small></article>
+  <article class="stat-card warning"><span>Balance</span><strong>INR {{ fee.balance|floatformat:2 }}</strong><small>Due {{ fee.due_date|date:"M d, Y"|default:"Not set" }}</small></article>
+</section>
+
+<section class="card">
+  <div class="table-header">
+    <div>
+      <p class="eyebrow">{{ fee.school.name }}</p>
+      <h2>{{ fee.student }}</h2>
+    </div>
+    <div class="row-actions">
+      <a class="btn btn-sm btn-muted" href="{% url 'fees:fee_list' %}">Back</a>
+      {% if can_manage %}
+        <a class="btn btn-sm" href="{% url 'fees:update_fee' fee.pk %}">Edit Fee</a>
+        <a class="btn btn-sm btn-danger" href="{% url 'fees:delete_fee' fee.pk %}">Delete Fee</a>
+      {% endif %}
+    </div>
+  </div>
+  <dl class="detail-list">
+    <div><dt>Class</dt><dd>{{ fee.student.school_class|default:"-" }}</dd></div>
+    <div><dt>Academic Year</dt><dd>{{ fee.academic_year }}</dd></div>
+    <div><dt>Due Date</dt><dd>{{ fee.due_date|date:"M d, Y"|default:"-" }}</dd></div>
+    <div><dt>Notes</dt><dd>{{ fee.notes|default:"-" }}</dd></div>
+  </dl>
+</section>
+
+<section class="card">
+  <div class="table-header">
+    <h2>Payments</h2>
+    <div class="table-actions">
+      <input data-filter="fee-payments" placeholder="Filter payments">
+      {% if can_manage and fee.balance > 0 %}
+        <a class="btn" href="{% url 'fees:create_payment' fee.pk %}">Add Payment</a>
+      {% endif %}
+    </div>
+  </div>
+  <table data-table="fee-payments" data-page-size="12">
+    <thead><tr><th data-sort>Receipt</th><th data-sort>Date</th><th data-sort>Amount</th><th data-sort>Method</th><th data-sort>Received By</th><th>Action</th></tr></thead>
+    <tbody>
+      {% for payment in payments %}
+        <tr>
+          <td>{{ payment.receipt_number }}</td>
+          <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+          <td>INR {{ payment.amount|floatformat:2 }}</td>
+          <td>{{ payment.get_method_display }}</td>
+          <td>{{ payment.received_by|default:"-" }}</td>
+          <td>
+            <div class="row-actions">
+              <a class="btn btn-sm btn-muted" href="{% url 'fees:payment_receipt' payment.pk %}">Receipt</a>
+              {% if can_manage %}
+                <a class="btn btn-sm" href="{% url 'fees:update_payment' payment.pk %}">Edit</a>
+                <a class="btn btn-sm btn-danger" href="{% url 'fees:delete_payment' payment.pk %}">Delete</a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6">No payments recorded.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="pager" data-pager="fee-payments"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+</section>
+{% endblock %}

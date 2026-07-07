@@ -1,5 +1,69 @@
 {% extends "base.html" %}
 {% block page_heading %}Contact{% endblock %}
 {% block content %}
-<section class="card"><h2>Contact</h2><p>Email the administration team for onboarding, access, and school setup support.</p></section>
+<section class="card">
+  <h2>Contact</h2>
+  <p>Email the administration team for onboarding, access, and school setup support.</p>
+</section>
+
+{% if user.is_authenticated %}
+<section class="card">
+  <div class="table-header">
+    <div>
+      <h2>Send a message to management</h2>
+      <p>Use this form to request support, access, or changes from the manager team.</p>
+    </div>
+  </div>
+  <form method="post" class="form-card">
+    {% csrf_token %}
+    <div>
+      <label>Email</label>
+      <input type="email" value="{{ user.email }}" readonly />
+    </div>
+    <div>
+      <label for="id_subject">Subject</label>
+      {{ form.subject }}
+    </div>
+    <div>
+      <label for="id_message">Message</label>
+      {{ form.message }}
+    </div>
+    <div class="form-actions">
+      <button class="btn" type="submit">Send request</button>
+    </div>
+  </form>
+</section>
+{% endif %}
+
+{% if user.is_authenticated and manager_messages is not None %}
+<section class="card">
+  <div class="table-header">
+    <h2>Contact requests</h2>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>From</th>
+        <th>Subject</th>
+        <th>Message</th>
+        <th>Sent</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for message in manager_messages %}
+      <tr>
+        <td>{{ message.user }}</td>
+        <td>{{ message.subject }}</td>
+        <td>{{ message.message|truncatechars:120 }}</td>
+        <td>{{ message.created_at|date:"M d, Y H:i" }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="4">No contact requests yet.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
 {% endblock %}

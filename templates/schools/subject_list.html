@@ -9,16 +9,30 @@
     </div>
     <div class="table-actions">
       <input data-filter="subjects" placeholder="Filter subjects">
-      <a class="btn" href="{% url 'schools:create_subject' %}">Add Subject</a>
+      {% if perms.plans.feature_schools_manage %}
+        <a class="btn" href="{% url 'schools:create_subject' %}">Add Subject</a>
+      {% endif %}
     </div>
   </div>
   <table data-table="subjects" data-page-size="12">
-    <thead><tr><th data-sort>Name</th><th data-sort>Code</th><th data-sort>School</th></tr></thead>
+    <thead><tr><th data-sort>Name</th><th data-sort>Code</th><th data-sort>School</th><th data-sort>Created By</th><th>Action</th></tr></thead>
     <tbody>
       {% for subject in subjects %}
-        <tr><td>{{ subject.name }}</td><td>{{ subject.code }}</td><td>{{ subject.school.name }}</td></tr>
+        <tr>
+          <td>{{ subject.name }}</td>
+          <td>{{ subject.code }}</td>
+          <td>{{ subject.school.name }}</td>
+          <td>{{ subject.created_by|default:"-" }}</td>
+          <td>
+            <div class="row-actions">
+              <a class="btn btn-sm btn-muted" href="{% url 'schools:subject_detail' subject.pk %}">View</a>
+              <a class="btn btn-sm" href="{% url 'schools:update_subject' subject.pk %}">Edit</a>
+              <a class="btn btn-sm btn-danger" href="{% url 'schools:delete_subject' subject.pk %}">Delete</a>
+            </div>
+          </td>
+        </tr>
       {% empty %}
-        <tr><td colspan="3">No subjects yet.</td></tr>
+        <tr><td colspan="5">No subjects yet.</td></tr>
       {% endfor %}
     </tbody>
   </table>

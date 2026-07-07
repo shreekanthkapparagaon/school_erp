@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block page_heading %}Service Management{% endblock %}
+
+{% block content %}
+<div class="action-row">
+  <a class="btn" href="{% url 'core:manager_dashboard' %}">Back to dashboard</a>
+</div>
+<section class="stat-grid">
+  <article class="stat-card"><span>Plans</span><strong>{{ plans.count }}</strong><small>Active packages</small></article>
+  <article class="stat-card success"><span>Subscriptions</span><strong>{{ subscriptions.count }}</strong><small>School assignments</small></article>
+</section>
+<section class="card">
+  <div class="table-header">
+    <h2>Plan assignments</h2>
+    <div class="row-actions">
+      <a class="btn" href="{% url 'plans:subscription_create' %}">Assign subscription</a>
+      <a class="btn btn-muted" href="{% url 'plans:plan_list' %}">Manage plans</a>
+    </div>
+  </div>
+  <table data-table="plans" data-page-size="12">
+    <thead>
+      <tr>
+        <th data-sort="true">School</th>
+        <th data-sort="true">Plan</th>
+        <th data-sort="true">Status</th>
+        <th>Assigned</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for subscription in subscriptions %}
+      <tr>
+        <td>{{ subscription.school.name }}</td>
+        <td>{{ subscription.plan.name }}</td>
+        <td>{{ subscription.get_status_display }}</td>
+        <td>{{ subscription.start_date }}</td>
+        <td class="row-actions">
+          <a class="btn btn-sm" href="{% url 'plans:subscription_update' subscription.id %}">Edit</a>
+          <a class="btn btn-sm btn-danger" href="{% url 'plans:subscription_delete' subscription.id %}">Delete</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5">No service subscriptions available.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

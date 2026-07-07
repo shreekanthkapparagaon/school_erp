@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block page_heading %}{{ title }}{% endblock %}
+{% block content %}
+<section class="card detail-card">
+  <div class="table-header">
+    <div>
+      <p class="eyebrow">{{ eyebrow }}</p>
+      <h2>{{ title }}</h2>
+    </div>
+    <div class="row-actions">
+      <a class="btn btn-sm btn-muted" href="{{ back_url }}">Back</a>
+      {% if edit_url %}
+        <a class="btn btn-sm" href="{{ edit_url }}">Edit</a>
+      {% endif %}
+      {% if delete_url %}
+        <a class="btn btn-sm btn-danger" href="{{ delete_url }}">Delete</a>
+      {% endif %}
+    </div>
+  </div>
+  <dl class="detail-list">
+    {% for label, value in fields %}
+      <div>
+        <dt>{{ label }}</dt>
+        <dd>{{ value }}</dd>
+      </div>
+    {% endfor %}
+  </dl>
+</section>
+{% endblock %}

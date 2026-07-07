@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block page_heading %}Fee Receipt{% endblock %}
+{% block content %}
+<section class="receipt card">
+  <div class="receipt-header">
+    <div>
+      <p class="eyebrow">Payment Receipt</p>
+      <h2>{{ fee.school.name }}</h2>
+      <p>{{ fee.school.address }}</p>
+    </div>
+    <div class="receipt-number">
+      <span>Receipt</span>
+      <strong>{{ payment.receipt_number }}</strong>
+    </div>
+  </div>
+  <dl class="detail-list">
+    <div><dt>Student</dt><dd>{{ fee.student }}</dd></div>
+    <div><dt>Class</dt><dd>{{ fee.student.school_class|default:"-" }}</dd></div>
+    <div><dt>Fee</dt><dd>{{ fee.title }}</dd></div>
+    <div><dt>Academic Year</dt><dd>{{ fee.academic_year }}</dd></div>
+    <div><dt>Payment Date</dt><dd>{{ payment.payment_date|date:"M d, Y" }}</dd></div>
+    <div><dt>Method</dt><dd>{{ payment.get_method_display }}</dd></div>
+    <div><dt>Amount Paid</dt><dd>INR {{ payment.amount|floatformat:2 }}</dd></div>
+    <div><dt>Balance</dt><dd>INR {{ fee.balance|floatformat:2 }}</dd></div>
+  </dl>
+  <div class="receipt-total">
+    <span>Amount received</span>
+    <strong>INR {{ payment.amount|floatformat:2 }}</strong>
+  </div>
+  <div class="row-actions receipt-actions">
+    <a class="btn btn-muted" href="{% url 'fees:fee_detail' fee.pk %}">Back</a>
+    {% if can_manage %}
+      <a class="btn btn-muted" href="{% url 'fees:update_payment' payment.pk %}">Edit</a>
+    {% endif %}
+    <button class="btn btn-muted" type="button" onclick="window.print()">Print</button>
+    <a class="btn" href="{% url 'fees:payment_receipt_pdf' payment.pk %}">Download PDF</a>
+  </div>
+</section>
+{% endblock %}

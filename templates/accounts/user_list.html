@@ -9,10 +9,12 @@
     </div>
     <div class="table-actions">
       <input data-filter="users" placeholder="Filter {{ title|lower }}">
-      {% if managed_role == "principle" %}
+      {% if managed_role == "principal" and perms.plans.feature_schools_manage %}
         <a class="btn btn-muted" href="{% url 'accounts:assign_principal_school' %}">Assign school</a>
       {% endif %}
-      <a class="btn" href="{% url 'accounts:create_user' %}?role={{ managed_role }}">Add {{ title|slice:":-1" }}</a>
+      {% if perms.plans.feature_schools_manage %}
+        <a class="btn" href="{% url 'accounts:create_user' %}?role={{ managed_role }}">Add {{ title|slice:":-1" }}</a>
+      {% endif %}
     </div>
   </div>
   <table data-table="users" data-page-size="12">
@@ -24,6 +26,7 @@
         <th data-sort>School</th>
         <th data-sort>Class</th>
         <th data-sort>Joined</th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody>
@@ -35,9 +38,16 @@
           <td>{{ account.school|default:"Not assigned" }}</td>
           <td>{{ account.school_class|default:"-" }}</td>
           <td>{{ account.date_joined|date:"M d, Y" }}</td>
+          <td>
+            <div class="row-actions">
+              <a class="btn btn-sm btn-muted" href="{% url 'accounts:user_detail' account.pk %}">View</a>
+              <a class="btn btn-sm" href="{% url 'accounts:update_user' account.pk %}">Edit</a>
+              <a class="btn btn-sm btn-danger" href="{% url 'accounts:delete_user' account.pk %}">Delete</a>
+            </div>
+          </td>
         </tr>
       {% empty %}
-        <tr><td colspan="6">No records yet.</td></tr>
+        <tr><td colspan="7">No records yet.</td></tr>
       {% endfor %}
     </tbody>
   </table>

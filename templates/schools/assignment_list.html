@@ -9,11 +9,13 @@
     </div>
     <div class="table-actions">
       <input data-filter="assignments" placeholder="Filter assignments">
-      <a class="btn" href="{% url 'schools:create_assignment' %}">Add Assignment</a>
+      {% if perms.plans.feature_schools_manage %}
+        <a class="btn" href="{% url 'schools:create_assignment' %}">Add Assignment</a>
+      {% endif %}
     </div>
   </div>
   <table data-table="assignments" data-page-size="12">
-    <thead><tr><th data-sort>Teacher</th><th data-sort>Subject</th><th data-sort>Class</th><th data-sort>School</th><th data-sort>Assigned</th></tr></thead>
+    <thead><tr><th data-sort>Teacher</th><th data-sort>Subject</th><th data-sort>Class</th><th data-sort>School</th><th data-sort>Assigned</th><th>Action</th></tr></thead>
     <tbody>
       {% for item in assignments %}
         <tr>
@@ -22,9 +24,16 @@
           <td>{{ item.school_class.name }} {{ item.school_class.section }}</td>
           <td>{{ item.school.name }}</td>
           <td>{{ item.created_at|date:"M d, Y" }}</td>
+          <td>
+            <div class="row-actions">
+              <a class="btn btn-sm btn-muted" href="{% url 'schools:assignment_detail' item.pk %}">View</a>
+              <a class="btn btn-sm" href="{% url 'schools:update_assignment' item.pk %}">Edit</a>
+              <a class="btn btn-sm btn-danger" href="{% url 'schools:delete_assignment' item.pk %}">Delete</a>
+            </div>
+          </td>
         </tr>
       {% empty %}
-        <tr><td colspan="5">No assignments yet.</td></tr>
+        <tr><td colspan="6">No assignments yet.</td></tr>
       {% endfor %}
     </tbody>
   </table>
