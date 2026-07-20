@@ -9,3 +9,7 @@ staticfiles/
 .vscode/
 .agents/
 demo_credentials*.txt
+# ==========================
+# uv
+# ==========================
+.python-version
