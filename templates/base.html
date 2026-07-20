@@ -39,6 +39,7 @@
             <a href="{% url 'accounts:user_list' 'teacher' %}">Teachers</a>
             <a href="{% url 'schools:subject_list' %}">Subjects</a>
             <a href="{% url 'schools:class_list' %}">Classes</a>
+            <a href="{% url 'schools:promote_class' %}">Promote Classes</a>
             <a href="{% url 'schools:assignment_list' %}">Assignments</a>
           {% endif %}
           {% if perms.plans.feature_fees_view %}
@@ -60,6 +61,7 @@
             <a href="{% url 'accounts:user_list' 'teacher' %}">Teachers</a>
             <a href="{% url 'schools:subject_list' %}">Subjects</a>
             <a href="{% url 'schools:class_list' %}">Classes</a>
+            <a href="{% url 'schools:promote_class' %}">Promote Classes</a>
             <a href="{% url 'schools:assignment_list' %}">Assignments</a>
           {% endif %}
           {% if perms.plans.feature_fees_view %}
@@ -131,6 +133,8 @@
       {% block content %}{% endblock %}
     </section>
   </main>
+  {% block scripts %}
+  {% endblock %}
   <script>
     document.querySelectorAll("[data-table]").forEach((table) => {
       const input = document.querySelector(`[data-filter="${table.dataset.table}"]`);

@@ -12,8 +12,12 @@ from .forms import (
     ManagedUserCreationForm,
     ManagedUserUpdateForm,
     PrincipalSchoolAssignmentForm,
+    ProfileUpdateForm,    
 )
-from .models import User
+from .models import (
+    User,
+    ProfileField,
+)
 
 
 class LoginView(auth_views.LoginView):
@@ -37,46 +41,209 @@ def role_redirect(request):
     return redirect(role_routes.get(request.user.role, "core:home"))
 
 
+
 @login_required
 def profile_detail(request):
-    profile = getattr(request.user, "profile", None)
-    profile_values = []
-    if profile:
-        profile_values = list(
-            profile.values.select_related("field").order_by("field__order", "field__name")
+    user = request.user
+    profile = user.profile
+
+    # ----------------------------------------
+    # Edit Mode
+    # ----------------------------------------
+    edit_mode = request.GET.get("edit") == "1"
+
+    # ----------------------------------------
+    # Form
+    # ----------------------------------------
+    if request.method == "POST" and "remove_profile_image" in request.POST:
+
+        profile = request.user.profile
+
+        if profile.profile_image:
+
+            profile.profile_image.delete(save=False)
+
+            profile.profile_image = None
+            profile.save(update_fields=["profile_image"])
+
+        messages.success(request, "Profile photo removed successfully.")
+
+        return redirect("accounts:profile")
+    
+    if request.method == "POST":
+
+        edit_mode = True
+
+        form = ProfileUpdateForm(
+            request.POST,
+            request.FILES,
+            instance=profile,
+        )
+        if form.is_valid():
+            form.save()
+
+            messages.success(
+                request,
+                "Profile updated successfully.",
+            )
+
+            return redirect("accounts:profile")
+
+    else:
+
+        form = ProfileUpdateForm(
+            instance=profile,
         )
 
-    fields = [
-        ("Name", str(request.user)),
-        ("Email", request.user.email),
-        ("Role", request.user.get_role_display()),
-        ("Phone", request.user.phone or "Not provided"),
-        ("School", request.user.school or "Not assigned"),
-        ("Class", request.user.school_class or "Not assigned"),
-        ("Joined", request.user.date_joined.strftime("%b %d, %Y")),
+    # ----------------------------------------
+    # Basic Information
+    # ----------------------------------------
+    basic_info = [
+        {
+            "label": "First Name",
+            "value": user.first_name or "-",
+            "form_field": form["first_name"],
+        },
+        {
+            "label": "Last Name",
+            "value": user.last_name or "-",
+            "form_field": form["last_name"],
+        },
+        {
+            "label": "Email",
+            "value": user.email,
+            "form_field": form["email"],
+        },
+        {
+            "label": "Phone",
+            "value": user.phone or "-",
+            "form_field": form["phone"],
+        },
+        {
+            "label": "Role",
+            "value": user.get_role_display(),
+            "form_field": None,
+        },
+        {
+            "label": "School",
+            "value": user.school or "-",
+            "form_field": None,
+        },
+        {
+            "label": "Class",
+            "value": user.school_class or "-",
+            "form_field": None,
+        },
+        {
+            "label": "Joined",
+            "value": user.date_joined,
+            "form_field": None,
+        },
     ]
 
-    if profile and profile.metadata:
-        fields.append(("Profile Metadata", profile.metadata))
+    # ----------------------------------------
+    # Dynamic Profile Fields
+    # ----------------------------------------
+    profile_fields = (
+        ProfileField.objects.filter(
+            role=user.role,
+            active=True,
+        )
+        .order_by("order", "name")
+    )
 
-    for value in profile_values:
-        label = value.field.name
-        if value.field.field_type == "file" and value.file:
-            fields.append((label, value.file.url if value.file else "No file uploaded"))
-        else:
-            fields.append((label, value.value or "—"))
+    existing_values = {
+        value.field_id: value
+        for value in profile.values.select_related("field")
+    }
+
+    custom_fields = []
+
+    completed_fields = 0
+
+    for profile_field in profile_fields:
+
+        profile_value = existing_values.get(profile_field.id)
+
+        value = None
+        is_new = True
+
+        if profile_value:
+
+            if (
+                profile_field.field_type == "file"
+                and profile_value.file
+            ):
+                value = profile_value.file
+            else:
+                value = profile_value.value
+
+            if value not in (None, "", False):
+                completed_fields += 1
+
+            is_new = False
+
+        custom_fields.append(
+            {
+                "id": profile_field.id,
+                "slug": profile_field.slug,
+                "label": profile_field.name,
+                "type": profile_field.field_type,
+                "required": profile_field.required,
+                "help_text": profile_field.help_text,
+                "value": value,
+                "is_new": is_new,
+                "form_field": form[f"profile_{profile_field.id}"],
+            }
+        )
+
+    # ----------------------------------------
+    # Profile Completion
+    # ----------------------------------------
+    total_fields = profile_fields.count()
+
+    completion = (
+        round((completed_fields / total_fields) * 100)
+        if total_fields
+        else 100
+    )
+
+    if completion == 100:
+        completion_badge = {
+            "label": "Complete",
+            "icon": "✅",
+            "class": "success",
+        }
+    elif completion >= 70:
+        completion_badge = {
+            "label": "Almost Complete",
+            "icon": "🟡",
+            "class": "warning",
+        }
+    else:
+        completion_badge = {
+            "label": "Incomplete",
+            "icon": "🔴",
+            "class": "danger",
+        }
+
+    context = {
+        "title": "My Profile",
+        "profile": profile,
+        "form": form,
+        "edit_mode": edit_mode,
+        "basic_info": basic_info,
+        "custom_fields": custom_fields,
+        "completion": completion,
+        "completed_fields": completed_fields,
+        "completion_badge": completion_badge,
+        "total_fields": total_fields,
+    }
 
     return render(
         request,
-        "shared/detail.html",
-        {
-            "title": "My Profile",
-            "eyebrow": "Profile Details",
-            "fields": fields,
-            "back_url": reverse("accounts:role_redirect"),
-            "edit_url": "",
-            "delete_url": "",
-        },
+        "accounts/profile.html",
+        context,
     )
 
 
