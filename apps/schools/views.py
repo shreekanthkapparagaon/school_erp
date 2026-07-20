@@ -432,6 +432,73 @@ def update_class(request, class_id):
         },
     )
 
+@login_required
+@plan_feature_required(
+    "schools.manage",
+    "Your current subscription does not include access to school management features.",
+)
+def promote_class(request):
+    if request.method != "POST":
+        return redirect("schools:class_list")
+
+    class_id = request.POST.get("class_id")
+    student_ids = request.POST.getlist("student_ids")
+    to_class_id = request.POST.get("to_class")
+
+    school_class = get_object_or_404(
+        SchoolClass.objects.select_related("school"),
+        pk=class_id,
+    )
+
+    if not can_manage_school_object(request.user, school_class.school_id):
+        messages.error(request, "You do not have permission to promote students.")
+        return redirect("accounts:role_redirect")
+
+    students = User.objects.filter(
+        id__in=student_ids,
+        role=User.Role.STUDENT,
+        school=school_class.school,
+        school_class=school_class,
+    )
+
+    if not students.exists():
+        messages.error(request, "Please select at least one student.")
+        return redirect("schools:class_detail", class_id=school_class.pk)
+
+    # Second POST -> actually promote
+    if to_class_id:
+        to_class = get_object_or_404(
+            SchoolClass,
+            pk=to_class_id,
+            school=school_class.school,
+        )
+        updated_count = students.update(school_class=to_class,)
+
+        messages.success(
+            request,
+            f"{updated_count} students promoted to {to_class}."
+        )
+
+        return redirect("schools:class_detail", class_id=to_class.pk)
+
+    # First POST -> show confirmation page
+    available_classes = (
+        SchoolClass.objects.filter(school=school_class.school)
+        .exclude(pk=school_class.pk)
+        .order_by("name", "section")
+    )
+
+    return render(
+        request,
+        "shared/confirm_promote.html",
+        {
+            "title": "Promote Students",
+            "current_class": school_class,
+            "students": students,
+            "available_classes": available_classes,
+            "cancel_url": reverse("schools:class_detail", args=[school_class.pk]),
+        },
+    )
 
 @login_required
 @plan_feature_required(

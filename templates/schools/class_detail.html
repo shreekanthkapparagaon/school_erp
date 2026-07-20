@@ -26,47 +26,111 @@
 </section>
 
 <section class="card">
-  <div class="table-header">
-    <h2>Students</h2>
-    <div class="table-actions">
-      <input data-filter="class-students" placeholder="Filter students">
-      {% if can_manage_students and perms.plans.feature_schools_manage %}
-        <a class="btn" href="{% url 'accounts:create_user' %}?role=student">Add Student</a>
-      {% endif %}
-    </div>
-  </div>
-  <table data-table="class-students" data-page-size="12">
-    <thead>
-      <tr>
-        <th data-sort>Name</th>
-        <th data-sort>Email</th>
-        <th data-sort>Phone</th>
-        <th data-sort>Joined</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for student in students %}
-        <tr>
-          <td>{{ student }}</td>
-          <td>{{ student.email }}</td>
-          <td>{{ student.phone|default:"-" }}</td>
-          <td>{{ student.date_joined|date:"M d, Y" }}</td>
-          <td>
-            <div class="row-actions">
-              <a class="btn btn-sm btn-muted" href="{% url 'accounts:user_detail' student.pk %}">View</a>
-              {% if can_manage_students %}
-                <a class="btn btn-sm" href="{% url 'accounts:update_user' student.pk %}">Edit</a>
-                <a class="btn btn-sm btn-danger" href="{% url 'accounts:delete_user' student.pk %}">Delete</a>
-              {% endif %}
+    <form method="post" action="{% url 'schools:promote_class' %}">
+        {% csrf_token %}
+
+        <input type="hidden" name="class_id" value="{{ school_class.id }}">
+
+        <div class="table-header">
+            <h2>Students</h2>
+
+            <div class="table-actions">
+                <input data-filter="class-students" placeholder="Filter students">
+
+                {% if can_manage_students and perms.plans.feature_schools_manage %}
+                    <a class="btn" href="{% url 'accounts:create_user' %}?role=student">
+                        Add Student
+                    </a>
+
+                    <button type="submit" class="btn">
+                        Promote Selected
+                    </button>
+                {% endif %}
             </div>
-          </td>
-        </tr>
-      {% empty %}
-        <tr><td colspan="5">No students assigned to this class.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <div class="pager" data-pager="class-students"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+        </div>
+
+        <table data-table="class-students" data-page-size="12">
+            <thead>
+                <tr>
+                    {% if can_manage_students %}
+                    <th>
+                        <input type="checkbox" id="select-all">
+                    </th>
+                    {% endif %}
+
+                    <th data-sort>Name</th>
+                    <th data-sort>Email</th>
+                    <th data-sort>Phone</th>
+                    <th data-sort>Joined</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for student in students %}
+                <tr>
+
+                    {% if can_manage_students %}
+                    <td>
+                        <input
+                            type="checkbox"
+                            name="student_ids"
+                            value="{{ student.id }}"
+                            class="student-checkbox">
+                    </td>
+                    {% endif %}
+
+                    <td>{{ student }}</td>
+                    <td>{{ student.email }}</td>
+                    <td>{{ student.phone|default:"-" }}</td>
+                    <td>{{ student.date_joined|date:"M d, Y" }}</td>
+
+                    <td>
+                        <div class="row-actions">
+                            <a class="btn btn-sm btn-muted"
+                               href="{% url 'accounts:user_detail' student.pk %}">
+                                View
+                            </a>
+
+                            {% if can_manage_students %}
+                                <a class="btn btn-sm"
+                                   href="{% url 'accounts:update_user' student.pk %}">
+                                    Edit
+                                </a>
+
+                                <a class="btn btn-sm btn-danger"
+                                   href="{% url 'accounts:delete_user' student.pk %}">
+                                    Delete
+                                </a>
+                            {% endif %}
+                        </div>
+                    </td>
+
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">No students assigned to this class.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+
+    <div class="pager" data-pager="class-students">
+        <button data-prev>Previous</button>
+        <span data-page></span>
+        <button data-next>Next</button>
+    </div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.getElementById("select-all")?.addEventListener("change", function () {
+    document.querySelectorAll(".student-checkbox").forEach(cb => {
+        cb.checked = this.checked;
+    });
+});
+</script>
+
 {% endblock %}

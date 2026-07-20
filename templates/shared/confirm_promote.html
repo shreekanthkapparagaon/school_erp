@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block page_heading %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="form-layout">
+  <section class="card delete-card">
+
+    <h2>{{ title }}</h2>
+
+    <p>
+      You are about to promote
+      <strong>{{ students|length }}</strong>
+      student{{ students|length|pluralize }}
+      from <strong>{{ current_class }}</strong>.
+    </p>
+
+    <form method="post" action="{% url 'schools:promote_class' %}">
+      {% csrf_token %}
+
+      <input type="hidden" name="class_id" value="{{ current_class.id }}">
+
+      {% for student in students %}
+        <input type="hidden" name="student_ids" value="{{ student.id }}">
+      {% endfor %}
+
+      <div style="margin-bottom: 1rem;">
+        <label for="id_students">
+          <strong>Selected Students</strong>
+        </label>
+
+        <select
+          id="id_students"
+          multiple
+          disabled
+          style="
+            width:100%;
+            height:260px;
+            margin-top:6px;
+            padding:8px;
+            border:1px solid #ccc;
+            border-radius:4px;
+            background:#f8f9fa;
+            font-size:14px;
+          "
+        >
+          {% for student in students %}
+            <option selected>
+              {{ student.get_full_name|default:student.email }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="margin-bottom:1.5rem;">
+        <label for="id_to_class">
+          <strong>Promote To</strong>
+        </label>
+
+        <select
+          id="id_to_class"
+          name="to_class"
+          required
+          style="
+            width:100%;
+            padding:8px;
+            margin-top:6px;
+          "
+        >
+          <option value="">---------</option>
+
+          {% for cls in available_classes %}
+            <option value="{{ cls.id }}">
+              {{ cls }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <a
+          href="{% url 'schools:class_detail' current_class.id %}"
+          class="btn btn-muted"
+        >
+          Cancel
+        </a>
+
+        <button type="submit" class="btn btn-primary">
+          Promote Students
+        </button>
+      </div>
+
+    </form>
+
+  </section>
+</div>
+{% endblock %}

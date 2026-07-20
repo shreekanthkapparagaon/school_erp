@@ -14,6 +14,7 @@ urlpatterns = [
     path("subjects/<int:subject_id>/edit/", views.update_subject, name="update_subject"),
     path("subjects/<int:subject_id>/delete/", views.delete_subject, name="delete_subject"),
     path("classes/new/", views.create_class, name="create_class"),
+    path("classes/promote/", views.promote_class, name="promote_class"),
     path("classes/<int:class_id>/", views.class_detail, name="class_detail"),
     path("classes/<int:class_id>/edit/", views.update_class, name="update_class"),
     path("classes/<int:class_id>/delete/", views.delete_class, name="delete_class"),
