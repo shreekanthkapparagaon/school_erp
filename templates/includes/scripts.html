@@ -1,0 +1,75 @@
+{% load static %}
+
+{% block scripts %}
+{% endblock %}
+
+<script>
+  document.querySelectorAll("[data-table]").forEach((table) => {
+    const input = document.querySelector(`[data-filter="${table.dataset.table}"]`);
+    const rows = Array.from(table.querySelectorAll("tbody tr"));
+    const pageSize = Number(table.dataset.pageSize || 12);
+    let page = 1;
+
+    function visibleRows() {
+      const term = (input?.value || "").toLowerCase();
+      return rows.filter((row) => row.innerText.toLowerCase().includes(term));
+    }
+
+    function render() {
+      const filtered = visibleRows();
+      const total = Math.max(1, Math.ceil(filtered.length / pageSize));
+      page = Math.min(page, total);
+
+      rows.forEach((row) => (row.style.display = "none"));
+
+      filtered
+        .slice((page - 1) * pageSize, page * pageSize)
+        .forEach((row) => (row.style.display = ""));
+
+      const pager = document.querySelector(
+        `[data-pager="${table.dataset.table}"]`
+      );
+
+      if (pager) {
+        pager.querySelector("[data-page]").textContent = `${page} / ${total}`;
+        pager.querySelector("[data-prev]").disabled = page === 1;
+        pager.querySelector("[data-next]").disabled = page === total;
+      }
+    }
+
+    table.querySelectorAll("th[data-sort]").forEach((th, index) => {
+      th.addEventListener("click", () => {
+        rows.sort((a, b) =>
+          a.children[index].innerText.localeCompare(
+            b.children[index].innerText
+          )
+        );
+
+        rows.forEach((row) => table.tBodies[0].appendChild(row));
+
+        render();
+      });
+    });
+
+    input?.addEventListener("input", () => {
+      page = 1;
+      render();
+    });
+
+    document
+      .querySelector(`[data-pager="${table.dataset.table}"] [data-prev]`)
+      ?.addEventListener("click", () => {
+        page--;
+        render();
+      });
+
+    document
+      .querySelector(`[data-pager="${table.dataset.table}"] [data-next]`)
+      ?.addEventListener("click", () => {
+        page++;
+        render();
+      });
+
+    render();
+  });
+</script>

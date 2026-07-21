@@ -5,174 +5,41 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}School ERP{% endblock %}</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="{% static 'css/theme.css' %}">
   <link rel="stylesheet" href="{% static 'css/pricing.css' %}">
+
+  {% block extra_css %}{% endblock %}
 </head>
+
 <body>
-  <aside class="sidebar">
-    <a class="brand" href="{% url 'core:home' %}">
-      <span class="brand-mark">S</span>
-      <span>School ERP</span>
-    </a>
-    <nav class="side-nav">
-      <a href="{% url 'core:home' %}">Home</a>
-      {% if user.is_authenticated and user.role != "not_given" %}
-        <a href="{% url 'accounts:role_redirect' %}">Dashboard</a>
-        <a href="{% url 'accounts:profile' %}">Profile</a>
-        {% if user.role == "manager" %}
-          <a href="{% url 'schools:school_list' %}">Schools</a>
-          <a href="{% url 'accounts:user_list' 'principal' %}">Principals</a>
-          <a href="{% url 'plans:service_management' %}">Service Management</a>
-          <a href="{% url 'plans:plan_list' %}">Plans</a>
-          <a href="{% url 'plans:subscription_create' %}">Add Subscription</a>
-          <a href="{% url 'plans:pricing' %}">Pricing</a>
-          <a href="{% url 'document:document_list' %}">Documents</a>
-          <a href="{% url 'core:contact_requests' %}">Contact Requests</a>
-        {% endif %}
-        {% if user.role == "principal" %}
-          {% if perms.plans.feature_schools_manage %}
-            <a href="{% url 'accounts:user_list' 'student' %}">Students</a>
-            <a href="{% url 'accounts:user_list' 'head' %}">Heads</a>
-            <a href="{% url 'accounts:user_list' 'teacher' %}">Teachers</a>
-            <a href="{% url 'schools:subject_list' %}">Subjects</a>
-            <a href="{% url 'schools:class_list' %}">Classes</a>
-            <a href="{% url 'schools:promote_class' %}">Promote Classes</a>
-            <a href="{% url 'schools:assignment_list' %}">Assignments</a>
-          {% endif %}
-          {% if perms.plans.feature_fees_view %}
-            <a href="{% url 'fees:fee_list' %}">Student Fees</a>
-          {% endif %}
-          {% if perms.plans.feature_payroll_view %}
-            <a href="{% url 'fees:salary_list' %}">Teacher Salaries</a>
-          {% endif %}
-          {% if perms.plans.feature_results_view %}
-            <a href="{% url 'results:home' %}">Results</a>
-          {% endif %}
-          {% if perms.plans.feature_documents_manage %}
-            <a href="{% url 'document:document_list' %}">Documents</a>
-          {% endif %}
-        {% endif %}
-        {% if user.role == "head" %}
-          {% if perms.plans.feature_schools_manage %}
-            <a href="{% url 'accounts:user_list' 'student' %}">Students</a>
-            <a href="{% url 'accounts:user_list' 'teacher' %}">Teachers</a>
-            <a href="{% url 'schools:subject_list' %}">Subjects</a>
-            <a href="{% url 'schools:class_list' %}">Classes</a>
-            <a href="{% url 'schools:promote_class' %}">Promote Classes</a>
-            <a href="{% url 'schools:assignment_list' %}">Assignments</a>
-          {% endif %}
-          {% if perms.plans.feature_fees_view %}
-            <a href="{% url 'fees:fee_list' %}">Student Fees</a>
-          {% endif %}
-          {% if perms.plans.feature_results_view %}
-            <a href="{% url 'results:home' %}">Results</a>
-          {% endif %}
-          {% if perms.plans.feature_documents_manage %}
-            <a href="{% url 'document:document_list' %}">Documents</a>
-          {% endif %}
-        {% endif %}
-        {% if user.role == "teacher" %}
-          {% if perms.plans.feature_schools_manage %}
-            <a href="{% url 'schools:class_list' %}">Classes</a>
-          {% endif %}
-          {% if perms.plans.feature_results_view %}
-            <a href="{% url 'results:home' %}">Results</a>
-          {% endif %}
-          {% if perms.plans.feature_documents_manage %}
-            <a href="{% url 'document:document_list' %}">Documents</a>
-          {% endif %}
-        {% endif %}
-        {% if user.role == "student" %}
-          {% if perms.plans.feature_fees_view %}
-            <a href="{% url 'fees:fee_list' %}">My Fees</a>
-          {% endif %}
-          {% if perms.plans.feature_results_view %}
-            <a href="{% url 'results:home' %}">My Results</a>
-          {% endif %}
-          {% if perms.plans.feature_documents_manage %}
-            <a href="{% url 'document:document_list' %}">Documents</a>
-          {% endif %}
-        {% endif %}
-      {% endif %}
-      <a href="{% url 'core:about' %}">About</a>
-      <a href="{% url 'core:contact' %}">Contact</a>
-    </nav>
-  </aside>
+
+  {% include "includes/sidebar.html" %}
 
   <main class="app-shell">
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">Academic Administration</p>
-        <h1>{% block page_heading %}School ERP{% endblock %}</h1>
-      </div>
-      <div class="top-actions">
-        {% if user.is_authenticated %}
-          <span class="user-pill">{{ user.get_role_display }}</span>
-          <form method="post" action="{% url 'accounts:logout' %}">
-            {% csrf_token %}
-            <button class="btn btn-muted" type="submit">Logout</button>
-          </form>
-        {% else %}
-          <a class="btn" href="{% url 'accounts:login' %}">Login</a>
-        {% endif %}
-      </div>
-    </header>
 
-    {% if messages %}
-      <section class="messages">
-        {% for message in messages %}
-          <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-        {% endfor %}
-      </section>
-    {% endif %}
+    {% include "includes/topbar.html" %}
+
+    {% include "includes/messages.html" %}
 
     <section class="content">
-      {% block content %}{% endblock %}
+      {% block content %}
+      {% endblock %}
     </section>
+
+    {% include "includes/footer.html" %}
+
   </main>
-  {% block scripts %}
+
+  {% include "includes/scripts.html" %}
+
+  {% block extra_js %}
   {% endblock %}
-  <script>
-    document.querySelectorAll("[data-table]").forEach((table) => {
-      const input = document.querySelector(`[data-filter="${table.dataset.table}"]`);
-      const rows = Array.from(table.querySelectorAll("tbody tr"));
-      const pageSize = Number(table.dataset.pageSize || 12);
-      let page = 1;
 
-      function visibleRows() {
-        const term = (input?.value || "").toLowerCase();
-        return rows.filter((row) => row.innerText.toLowerCase().includes(term));
-      }
-
-      function render() {
-        const filtered = visibleRows();
-        const total = Math.max(1, Math.ceil(filtered.length / pageSize));
-        page = Math.min(page, total);
-        rows.forEach((row) => row.style.display = "none");
-        filtered.slice((page - 1) * pageSize, page * pageSize).forEach((row) => row.style.display = "");
-        const pager = document.querySelector(`[data-pager="${table.dataset.table}"]`);
-        if (pager) {
-          pager.querySelector("[data-page]").textContent = `${page} / ${total}`;
-          pager.querySelector("[data-prev]").disabled = page === 1;
-          pager.querySelector("[data-next]").disabled = page === total;
-        }
-      }
-
-      table.querySelectorAll("th[data-sort]").forEach((th, index) => {
-        th.addEventListener("click", () => {
-          rows.sort((a, b) => a.children[index].innerText.localeCompare(b.children[index].innerText));
-          rows.forEach((row) => table.tBodies[0].appendChild(row));
-          render();
-        });
-      });
-      input?.addEventListener("input", () => { page = 1; render(); });
-      document.querySelector(`[data-pager="${table.dataset.table}"] [data-prev]`)?.addEventListener("click", () => { page--; render(); });
-      document.querySelector(`[data-pager="${table.dataset.table}"] [data-next]`)?.addEventListener("click", () => { page++; render(); });
-      render();
-    });
-  </script>
 </body>
 </html>
