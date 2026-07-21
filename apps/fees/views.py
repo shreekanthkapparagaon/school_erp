@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from apps.plans.utils import plan_feature_required
+from apps.plans.utils import feature_action_required
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
@@ -61,9 +61,10 @@ def get_payment_or_404(payment_id):
 
 
 @login_required
-@plan_feature_required(
-    "fees.view",
-    "Your current subscription does not include access to fee viewing.",
+@feature_action_required(
+    "fees",
+    "view",
+    "Your current subscription does not include Fee Management.",
 )
 def fee_list(request):
     if can_manage_student_fees(request.user):
@@ -85,9 +86,10 @@ def fee_list(request):
 
 
 @login_required
-@plan_feature_required(
-    "fees.manage",
-    "Your current subscription does not include access to fee management.",
+@feature_action_required(
+    "fees",
+    "view",
+    "Your current subscription does not include Fee Management.",
 )
 def fee_structure_list(request):
     if not can_manage_student_fees(request.user):
@@ -105,9 +107,10 @@ def fee_structure_list(request):
 
 
 @login_required
-@plan_feature_required(
-    "fees.manage",
-    "Your current subscription does not include access to fee management.",
+@feature_action_required(
+    "fees",
+    "create",
+    "You do not have permission to create fee structures.",
 )
 def create_fee_structure(request):
     if not can_manage_student_fees(request.user):
@@ -131,9 +134,10 @@ def create_fee_structure(request):
 
 
 @login_required
-@plan_feature_required(
-    "fees.manage",
-    "Your current subscription does not include access to fee management.",
+@feature_action_required(
+    "fees",
+    "view",
+    "You do not have permission to view fee structures.",
 )
 def fee_structure_detail(request, structure_id):
     structure = get_object_or_404(
@@ -157,9 +161,10 @@ def fee_structure_detail(request, structure_id):
 
 
 @login_required
-@plan_feature_required(
-    "fees.manage",
-    "Your current subscription does not include access to fee management.",
+@feature_action_required(
+    "fees",
+    "create",
+    "You do not have permission to create student fees.",
 )
 def create_fee(request):
     if not can_manage_student_fees(request.user):
@@ -178,9 +183,10 @@ def create_fee(request):
 
 
 @login_required
-@plan_feature_required(
-    "fees.view",
-    "Your current subscription does not include access to fee viewing.",
+@feature_action_required(
+    "fees",
+    "view",
+    "You do not have permission to view student fees.",
 )
 def fee_detail(request, fee_id):
     fee = get_fee_or_404(fee_id)
@@ -199,9 +205,10 @@ def fee_detail(request, fee_id):
 
 
 @login_required
-@plan_feature_required(
-    "fees.manage",
-    "Your current subscription does not include access to fee management.",
+@feature_action_required(
+    "fees",
+    "update",
+    "You do not have permission to update student fees.",
 )
 def update_fee(request, fee_id):
     fee = get_fee_or_404(fee_id)
@@ -226,9 +233,10 @@ def update_fee(request, fee_id):
 
 
 @login_required
-@plan_feature_required(
-    "fees.manage",
-    "Your current subscription does not include access to fee management.",
+@feature_action_required(
+    "fees",
+    "delete",
+    "You do not have permission to delete student fees.",
 )
 def delete_fee(request, fee_id):
     fee = get_fee_or_404(fee_id)
@@ -253,9 +261,10 @@ def delete_fee(request, fee_id):
 
 
 @login_required
-@plan_feature_required(
-    "fees.manage",
-    "Your current subscription does not include access to fee management.",
+@feature_action_required(
+    "fees",
+    "create",
+    "You do not have permission to record fee payments.",
 )
 def create_payment(request, fee_id):
     fee = get_fee_or_404(fee_id)
@@ -283,9 +292,10 @@ def create_payment(request, fee_id):
 
 
 @login_required
-@plan_feature_required(
-    "fees.manage",
-    "Your current subscription does not include access to fee management.",
+@feature_action_required(
+    "fees",
+    "update",
+    "You do not have permission to update fee payments.",
 )
 def update_payment(request, payment_id):
     payment = get_payment_or_404(payment_id)
@@ -315,9 +325,10 @@ def update_payment(request, payment_id):
 
 
 @login_required
-@plan_feature_required(
-    "fees.manage",
-    "Your current subscription does not include access to fee management.",
+@feature_action_required(
+    "fees",
+    "delete",
+    "You do not have permission to delete fee payments.",
 )
 def delete_payment(request, payment_id):
     payment = get_payment_or_404(payment_id)
@@ -343,9 +354,10 @@ def delete_payment(request, payment_id):
 
 
 @login_required
-@plan_feature_required(
-    "fees.view",
-    "Your current subscription does not include access to fee viewing.",
+@feature_action_required(
+    "fees",
+    "view",
+    "You do not have permission to view fee receipts.",
 )
 def payment_receipt(request, payment_id):
     payment = get_payment_or_404(payment_id)
@@ -364,9 +376,10 @@ def payment_receipt(request, payment_id):
 
 
 @login_required
-@plan_feature_required(
-    "fees.view",
-    "Your current subscription does not include access to fee viewing.",
+@feature_action_required(
+    "fees",
+    "view",
+    "You do not have permission to download fee receipts.",
 )
 def payment_receipt_pdf(request, payment_id):
     payment = get_payment_or_404(payment_id)
@@ -426,9 +439,10 @@ def principal_salary_access(user):
 
 
 @login_required
-@plan_feature_required(
-    "payroll.view",
-    "Your current subscription does not include access to payroll viewing.",
+@feature_action_required(
+    "teacher_management",
+    "view",
+    "Your current subscription does not include Teacher Management.",
 )
 def salary_list(request):
     if not principal_salary_access(request.user):
@@ -441,9 +455,10 @@ def salary_list(request):
 
 
 @login_required
-@plan_feature_required(
-    "payroll.manage",
-    "Your current subscription does not include access to payroll management.",
+@feature_action_required(
+    "teacher_management",
+    "create",
+    "You do not have permission to create teacher salary records.",
 )
 def create_salary(request):
     if not principal_salary_access(request.user):
@@ -472,9 +487,10 @@ def get_salary_for_principal(request, salary_id):
 
 
 @login_required
-@plan_feature_required(
-    "payroll.view",
-    "Your current subscription does not include access to payroll viewing.",
+@feature_action_required(
+    "teacher_management",
+    "view",
+    "You do not have permission to view teacher salary records.",
 )
 def salary_detail(request, salary_id):
     salary = get_salary_for_principal(request, salary_id)
@@ -503,9 +519,10 @@ def salary_detail(request, salary_id):
 
 
 @login_required
-@plan_feature_required(
-    "payroll.manage",
-    "Your current subscription does not include access to payroll management.",
+@feature_action_required(
+    "teacher_management",
+    "update",
+    "You do not have permission to update teacher salary records.",
 )
 def update_salary(request, salary_id):
     salary = get_salary_for_principal(request, salary_id)
@@ -534,9 +551,10 @@ def update_salary(request, salary_id):
 
 
 @login_required
-@plan_feature_required(
-    "payroll.manage",
-    "Your current subscription does not include access to payroll management.",
+@feature_action_required(
+    "teacher_management",
+    "delete",
+    "You do not have permission to delete teacher salary records.",
 )
 def delete_salary(request, salary_id):
     salary = get_salary_for_principal(request, salary_id)

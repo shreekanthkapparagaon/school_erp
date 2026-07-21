@@ -20,7 +20,7 @@
           <a href="{% url 'core:contact_requests' %}">Contact Requests</a>
         {% endif %}
         {% if user.role == "principal" %}
-          {% if perms.plans.feature_schools_manage %}
+          {% if perms.plans.feature_student_management %}
             <a href="{% url 'accounts:user_list' 'student' %}">Students</a>
             <a href="{% url 'accounts:user_list' 'head' %}">Heads</a>
             <a href="{% url 'accounts:user_list' 'teacher' %}">Teachers</a>
@@ -29,21 +29,21 @@
             <a href="{% url 'schools:promote_class' %}">Promote Classes</a>
             <a href="{% url 'schools:assignment_list' %}">Assignments</a>
           {% endif %}
-          {% if perms.plans.feature_fees_view %}
+          {% if perms.plans.feature_fees %}
             <a href="{% url 'fees:fee_list' %}">Student Fees</a>
           {% endif %}
-          {% if perms.plans.feature_payroll_view %}
+          {% if perms.plans.feature_teacher_management %}
             <a href="{% url 'fees:salary_list' %}">Teacher Salaries</a>
           {% endif %}
-          {% if perms.plans.feature_results_view %}
+          {% if perms.plans.feature_results %}
             <a href="{% url 'results:home' %}">Results</a>
           {% endif %}
-          {% if perms.plans.feature_documents_manage %}
+          {% if perms.plans.feature_documents %}
             <a href="{% url 'document:document_list' %}">Documents</a>
           {% endif %}
         {% endif %}
         {% if user.role == "head" %}
-          {% if perms.plans.feature_schools_manage %}
+          {% if perms.plans.feature_student_management %}
             <a href="{% url 'accounts:user_list' 'student' %}">Students</a>
             <a href="{% url 'accounts:user_list' 'teacher' %}">Teachers</a>
             <a href="{% url 'schools:subject_list' %}">Subjects</a>
@@ -51,35 +51,35 @@
             <a href="{% url 'schools:promote_class' %}">Promote Classes</a>
             <a href="{% url 'schools:assignment_list' %}">Assignments</a>
           {% endif %}
-          {% if perms.plans.feature_fees_view %}
+          {% if perms.plans.feature_fees %}
             <a href="{% url 'fees:fee_list' %}">Student Fees</a>
           {% endif %}
-          {% if perms.plans.feature_results_view %}
+          {% if perms.plans.feature_results %}
             <a href="{% url 'results:home' %}">Results</a>
           {% endif %}
-          {% if perms.plans.feature_documents_manage %}
+          {% if perms.plans.feature_documents %}
             <a href="{% url 'document:document_list' %}">Documents</a>
           {% endif %}
         {% endif %}
         {% if user.role == "teacher" %}
-          {% if perms.plans.feature_schools_manage %}
+          {% if perms.plans.feature_student_management %}
             <a href="{% url 'schools:class_list' %}">Classes</a>
           {% endif %}
-          {% if perms.plans.feature_results_view %}
+          {% if perms.plans.feature_results %}
             <a href="{% url 'results:home' %}">Results</a>
           {% endif %}
-          {% if perms.plans.feature_documents_manage %}
+          {% if perms.plans.feature_documents %}
             <a href="{% url 'document:document_list' %}">Documents</a>
           {% endif %}
         {% endif %}
         {% if user.role == "student" %}
-          {% if perms.plans.feature_fees_view %}
+          {% if perms.plans.feature_fees %}
             <a href="{% url 'fees:fee_list' %}">My Fees</a>
           {% endif %}
-          {% if perms.plans.feature_results_view %}
+          {% if perms.plans.feature_results %}
             <a href="{% url 'results:home' %}">My Results</a>
           {% endif %}
-          {% if perms.plans.feature_documents_manage %}
+          {% if perms.plans.feature_documents %}
             <a href="{% url 'document:document_list' %}">Documents</a>
           {% endif %}
         {% endif %}

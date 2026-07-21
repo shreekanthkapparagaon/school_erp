@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from apps.plans.utils import plan_feature_required
+from apps.plans.utils import feature_action_required, feature_required
 from apps.schools.models import TeacherSubjectAssignment
 
 from .forms import (
@@ -304,9 +304,9 @@ def role_queryset_for(user, role):
 
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school and user management.",
+@feature_required(
+    "student_management",
+    "Your current subscription does not include Student Management.",
 )
 def user_list(request, role):
     allowed_roles = [r.value for r in manageable_roles(request.user)]
@@ -330,9 +330,10 @@ def user_list(request, role):
 
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school and user management.",
+@feature_action_required(
+    "student_management",
+    "create",
+    "You do not have permission to create students.",
 )
 def create_user(request):
     allowed_roles = manageable_roles(request.user)
@@ -373,9 +374,10 @@ def create_user(request):
 
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school and user management.",
+@feature_action_required(
+    "student_management",
+    "view",
+    "You do not have permission to view student details.",
 )
 def user_detail(request, user_id):
     account = get_object_or_404(
@@ -413,9 +415,10 @@ def user_detail(request, user_id):
 
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school and user management.",
+@feature_action_required(
+    "student_management",
+    "update",
+    "You do not have permission to update students.",
 )
 def update_user(request, user_id):
     account = get_object_or_404(User, pk=user_id)
@@ -447,9 +450,10 @@ def update_user(request, user_id):
 
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school and user management.",
+@feature_action_required(
+    "student_management",
+    "delete",
+    "You do not have permission to delete students.",
 )
 def delete_user(request, user_id):
     account = get_object_or_404(User, pk=user_id)
@@ -477,9 +481,10 @@ def delete_user(request, user_id):
 
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school and user management.",
+@feature_action_required(
+    "student_management",
+    "assign",
+    "You do not have permission to delete students.",
 )
 def assign_principal_school(request):
     if request.user.role != User.Role.MANAGER:

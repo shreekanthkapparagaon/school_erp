@@ -7,7 +7,7 @@ from django.core.paginator import Paginator
 
 from apps.document.forms import DocumentForm, DocumentTypeForm
 from apps.document.models import Document, DocumentType
-from apps.plans.utils import plan_feature_required
+from apps.plans.utils import feature_required
 
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -19,8 +19,8 @@ User = get_user_model()
 
 
 @login_required
-@plan_feature_required(
-    "documents.manage",
+@feature_required(
+    "documents",
     "Your current subscription does not include access to document management.",
 )
 def document_list(request):
@@ -41,8 +41,8 @@ def document_list(request):
     )
 
 @login_required
-@plan_feature_required(
-    "documents.manage",
+@feature_required(
+    "documents",
     "Your current subscription does not include access to document management.",
 )
 def document_detail(request, pk):
@@ -59,8 +59,8 @@ def document_detail(request, pk):
 
 
 @login_required
-@plan_feature_required(
-    "documents.manage",
+@feature_required(
+    "documents",
     "Your current subscription does not include access to document management.",
 )
 def document_create(request):
@@ -93,8 +93,8 @@ def document_create(request):
 
 
 @login_required
-@plan_feature_required(
-    "documents.manage",
+@feature_required(
+    "documents",
     "Your current subscription does not include access to document management.",
 )
 def document_update(request, pk):
@@ -131,8 +131,8 @@ def document_update(request, pk):
     )
 
 @login_required
-@plan_feature_required(
-    "documents.manage",
+@feature_required(
+    "documents",
     "Your current subscription does not include access to document management.",
 )
 def document_delete(request, pk):
@@ -159,8 +159,8 @@ def document_delete(request, pk):
 
 
 @login_required
-@plan_feature_required(
-    "documents.manage",
+@feature_required(
+    "documents",
     "Your current subscription does not include access to document management.",
 )
 def document_type_list(request):
@@ -174,8 +174,8 @@ def document_type_list(request):
     )
 
 @login_required
-@plan_feature_required(
-    "documents.manage",
+@feature_required(
+    "documents",
     "Your current subscription does not include access to document management.",
 )
 def document_type_create(request):
@@ -206,8 +206,8 @@ def document_type_create(request):
     )
 
 @login_required
-@plan_feature_required(
-    "documents.manage",
+@feature_required(
+    "documents",
     "Your current subscription does not include access to document management.",
 )
 def document_type_update(request, pk):
@@ -246,8 +246,8 @@ def document_type_update(request, pk):
 
 
 @login_required
-@plan_feature_required(
-    "documents.manage",
+@feature_required(
+    "documents",
     "Your current subscription does not include access to document management.",
 )
 def document_type_delete(request, pk):

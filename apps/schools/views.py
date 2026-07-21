@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from apps.accounts.models import User
-from apps.plans.utils import plan_feature_required
+from apps.plans.utils import feature_action_required
 
 from .models import School, SchoolClass, Subject, TeacherSubjectAssignment
 from .forms import SchoolClassForm, SchoolForm, SubjectForm, TeacherSubjectAssignmentForm
@@ -182,10 +182,10 @@ def delete_school(request, school_id):
     )
 
 
-@login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school management features.",
+@feature_action_required(
+    "teacher_management",
+    "view",
+    "Your current subscription does not include Teacher Management.",
 )
 def subject_list(request):
     if not can_manage_school_content(request.user):
@@ -202,9 +202,10 @@ def subject_list(request):
 
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school management features.",
+@feature_action_required(
+    "teacher_management",
+    "create",
+    "You do not have permission to create subjects.",
 )
 def create_subject(request):
     if not can_manage_school_content(request.user):
@@ -222,9 +223,10 @@ def create_subject(request):
 
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school management features.",
+@feature_action_required(
+    "teacher_management",
+    "view",
+    "You do not have permission to view subjects.",
 )
 def subject_detail(request, subject_id):
     subject = get_object_or_404(Subject.objects.select_related("school"), pk=subject_id)
@@ -257,9 +259,10 @@ def subject_detail(request, subject_id):
 
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school management features.",
+@feature_action_required(
+    "teacher_management",
+    "update",
+    "You do not have permission to update subjects.",
 )
 def update_subject(request, subject_id):
     subject = get_object_or_404(Subject.objects.select_related("school"), pk=subject_id)
@@ -284,9 +287,10 @@ def update_subject(request, subject_id):
 
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school management features.",
+@feature_action_required(
+    "teacher_management",
+    "delete",
+    "You do not have permission to delete subjects.",
 )
 def delete_subject(request, subject_id):
     subject = get_object_or_404(Subject.objects.select_related("school"), pk=subject_id)
@@ -311,9 +315,10 @@ def delete_subject(request, subject_id):
 
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school management features.",
+@feature_action_required(
+    "student_management",
+    "view",
+    "Your current subscription does not include Student Management.",
 )
 def class_list(request):
     can_manage = can_manage_school_content(request.user)
@@ -338,9 +343,10 @@ def class_list(request):
 
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school management features.",
+@feature_action_required(
+    "student_management",
+    "create",
+    "You do not have permission to create classes.",
 )
 def create_class(request):
     if not can_manage_school_content(request.user):
@@ -358,9 +364,10 @@ def create_class(request):
 
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school management features.",
+@feature_action_required(
+    "student_management",
+    "create",
+    "You do not have permission to create classes.",
 )
 def class_detail(request, class_id):
     school_class = get_object_or_404(
@@ -400,9 +407,10 @@ def class_detail(request, class_id):
 
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school management features.",
+@feature_action_required(
+    "student_management",
+    "update",
+    "You do not have permission to update classes.",
 )
 def update_class(request, class_id):
     school_class = get_object_or_404(
@@ -433,9 +441,10 @@ def update_class(request, class_id):
     )
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school management features.",
+@feature_action_required(
+    "student_management",
+    "update",
+    "You do not have permission to promote students.",
 )
 def promote_class(request):
     if request.method != "POST":
@@ -501,9 +510,10 @@ def promote_class(request):
     )
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school management features.",
+@feature_action_required(
+    "student_management",
+    "delete",
+    "You do not have permission to delete classes.",
 )
 def delete_class(request, class_id):
     school_class = get_object_or_404(
@@ -531,9 +541,10 @@ def delete_class(request, class_id):
 
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school management features.",
+@feature_action_required(
+    "teacher_management",
+    "view",
+    "Your current subscription does not include Teacher Management.",
 )
 def assignment_list(request):
     if not can_manage_school_content(request.user):
@@ -549,9 +560,10 @@ def assignment_list(request):
 
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school management features.",
+@feature_action_required(
+    "teacher_management",
+    "assign",
+    "You do not have permission to assign subjects to teachers.",
 )
 def create_assignment(request):
     if not can_manage_school_content(request.user):
@@ -573,9 +585,10 @@ def create_assignment(request):
 
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school management features.",
+@feature_action_required(
+    "teacher_management",
+    "view",
+    "You do not have permission to view teacher assignments.",
 )
 def assignment_detail(request, assignment_id):
     assignment = get_object_or_404(
@@ -615,9 +628,10 @@ def assignment_detail(request, assignment_id):
 
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school management features.",
+@feature_action_required(
+    "teacher_management",
+    "update",
+    "You do not have permission to update teacher assignments.",
 )
 def update_assignment(request, assignment_id):
     assignment = get_object_or_404(
@@ -649,9 +663,10 @@ def update_assignment(request, assignment_id):
 
 
 @login_required
-@plan_feature_required(
-    "schools.manage",
-    "Your current subscription does not include access to school management features.",
+@feature_action_required(
+    "teacher_management",
+    "delete",
+    "You do not have permission to delete teacher assignments.",
 )
 def delete_assignment(request, assignment_id):
     assignment = get_object_or_404(

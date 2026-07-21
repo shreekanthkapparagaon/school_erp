@@ -49,52 +49,109 @@ def school_scope(user):
 @login_required
 @manager_required
 def manager_dashboard(request):
-    contact_requests = Contact.objects.order_by("-created_at")
     context = {
         "page_title": "Manager Dashboard",
-        "schools": School.objects.order_by("-id"),
-        "principals": User.objects.filter(role=User.Role.PRINCIPAL).select_related("school").order_by("-date_joined", "-id"),
-        "subscriptions": Subscription.objects.select_related("school", "plan").order_by("school__name"),
-        "plans": Plan.objects.order_by("name"),
-        "contact_requests_count": contact_requests.count(),
-        "unread_contact_requests_count": contact_requests.filter(is_read=False).count(),
+
+        "school_count": School.objects.count(),
+
+        "principal_count": User.objects.filter(
+            role=User.Role.PRINCIPAL
+        ).count(),
+
+        "plan_count": Plan.objects.count(),
+
+        "subscription_count": Subscription.objects.count(),
+
+        "contact_request_count": Contact.objects.count(),
+
+        "unread_contact_request_count": Contact.objects.filter(
+            is_read=False
+        ).count(),
     }
-    return render(request, "dashboards/manager.html", context)
+
+    return render(
+        request,
+        "dashboards/manager.html",
+        context,
+    )
 
 
 @login_required
 def head_dashboard(request):
     filters = school_scope(request.user)
+
     context = {
         "page_title": "Head Dashboard",
-        "schools": School.objects.filter(id=request.user.school_id) if request.user.school_id else [],
-        "students": User.objects.filter(role=User.Role.STUDENT, **filters).order_by("-date_joined", "-id"),
-        "teachers": User.objects.filter(role=User.Role.TEACHER, **filters).order_by("-date_joined", "-id"),
-        "subjects": Subject.objects.filter(**filters).order_by("-id"),
-        "classes": SchoolClass.objects.filter(**filters).order_by("-id"),
-        "assignments": TeacherSubjectAssignment.objects.filter(**filters).select_related(
-            "teacher", "subject", "school_class", "school"
-        ).order_by("-created_at", "-id"),
-    }
-    return render(request, "dashboards/head.html", context)
 
+        "student_count": User.objects.filter(
+            role=User.Role.STUDENT,
+            **filters
+        ).count(),
+
+        "teacher_count": User.objects.filter(
+            role=User.Role.TEACHER,
+            **filters
+        ).count(),
+
+        "subject_count": Subject.objects.filter(
+            **filters
+        ).count(),
+
+        "class_count": SchoolClass.objects.filter(
+            **filters
+        ).count(),
+
+        "assignment_count": TeacherSubjectAssignment.objects.filter(
+            **filters
+        ).count(),
+    }
+
+    return render(
+        request,
+        "dashboards/head.html",
+        context,
+    )
 
 @login_required
 def principal_dashboard(request):
     filters = school_scope(request.user)
+
     context = {
         "page_title": "Principal Dashboard",
-        "schools": School.objects.filter(id=request.user.school_id) if request.user.school_id else School.objects.none(),
-        "students": User.objects.filter(role=User.Role.STUDENT, **filters).order_by("-date_joined", "-id"),
-        "teachers": User.objects.filter(role=User.Role.TEACHER, **filters).order_by("-date_joined", "-id"),
-        "heads": User.objects.filter(role=User.Role.HEAD, **filters).order_by("-date_joined", "-id"),
-        "subjects": Subject.objects.filter(**filters).select_related("school").order_by("-id"),
-        "classes": SchoolClass.objects.filter(**filters).select_related("school").order_by("-id"),
-        "assignments": TeacherSubjectAssignment.objects.filter(**filters).select_related(
-            "teacher", "subject", "school_class", "school"
-        ).order_by("-created_at", "-id"),
+
+        "student_count": User.objects.filter(
+            role=User.Role.STUDENT,
+            **filters
+        ).count(),
+
+        "teacher_count": User.objects.filter(
+            role=User.Role.TEACHER,
+            **filters
+        ).count(),
+
+        "head_count": User.objects.filter(
+            role=User.Role.HEAD,
+            **filters
+        ).count(),
+
+        "subject_count": Subject.objects.filter(
+            **filters
+        ).count(),
+
+        "class_count": SchoolClass.objects.filter(
+            **filters
+        ).count(),
+
+        "assignment_count": TeacherSubjectAssignment.objects.filter(
+            **filters
+        ).count(),
     }
-    return render(request, "dashboards/principal.html", context)
+
+    return render(
+        request,
+        "dashboards/principal.html",
+        context,
+    )
 
 
 @login_required
@@ -150,33 +207,71 @@ def manager_contact_request_detail(request, request_id):
 
 @login_required
 def teacher_dashboard(request):
-    assignments = TeacherSubjectAssignment.objects.filter(teacher=request.user).select_related(
-        "school", "subject", "school_class"
+    assignments = TeacherSubjectAssignment.objects.filter(
+        teacher=request.user
     )
-    class_ids = assignments.values_list("school_class_id", flat=True)
-    students = User.objects.filter(role=User.Role.STUDENT, school_class_id__in=class_ids)
+
+    class_ids = assignments.values_list(
+        "school_class_id",
+        flat=True
+    ).distinct()
+
+    student_count = User.objects.filter(
+        role=User.Role.STUDENT,
+        school_class_id__in=class_ids,
+    ).count()
+
+    context = {
+        "page_title": "Teacher Dashboard",
+
+        "subject_count": assignments.values(
+            "subject"
+        ).distinct().count(),
+
+        "class_count": assignments.values(
+            "school_class"
+        ).distinct().count(),
+
+        "student_count": student_count,
+
+        "assignment_count": assignments.count(),
+    }
+
     return render(
         request,
         "dashboards/teacher.html",
-        {"assignments": assignments, "students": students, "page_title": "Teacher Dashboard"},
+        context,
     )
 
 
 @login_required
 def student_dashboard(request):
-    subjects = Subject.objects.filter(classes=request.user.school_class).distinct()
     assignments = TeacherSubjectAssignment.objects.filter(
         school_class=request.user.school_class
-    ).select_related("teacher", "subject")
+    ).select_related(
+        "teacher",
+        "subject",
+        "school_class",
+    )
+
+    context = {
+        "page_title": "Student Dashboard",
+
+        "subject_count": assignments.values(
+            "subject"
+        ).distinct().count(),
+
+        "teacher_count": assignments.values(
+            "teacher"
+        ).distinct().count(),
+    }
+
     return render(
         request,
         "dashboards/student.html",
-        {
-            "subjects": subjects,
-            "assignments": assignments,
-            "page_title": "Student Dashboard",
-        },
+        context,
     )
+
 
 
 def bad_request(request, exception=None):

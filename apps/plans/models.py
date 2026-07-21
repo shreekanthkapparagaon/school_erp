@@ -38,13 +38,6 @@ class Feature(models.Model):
         self.get_permission()
 
 
-IMPLIED_FEATURE_PERMISSIONS = {
-    "fees.manage": ["fees.view"],
-    "results.manage": ["results.view"],
-    "payroll.manage": ["payroll.view"],
-}
-
-
 class Plan(models.Model):
     slug = models.SlugField(max_length=100, unique=True)
     name = models.CharField(max_length=140)
@@ -67,21 +60,18 @@ class Plan(models.Model):
         return self.features.count()
 
     def active_features(self):
-        return self.features.filter(planfeature__enabled=True)
+        return self.features.all()
 
     def feature_permissions(self):
-        feature_codes = {feature.code for feature in self.active_features()}
-        for feature_code in list(feature_codes):
-            for parent_code, implied_codes in IMPLIED_FEATURE_PERMISSIONS.items():
-                if feature_code == parent_code:
-                    feature_codes.update(implied_codes)
-        return [feature.get_permission() for feature in Feature.objects.filter(code__in=feature_codes)]
+        return [
+        feature.get_permission()
+        for feature in self.features.all()
+    ]
 
 
 class PlanFeature(models.Model):
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
     feature = models.ForeignKey(Feature, on_delete=models.CASCADE)
-    enabled = models.BooleanField(default=False)
 
     class Meta:
         unique_together = [["plan", "feature"]]

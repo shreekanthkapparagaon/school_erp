@@ -11,7 +11,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from apps.plans.utils import plan_feature_required
+from apps.plans.utils import feature_action_required
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill
 from tablib import Dataset
@@ -79,9 +79,10 @@ def managed_classes(user):
 
 
 @login_required
-@plan_feature_required(
-    "results.view",
-    "Your current subscription does not include access to results.",
+@feature_action_required(
+    "results",
+    "view",
+    "Your current subscription does not include Results.",
 )
 def result_home(request):
     if request.user.role == User.Role.STUDENT:
@@ -117,9 +118,10 @@ def result_home(request):
 
 
 @login_required
-@plan_feature_required(
-    "results.view",
-    "Your current subscription does not include access to results.",
+@feature_action_required(
+    "results",
+    "view",
+    "Your current subscription does not include Results.",
 )
 def exam_results(request, exam_id):
     exam = get_object_or_404(
@@ -166,9 +168,10 @@ def exam_results(request, exam_id):
 
 
 @login_required
-@plan_feature_required(
-    "results.view",
-    "Your current subscription does not include access to results.",
+@feature_action_required(
+    "results",
+    "view",
+    "You do not have permission to view results.",
 )
 def class_results(request, class_id, exam_id=None):
     school_class = get_object_or_404(
@@ -212,9 +215,10 @@ def class_results(request, class_id, exam_id=None):
 
 
 @login_required
-@plan_feature_required(
-    "results.manage",
-    "Your current subscription does not include access to result creation.",
+@feature_action_required(
+    "results",
+    "create",
+    "You do not have permission to create results.",
 )
 def create_result(request, class_id, exam_id=None):
     school_class = get_object_or_404(SchoolClass, pk=class_id)
@@ -250,9 +254,10 @@ def create_result(request, class_id, exam_id=None):
 
 
 @login_required
-@plan_feature_required(
-    "results.view",
-    "Your current subscription does not include access to result details.",
+@feature_action_required(
+    "results",
+    "view",
+    "You do not have permission to view result details.",
 )
 def result_detail(request, result_id):
     result = get_object_or_404(
@@ -292,9 +297,10 @@ def result_detail(request, result_id):
 
 
 @login_required
-@plan_feature_required(
-    "results.manage",
-    "Your current subscription does not include access to result editing.",
+@feature_action_required(
+    "results",
+    "update",
+    "You do not have permission to update results.",
 )
 def update_result(request, result_id):
     result = get_object_or_404(
@@ -330,9 +336,10 @@ def update_result(request, result_id):
 
 
 @login_required
-@plan_feature_required(
-    "results.manage",
-    "Your current subscription does not include access to result deletion.",
+@feature_action_required(
+    "results",
+    "delete",
+    "You do not have permission to delete results.",
 )
 def delete_result(request, result_id):
     result = get_object_or_404(
@@ -361,9 +368,10 @@ def delete_result(request, result_id):
 
 
 @login_required
-@plan_feature_required(
-    "results.import",
-    "Your current subscription does not include access to result import.",
+@feature_action_required(
+    "results",
+    "import",
+    "You do not have permission to import results.",
 )
 def import_results(request, class_id):
     school_class = get_object_or_404(
@@ -512,9 +520,10 @@ def workbook_response(workbook, filename):
 
 
 @login_required
-@plan_feature_required(
-    "results.import",
-    "Your current subscription does not include access to result import templates.",
+@feature_action_required(
+    "results",
+    "import",
+    "You do not have permission to download the import template.",
 )
 def download_import_template(request, class_id):
     school_class = get_object_or_404(
@@ -542,6 +551,11 @@ def download_import_template(request, class_id):
 
 
 @login_required
+@feature_action_required(
+    "results",
+    "export",
+    "You do not have permission to export results.",
+)
 def export_class_results(request, class_id):
     school_class = get_object_or_404(
         SchoolClass.objects.select_related("school"),
@@ -571,9 +585,10 @@ def export_class_results(request, class_id):
 
 
 @login_required
-@plan_feature_required(
-    "results.view",
-    "Your current subscription does not include access to exporting results.",
+@feature_action_required(
+    "results",
+    "export",
+    "You do not have permission to export results.",
 )
 def export_all_results(request):
     if request.user.role != User.Role.PRINCIPAL or not request.user.school_id:
