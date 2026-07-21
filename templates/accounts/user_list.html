@@ -9,10 +9,10 @@
     </div>
     <div class="table-actions">
       <input data-filter="users" placeholder="Filter {{ title|lower }}">
-      {% if managed_role == "principal" and perms.plans.feature_schools_manage %}
+      {% if managed_role == "principal" and perms.plans.feature_student_management %}
         <a class="btn btn-muted" href="{% url 'accounts:assign_principal_school' %}">Assign school</a>
       {% endif %}
-      {% if perms.plans.feature_schools_manage %}
+      {% if perms.plans.feature_student_management %}
         <a class="btn" href="{% url 'accounts:create_user' %}?role={{ managed_role }}">Add {{ title|slice:":-1" }}</a>
       {% endif %}
     </div>

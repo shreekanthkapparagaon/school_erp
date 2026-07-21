@@ -546,3 +546,14 @@ input:focus, select:focus, textarea:focus {
     box-shadow: none;
   }
 }
+.stat-card {
+    text-decoration: none;
+    color: inherit;
+    transition: .2s ease;
+    cursor: pointer;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,.12);
+}

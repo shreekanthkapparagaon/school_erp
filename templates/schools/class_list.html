@@ -9,7 +9,7 @@
     </div>
     <div class="table-actions">
       <input data-filter="classes" placeholder="Filter classes">
-      {% if can_manage and perms.plans.feature_schools_manage %}
+      {% if can_manage and perms.plans.feature_student_management %}
         <a class="btn" href="{% url 'schools:create_class' %}">Add Class</a>
       {% endif %}
     </div>
