@@ -1,24 +1,52 @@
 {% extends "base.html" %}
-{% block page_heading %}Student Dashboard{% endblock %}
+
+{% block page_heading %}
+Student Dashboard
+{% endblock %}
+
 {% block content %}
-<section class="grid-two">
-  <article class="card profile-card">
-    <h2>My Profile</h2>
-    <p><strong>Name:</strong> {{ user }}</p>
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>School:</strong> {{ user.school|default:"Not assigned" }}</p>
-    <p><strong>Class:</strong> {{ user.school_class|default:"Not assigned" }}</p>
-  </article>
-  <article class="card">
-    <h2>Subjects</h2>
-    <div class="compact-list">{% for subject in subjects %}<span>{{ subject.name }} · {{ subject.code }}</span>{% empty %}<span>No subjects assigned.</span>{% endfor %}</div>
-  </article>
+
+<section class="stat-grid">
+
+    <a class="stat-card"
+       href="{% url 'accounts:profile' %}">
+        <span>My Profile</span>
+        <strong>👤</strong>
+        <small>View Profile</small>
+    </a>
+
+    <a class="stat-card success"
+       href="{% url 'schools:subject_list' %}">
+        <span>Subjects</span>
+        <strong>{{ subject_count }}</strong>
+        <small>My Subjects</small>
+    </a>
+
+    <a class="stat-card warning"
+       href="{% url 'schools:assignment_list' %}">
+        <span>Teachers</span>
+        <strong>{{ teacher_count }}</strong>
+        <small>Assigned Teachers</small>
+    </a>
+
+    {% if perms.plans.feature_fees %}
+    <a class="stat-card danger"
+       href="{% url 'fees:fee_list' %}">
+        <span>Fees</span>
+        <strong>₹</strong>
+        <small>View Fees</small>
+    </a>
+    {% endif %}
+
+    {% if perms.plans.feature_results %}
+    <a class="stat-card info"
+       href="{% url 'results:home' %}">
+        <span>Results</span>
+        <strong>📄</strong>
+        <small>View Results</small>
+    </a>
+    {% endif %}
+
 </section>
-<section class="card">
-  <div class="table-header"><h2>Teachers</h2><input data-filter="teachers" placeholder="Filter teachers"></div>
-  <table data-table="teachers" data-page-size="12"><thead><tr><th data-sort>Subject</th><th data-sort>Teacher</th><th data-sort>Email</th><th>Action</th></tr></thead><tbody>
-  {% for item in assignments %}<tr><td>{{ item.subject.name }}</td><td>{{ item.teacher }}</td><td>{{ item.teacher.email }}</td><td><div class="row-actions"><a class="btn btn-sm btn-muted" href="{% url 'schools:assignment_detail' item.pk %}">View</a></div></td></tr>{% empty %}<tr><td colspan="4">No teacher assignments yet.</td></tr>{% endfor %}
-  </tbody></table>
-  <div class="pager" data-pager="teachers"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
-</section>
+
 {% endblock %}

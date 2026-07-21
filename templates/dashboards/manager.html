@@ -1,64 +1,54 @@
 {% extends "base.html" %}
-{% block page_heading %}Manager Dashboard{% endblock %}
+
+{% block page_heading %}
+Manager Dashboard
+{% endblock %}
+
 {% block content %}
-<div class="action-row">
-  <a class="btn" href="{% url 'schools:school_list' %}">View schools</a>
-  <a class="btn btn-muted" href="{% url 'accounts:user_list' 'principal' %}">View principals</a>
-</div>
+
 <section class="stat-grid">
-  <article class="stat-card"><span>Schools</span><strong>{{ schools.count }}</strong><small>Managed institutions</small></article>
-  <article class="stat-card success"><span>Principals</span><strong>{{ principals.count }}</strong><small>Assigned leaders</small></article>
-  <article class="stat-card warning"><span>Plans</span><strong>{{ plans.count }}</strong><small>Configured plans</small></article>
-  <article class="stat-card"><span>Subscriptions</span><strong>{{ subscriptions.count }}</strong><small>Active assignments</small></article>
-  <article class="stat-card info"><span>Requests</span><strong>{{ contact_requests_count }}</strong><small>Total contact requests</small></article>
-  <article class="stat-card success"><span>Unread</span><strong>{{ unread_contact_requests_count }}</strong><small>Unresolved messages</small></article>
+
+    <a class="stat-card" href="{% url 'schools:school_list' %}">
+        <span>Schools</span>
+        <strong>{{ school_count }}</strong>
+        <small>Manage Schools</small>
+    </a>
+
+    <a class="stat-card success"
+       href="{% url 'accounts:user_list' 'principal' %}">
+        <span>Principals</span>
+        <strong>{{ principal_count }}</strong>
+        <small>View Principals</small>
+    </a>
+
+    <a class="stat-card warning"
+       href="{% url 'plans:plan_list' %}">
+        <span>Plans</span>
+        <strong>{{ plan_count }}</strong>
+        <small>Subscription Plans</small>
+    </a>
+
+    <a class="stat-card info"
+       href="{% url 'plans:service_management' %}">
+        <span>Subscriptions</span>
+        <strong>{{ subscription_count }}</strong>
+        <small>Manage Services</small>
+    </a>
+
+    <a class="stat-card danger"
+       href="{% url 'core:contact_requests' %}">
+        <span>Contact Requests</span>
+        <strong>{{ contact_request_count }}</strong>
+        <small>Total Requests</small>
+    </a>
+
+    <a class="stat-card success"
+       href="{% url 'core:contact_requests' %}">
+        <span>Unread Requests</span>
+        <strong>{{ unread_contact_request_count }}</strong>
+        <small>Need Attention</small>
+    </a>
+
 </section>
-<section class="grid-two">
-  <div class="card">
-    <div class="table-header"><h2>Recent Schools</h2><a class="btn btn-muted" href="{% url 'schools:create_school' %}">Add School</a></div>
-    <div class="compact-list">{% for school in schools|slice:":6" %}<span>{{ school.name }} · {{ school.code }}</span>{% empty %}<span>No schools yet.</span>{% endfor %}</div>
-  </div>
-  <div class="card">
-    <div class="table-header"><h2>Recent Principals</h2><a class="btn btn-muted" href="{% url 'accounts:create_user' %}?role=principal">Add Principal</a></div>
-    <div class="compact-list">{% for principal in principals|slice:":6" %}<span>{{ principal.email }} · {{ principal.school|default:"No school" }}</span>{% empty %}<span>No principals yet.</span>{% endfor %}</div>
-  </div>
-</section>
-<section class="card">
-  <div class="table-header">
-    <h2>Service packages</h2>
-    <div class="row-actions">
-      <a class="btn btn-muted" href="{% url 'plans:plan_list' %}">Manage plans</a>
-      <a class="btn btn-muted" href="{% url 'plans:subscription_create' %}">Assign subscription</a>
-      <a class="btn btn-muted" href="{% url 'plans:service_management' %}">Manage services</a>
-      <a class="btn btn-muted" href="{% url 'core:contact_requests' %}">Review contact requests</a>
-    </div>
-  </div>
-  <table data-table="plans" data-page-size="6">
-    <thead>
-      <tr>
-        <th data-sort="true">School</th>
-        <th data-sort="true">Plan</th>
-        <th data-sort="true">Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for subscription in subscriptions|slice:":6" %}
-      <tr>
-        <td>{{ subscription.school.name }}</td>
-        <td>{{ subscription.plan.name }}</td>
-        <td>{{ subscription.get_status_display }}</td>
-        <td>
-          <a class="btn btn-sm" href="{% url 'plans:subscription_update' subscription.id %}">Edit</a>
-          <a class="btn btn-sm btn-danger" href="{% url 'plans:subscription_delete' subscription.id %}">Delete</a>
-        </td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="4">No subscriptions assigned yet.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</section>
+
 {% endblock %}
