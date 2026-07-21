@@ -1,15 +1,49 @@
 {% extends "base.html" %}
+
 {% block page_heading %}{{ title }}{% endblock %}
+
 {% block content %}
 <div class="form-layout">
-  <form class="card form-card" method="post">
-    {% csrf_token %}
-    <h2>{{ title }}</h2>
-    {{ form.as_p }}
-    <div class="form-actions">
-      <a class="btn btn-muted" href="{% url 'document:document_type_list' %}">Cancel</a>
-      <button class="btn" type="submit">{{ submit_label }}</button>
-    </div>
-  </form>
+    <form class="card form-card" method="post">
+        {% csrf_token %}
+
+        <h2>{{ title }}</h2>
+
+        <div class="form-group">
+            {{ form.name.label_tag }}
+            {{ form.name }}
+            {{ form.name.errors }}
+        </div>
+
+        <div class="form-group">
+            {{ form.slug.label_tag }}
+            {{ form.slug }}
+            {{ form.slug.errors }}
+        </div>
+
+        <div class="form-group">
+            {{ form.roles.label_tag }}
+            {{ form.roles }}
+            {{ form.roles.errors }}
+            <small>Select one or more roles that can use this document type.</small>
+        </div>
+
+        <div class="form-group">
+            {{ form.description.label_tag }}
+            {{ form.description }}
+            {{ form.description.errors }}
+        </div>
+
+        <div class="form-group">
+            {{ form.active.label_tag }}
+            {{ form.active }}
+            {{ form.active.errors }}
+        </div>
+
+        <div class="form-actions">
+            <a class="btn btn-muted" href="{% url 'document:document_type_list' %}">Cancel</a>
+            <button class="btn" type="submit">{{ submit_label }}</button>
+        </div>
+    </form>
 </div>
 {% endblock %}

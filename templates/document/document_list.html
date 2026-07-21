@@ -5,8 +5,10 @@
   <div class="table-header">
     <h2>Documents</h2>
     <div class="row-actions">
-      <a class="btn" href="{% url 'document:document_create' %}">Upload Document</a>
-      <a class="btn btn-muted" href="{% url 'document:document_type_list' %}">Document Types</a>
+      {% if can_manage %}
+        <a class="btn" href="{% url 'document:document_create' %}">Upload Document</a>
+        <a class="btn btn-muted" href="{% url 'document:document_type_list' %}">Document Types</a>
+      {% endif %}
     </div>
   </div>
   <table>
@@ -39,5 +41,22 @@
       {% endfor %}
     </tbody>
   </table>
+  {% if documents.has_other_pages %}
+  <nav class="pagination">
+      {% if documents.has_previous %}
+          <a class="btn btn-sm" href="?page=1">&laquo; First</a>
+          <a class="btn btn-sm" href="?page={{ documents.previous_page_number }}">Previous</a>
+      {% endif %}
+
+      <span class="pagination-info">
+          Page {{ documents.number }} of {{ documents.paginator.num_pages }}
+      </span>
+
+      {% if documents.has_next %}
+          <a class="btn btn-sm" href="?page={{ documents.next_page_number }}">Next</a>
+          <a class="btn btn-sm" href="?page={{ documents.paginator.num_pages }}">Last &raquo;</a>
+      {% endif %}
+  </nav>
+  {% endif %}
 </section>
 {% endblock %}

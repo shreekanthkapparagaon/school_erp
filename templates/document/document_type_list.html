@@ -13,6 +13,7 @@
     <thead>
       <tr>
         <th>Name</th>
+        <th>School</th>
         <th>Slug</th>
         <th>Active</th>
         <th>Actions</th>
@@ -22,6 +23,13 @@
       {% for type in document_types %}
       <tr>
         <td>{{ type.name }}</td>
+        <td>
+            {% if type.school %}
+                {{ type.school.name }}
+            {% else %}
+                Global
+            {% endif %}
+        </td>
         <td>{{ type.slug }}</td>
         <td>{{ type.active|yesno:"Yes,No" }}</td>
         <td>

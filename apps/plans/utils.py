@@ -13,6 +13,7 @@ FEATURE_PERMISSION_PREFIX = "feature_"
 FEATURE_SUPERSET_PERMISSIONS = {
     "fees.view": ["fees.manage"],
     "results.view": ["results.manage"],
+    "documents.view": ["documents.manage"],
 }
 
 FEATURE_ROLE_ACTIONS = {
@@ -30,6 +31,12 @@ FEATURE_ROLE_ACTIONS = {
     },
     "results.manage": {
         User.Role.PRINCIPAL: {"view", "create", "update", "delete", "assign"},
+        User.Role.HEAD: {"view", "create", "update"},
+        User.Role.TEACHER: {"view", "create", "update"},
+        User.Role.STUDENT: {"view"},
+    },
+    "documents.manage": {
+        User.Role.PRINCIPAL: {"view", "create", "update", "delete"},
         User.Role.HEAD: {"view", "create", "update"},
         User.Role.TEACHER: {"view", "create", "update"},
         User.Role.STUDENT: {"view"},

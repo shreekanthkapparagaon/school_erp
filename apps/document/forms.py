@@ -8,41 +8,87 @@ class DocumentForm(forms.ModelForm):
     role = forms.ChoiceField(
         choices=User.Role.choices,
         required=True,
-        label="Role",
     )
 
     class Meta:
         model = Document
-        fields = ["role", "user", "document_type", "file"]
+        fields = [
+            "role",
+            "user",
+            "document_type",
+            "file",
+        ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, current_user=None, **kwargs):
         super().__init__(*args, **kwargs)
-        role_value = None
-        if self.data.get("role"):
-            role_value = self.data.get("role")
-        elif self.instance and self.instance.role:
-            role_value = self.instance.role
 
-        if role_value:
-            self.fields["user"].queryset = User.objects.filter(role=role_value).order_by("email")
-        else:
-            self.fields["user"].queryset = User.objects.order_by("email")
+        self.current_user = current_user
 
-        self.fields["user"].label_from_instance = lambda obj: f"{obj.email} ({obj.get_role_display()})"
+        role = (
+            self.data.get("role")
+            or getattr(self.instance, "role", None)
+        )
 
-    def clean(self):
-        cleaned_data = super().clean()
-        role = cleaned_data.get("role")
-        user = cleaned_data.get("user")
-        if role and user and user.role != role:
-            self.add_error(
-                "user",
-                "Selected user does not match the chosen role."
+        # Empty until a role is selected
+        self.fields["user"].queryset = User.objects.none()
+        self.fields["document_type"].queryset = DocumentType.objects.none()
+
+        if role:
+
+            # ----------------------------
+            # User queryset
+            # ----------------------------
+            users = User.objects.filter(role=role)
+
+            if (
+                current_user
+                and current_user.role != User.Role.MANAGER
+            ):
+                users = users.filter(
+                    school=current_user.school
+                )
+
+            self.fields["user"].queryset = users.order_by("email")
+
+            # ----------------------------
+            # Document Types
+            # ----------------------------
+            self.fields["document_type"].queryset = (
+                DocumentType.objects.filter(
+                    active=True,
+                    roles__contains=[role],
+                )
+                .order_by("name")
             )
-        return cleaned_data
+
+        self.fields["user"].label_from_instance = (
+            lambda obj: f"{obj.email} ({obj.get_role_display()})"
+        )
 
 
 class DocumentTypeForm(forms.ModelForm):
+    roles = forms.MultipleChoiceField(
+        choices=User.Role.choices,
+        widget=forms.SelectMultiple(attrs={"size": 6}),
+        required=True,
+    )
+
     class Meta:
         model = DocumentType
-        fields = ["slug", "name", "description", "active"]
+        fields = [
+            "school",
+            "name",
+            "slug",
+            "roles",
+            "description",
+            "active",
+        ]
+
+    def __init__(self, *args, current_user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance.pk:
+            self.initial["roles"] = self.instance.roles
+
+        if current_user and current_user.role != User.Role.MANAGER:
+            self.fields.pop("school")

@@ -9,8 +9,11 @@
     </div>
     <div class="row-actions">
       <a class="btn btn-muted" href="{% url 'document:document_list' %}">Back</a>
-      <a class="btn btn-sm" href="{% url 'document:document_update' document.pk %}">Edit</a>
-      <a class="btn btn-sm btn-danger" href="{% url 'document:document_delete' document.pk %}">Delete</a>
+
+      {% if can_manage %}
+        <a class="btn btn-sm" href="{% url 'document:document_update' document.pk %}">Edit</a>
+        <a class="btn btn-sm btn-danger" href="{% url 'document:document_delete' document.pk %}">Delete</a>
+      {% endif %}
     </div>
   </div>
   <dl class="detail-list">
