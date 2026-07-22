@@ -1,30 +1,186 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Home | School ERP{% endblock %}
-{% block page_heading %}School ERP Administration{% endblock %}
-{% block content %}
-<div class="hero-panel">
-  <div>
-    <p class="eyebrow">Modern academic operations</p>
-    <h2>Manage schools, users, classes, subjects, and assignments from one clean workspace.</h2>
-    <p>Built for principals, heads, teachers, and students with role-based dashboards and school-scoped data.</p>
-    <div class="action-row">
-      {% if request.user.is_authenticated %}
-        <a class="btn" href="{% url 'accounts:role_redirect' %}">Go to Dashboard</a>
-      {% else %}
-        <a class="btn" href="{% url 'accounts:login' %}">Sign up</a>
-      {% endif %}
-      <a class="btn btn-muted" href="{% url 'core:about' %}">Learn more</a>
-    </div>
-  </div>
-  <div>
-    <img src="{% static 'images/hero.svg' %}" alt="School ERP" width="400" height="300">
-  </div>
-</div>
 
-<div class="stat-grid">
-  <article class="stat-card"><span>Dashboard</span><strong>Responsive</strong><small>Academic SaaS layout</small></article>
-  <article class="stat-card success"><span>Roles</span><strong>4+</strong><small>Student, teacher, head, principal</small></article>
-  <article class="stat-card warning"><span>Scope</span><strong>School</strong><small>Subjects and classes per school</small></article>
-</div>
+{% block title %}School ERP{% endblock %}
+{% block page_heading %}School ERP{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+
+<section class="hero-panel">
+
+    <div>
+
+        <p class="eyebrow">
+            Modern School Management Platform
+        </p>
+
+        <h1>
+            Everything your school needs in one place.
+        </h1>
+
+        <p>
+            Manage students, teachers, classes, fees, results,
+            documents, and more through a secure role-based ERP.
+        </p>
+
+        <div class="action-row">
+
+            {% if user.is_authenticated %}
+                <a class="btn"
+                   href="{% url 'accounts:role_redirect' %}">
+                    Dashboard
+                </a>
+            {% else %}
+                <a class="btn"
+                   href="{% url 'accounts:login' %}">
+                    Get Started
+                </a>
+            {% endif %}
+
+            <a class="btn btn-muted"
+               href="{% url 'core:about' %}">
+                Learn More
+            </a>
+
+        </div>
+
+    </div>
+
+    <div>
+
+        <img
+            src="{% static 'images/hero.svg' %}"
+            alt="School ERP"
+            width="450">
+
+    </div>
+
+</section>
+
+<section class="card">
+
+    <div class="section-header">
+        <div>
+            <p class="eyebrow">Core Modules</p>
+            <h2>Everything You Need to Manage Your School</h2>
+            <p>
+                School ERP provides all the essential tools required to
+                efficiently manage academic and administrative operations.
+            </p>
+        </div>
+    </div>
+
+    <div class="stat-grid">
+
+        <article class="stat-card">
+            <i class="fa-solid fa-user-graduate module-icon"></i>
+            <span>Student Management</span>
+            <small>
+                Admissions, profiles, class allocation and student records.
+            </small>
+        </article>
+
+        <article class="stat-card">
+            <i class="fa-solid fa-chalkboard-user module-icon"></i>
+            <span>Teacher Management</span>
+            <small>
+                Faculty management, assignments and staff administration.
+            </small>
+        </article>
+
+        <article class="stat-card">
+            <i class="fa-solid fa-school module-icon"></i>
+            <span>School Management</span>
+            <small>
+                Multi-school administration with centralized control.
+            </small>
+        </article>
+
+        <article class="stat-card">
+            <i class="fa-solid fa-book-open-reader module-icon"></i>
+            <span>Academic Management</span>
+            <small>
+                Subjects, classes and teacher assignments.
+            </small>
+        </article>
+
+        <article class="stat-card">
+            <i class="fa-solid fa-square-poll-vertical module-icon"></i>
+            <span>Examination & Results</span>
+            <small>
+                Publish results and manage examinations efficiently.
+            </small>
+        </article>
+
+        <article class="stat-card">
+            <i class="fa-solid fa-folder-open module-icon"></i>
+            <span>Document Management</span>
+            <small>
+                Securely organize certificates and academic documents.
+            </small>
+        </article>
+
+    </div>
+
+</section>
+
+<section class="card">
+
+  <h2>Why Choose School ERP?</h2>
+
+  <ul class="feature-list">
+
+    <li>✔ Multi-school Management</li>
+
+    <li>✔ Role-based Access Control</li>
+
+    <li>✔ Subscription-based SaaS</li>
+
+    <li>✔ Secure Authentication</li>
+
+    <li>✔ Responsive Dashboard</li>
+
+    <li>✔ Document Management</li>
+
+    <li>✔ Examination & Results</li>
+
+    <li>✔ Fee Management</li>
+
+  </ul>
+
+</section>
+
+<section class="hero-panel">
+
+  <div>
+
+    <h2>
+    Ready to digitize your institution?
+    </h2>
+
+    <p>
+    Start managing your school efficiently with School ERP.
+    </p>
+
+    {% if user.is_authenticated %}
+
+      <a class="btn"
+      href="{% url 'accounts:role_redirect' %}">
+      Go to Dashboard
+      </a>
+
+    {% else %}
+
+      <a class="btn"
+      href="{% url 'accounts:login' %}">
+      Login
+      </a>
+
+    {% endif %}
+
+  </div>
+
+</section>
 {% endblock %}
