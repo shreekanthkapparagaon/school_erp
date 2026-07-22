@@ -1,72 +1,159 @@
 # School ERP
 
-A lightweight Django-based school management system with modular accounts, plans, fees, results, and contact workflows.
+A modular, multi-school ERP built with Django, featuring role-based access control, subscription plans, academic management, fee management, examination & results, and document management.
+
+> Current Release: **v2.1.0**
+
+---
+
+## Features
+
+- Multi-school management
+- Student management
+- Teacher management
+- Academic management
+- Fee management
+- Examination & Results
+- Document management
+- Subscription plans & feature-based access
+- Role-based authentication
+
+---
+
+## Tech Stack
+
+- Python 3.13
+- Django
+- SQLite (default)
+- PostgreSQL (recommended)
+- uv
+- HTML5
+- CSS3
+- JavaScript
+
+---
+
+## Prerequisites
+
+- Python 3.13 or later
+- uv
+
+Install **uv** if you don't have it:
+
+```bash
+pip install uv
+```
+
+---
 
 ## Setup
 
-1. Create a Python virtual environment:
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate    # macOS / Linux
-   .\.venv\Scripts\activate   # Windows
-   ```
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Create `.env` with your environment settings or configure `config/settings/dev.py`.
-4. Run migrations:
-   ```bash
-   python manage.py migrate --settings=config.settings.dev
-   ```
-
-## Demo data seeding
-
-Use the built-in demo seed command to generate schools, users, plans, subscriptions, fees, results, and demo credentials.
-
-### Basic seed
+### 1. Clone the repository
 
 ```bash
-python manage.py seed_demo_data --settings=config.settings.dev
+git clone https://github.com/shreekanthkapparagaon/school_erp.git
+cd school_erp
 ```
 
-### Seed with larger demo volume
+### 2. Create the virtual environment
 
 ```bash
-python manage.py seed_demo_data --settings=config.settings.dev \
-  --schools 20 \
-  --students-per-school 120 \
-  --teachers-per-school 20 \
-  --classes-per-school 10 \
-  --credentials-file demo_credentials.txt
+uv venv
 ```
 
-### Reset and reseed demo data
+### 3. Activate the environment
 
-This clears previously created demo plans, features, subscriptions, school demo data, and user accounts before seeding again.
+**Windows**
 
 ```bash
-python manage.py seed_demo_data --settings=config.settings.dev --reset --schools 10 --students-per-school 80
+.venv\Scripts\activate
 ```
 
-### Dry-run reset summary
+**Linux / macOS**
 
 ```bash
-python manage.py reset_demo_data --settings=config.settings.dev
+source .venv/bin/activate
 ```
 
-### Confirmed reset
+### 4. Install project dependencies
 
 ```bash
-python manage.py reset_demo_data --settings=config.settings.dev --confirm
+uv sync
 ```
 
-## Profile page
+### 5. Configure development settings
 
-A new profile link is available in the sidebar when authenticated. It redirects to a profile detail page for the logged-in user.
+Create a `.env` file or configure your settings in:
+
+```text
+config/settings/dev.py
+```
+
+### 6. Apply database migrations
+
+```bash
+python manage.py migrate --settings=config.settings.dev
+```
+
+### 7. Run the development server
+
+```bash
+python manage.py runserver --settings=config.settings.dev
+```
+
+---
+
+## Demo Data
+
+Generate a complete demo environment including schools, users, plans, subscriptions, fees, results, and demo credentials.
+
+### Seed Demo Dataset
+
+```bash
+python manage.py seed_demo_data
+```
+
+### Delete Demo Data
+
+Delete all demo data and reset the database.
+
+```bash
+python manage.py delete_demo_data --yes
+```
+
+---
+
+## Profile
+
+Authenticated users can access their profile from the application sidebar after logging in.
+
+---
+
+## Roadmap
+
+Future modules planned for the project:
+
+- Attendance Management
+- Library Management
+- Timetable Management
+- Inventory Management
+- Payroll
+- REST API
+
+---
+
+## License
+
+This project is licensed under the MIT License.
+
+---
 
 ## Notes
 
-- Demo credentials are written to `demo_credentials.txt` by default.
-- The seed command now supports bulk sizes up to 50 demo schools.
-- Demo plans are created and assigned to schools with feature-based subscriptions.
+- Uses **uv** for dependency and virtual environment management.
+- SQLite is the default database for local development.
+- PostgreSQL is recommended for production deployments.
+- Demo credentials are written to `demo_credentials.txt`.
+- Supports generating up to **50 demo schools**.
+- Automatically creates plans, features, subscriptions, schools, users, fees, and results.
+- `delete_demo_data --yes` removes all generated demo data.
