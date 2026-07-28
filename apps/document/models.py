@@ -46,6 +46,15 @@ class DocumentType(models.Model):
 
 
 class Document(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        APPROVED = "approved", "Approved"
+        REJECTED = "rejected", "Rejected"
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
     role = models.CharField(
         max_length=20,
         choices=User.Role.choices,
@@ -67,6 +76,7 @@ class Document(models.Model):
         on_delete=models.CASCADE,
         related_name="uploaded_documents",
     )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -80,3 +90,26 @@ class Document(models.Model):
 
     def __str__(self):
         return f"{self.document_type.name} for {self.user.email}"
+
+    @property
+    def filename(self):
+        return self.file.name.split("/")[-1]
+
+
+    @property
+    def extension(self):
+        return self.file.name.split(".")[-1].lower()
+
+    @property
+    def is_pdf(self):
+        return self.extension == "pdf"
+
+    @property
+    def is_image(self):
+        return self.extension in {
+            "jpg",
+            "jpeg",
+            "png",
+            "webp",
+        }
+    

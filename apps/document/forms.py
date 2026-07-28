@@ -53,12 +53,28 @@ class DocumentForm(forms.ModelForm):
             # ----------------------------
             # Document Types
             # ----------------------------
+            document_types = DocumentType.objects.filter(
+                active=True
+            )
+
+            if (
+                current_user
+                and current_user.role != User.Role.MANAGER
+            ):
+                document_types = document_types.filter(
+                    school=current_user.school
+                )
+
+            allowed_ids = [
+                dt.pk
+                for dt in document_types
+                if role in (dt.roles or [])
+            ]
+
             self.fields["document_type"].queryset = (
                 DocumentType.objects.filter(
-                    active=True,
-                    roles__contains=[role],
-                )
-                .order_by("name")
+                    pk__in=allowed_ids
+                ).order_by("name")
             )
 
         self.fields["user"].label_from_instance = (

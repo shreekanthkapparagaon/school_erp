@@ -41,22 +41,38 @@
       {% endfor %}
     </tbody>
   </table>
-  {% if documents.has_other_pages %}
-  <nav class="pagination">
+  {% if documents.paginator.num_pages > 1 %}
+  <div class="pager">
+
       {% if documents.has_previous %}
-          <a class="btn btn-sm" href="?page=1">&laquo; First</a>
-          <a class="btn btn-sm" href="?page={{ documents.previous_page_number }}">Previous</a>
+          <a class="btn btn-sm"
+            href="?page=1">
+              First
+          </a>
+
+          <a class="btn btn-sm"
+            href="?page={{ documents.previous_page_number }}">
+              Previous
+          </a>
       {% endif %}
 
-      <span class="pagination-info">
+      <span>
           Page {{ documents.number }} of {{ documents.paginator.num_pages }}
       </span>
 
       {% if documents.has_next %}
-          <a class="btn btn-sm" href="?page={{ documents.next_page_number }}">Next</a>
-          <a class="btn btn-sm" href="?page={{ documents.paginator.num_pages }}">Last &raquo;</a>
+          <a class="btn btn-sm"
+            href="?page={{ documents.next_page_number }}">
+              Next
+          </a>
+
+          <a class="btn btn-sm"
+            href="?page={{ documents.paginator.num_pages }}">
+              Last
+          </a>
       {% endif %}
-  </nav>
+
+  </div>
   {% endif %}
 </section>
 {% endblock %}

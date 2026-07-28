@@ -14,8 +14,41 @@ from django.urls import reverse
 
 from .utils import get_documents, can_manage_documents,get_document_types
 
+from django.template.response import TemplateResponse
+
 User = get_user_model()
 
+
+@login_required
+def document_role_filter(request):
+    role = request.GET.get("role")
+
+    users = User.objects.none()
+    document_types = DocumentType.objects.none()
+
+    if role:
+        users = User.objects.filter(
+            school=request.user.school,
+            role=role,
+        ).order_by("email")
+
+        document_types = [
+            dt
+            for dt in DocumentType.objects.filter(
+                school=request.user.school,
+                active=True,
+            )
+            if role in dt.roles
+        ]
+
+    return TemplateResponse(
+        request,
+        "document/partials/document_filters.html",
+        {
+            "users": users,
+            "document_types": document_types,
+        },
+    )
 
 
 @login_required

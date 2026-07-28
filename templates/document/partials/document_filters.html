@@ -1,0 +1,27 @@
+<div id="document-filter-area">
+
+    <div class="form-group">
+        <label for="id_user">User</label>
+        <select name="user" id="id_user">
+            <option value="">---------</option>
+            {% for user in users %}
+                <option value="{{ user.pk }}">
+                    {{ user }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="id_document_type">Document Type</label>
+        <select name="document_type" id="id_document_type">
+            <option value="">---------</option>
+            {% for type in document_types %}
+                <option value="{{ type.pk }}">
+                    {{ type.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+</div>

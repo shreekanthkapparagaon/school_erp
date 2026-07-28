@@ -5,6 +5,11 @@ from . import views
 app_name = "document"
 
 urlpatterns = [
+    path(
+        "role-filter/",
+        views.document_role_filter,
+        name="document_role_filter",
+    ),
     path("types/", views.document_type_list, name="document_type_list"),
     path("types/new/", views.document_type_create, name="document_type_create"),
     path("types/<int:pk>/edit/", views.document_type_update, name="document_type_update"),
