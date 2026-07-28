@@ -1,25 +1,30 @@
-"""
-Production settings for the Django project.
+from .base import *
 
-This module imports `base.py` and applies production-safe overrides. In
-production the `DJANGO_SETTINGS_MODULE` environment variable should be set to
-`config.settings.prod` and a real `DJANGO_SECRET_KEY` must be provided.
-"""
-from .base import *  # noqa: F401,F403
-
-import os
-
-# In production, require an explicit secret key.
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
-if not SECRET_KEY:
-	raise RuntimeError("DJANGO_SECRET_KEY environment variable must be set in production")
-
-# Disable debug in production
 DEBUG = False
 
-# ALLOWED_HOSTS must be explicitly provided in production
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",") if os.environ.get("DJANGO_ALLOWED_HOSTS") else []
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.getenv("MARIADB_DATABASE"),
+        "USER": os.getenv("MARIADB_USER"),
+        "PASSWORD": os.getenv("MARIADB_PASSWORD"),
+        "HOST": os.getenv("MARIADB_HOST", "localhost"),
+        "PORT": os.getenv("MARIADB_PORT", "3306"),
+        "CONN_MAX_AGE": 600,
+        "OPTIONS": {
+            "charset": "utf8mb4",
+            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
+    }
+}
 
-# Production database settings (example): set via environment variables
-# Consider using a URL parser (dj-database-url) if needed.
-MEDIA_URL = ""
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+
+X_FRAME_OPTIONS = "DENY"
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

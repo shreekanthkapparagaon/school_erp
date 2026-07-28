@@ -1,19 +1,33 @@
 [project]
 name = "school-erp"
 version = "0.1.0"
-description = "Add your description here"
+description = "School ERP - Multi-tenant School Management System"
 readme = "README.md"
 requires-python = ">=3.14"
+
 dependencies = [
     "django>=5.0,<6.0",
     "django-filter>=23.0,<24.0",
     "django-import-export[xlsx]>=4.3,<5.0",
-    "django-jazzmin>=2.0,<3.0",
+    "django-jazzmin>=3.0.5",
     "django-widget-tweaks>=1.4,<2.0",
     "openpyxl>=3.1,<4.0",
     "pillow>=11.3,<12.0",
-    "psycopg[binary]>=3.0,<4.0",
     "python-dotenv>=1.0,<2.0",
     "reportlab>=4.0,<5.0",
     "whitenoise>=6.0,<8.0",
 ]
+
+[dependency-groups]
+dev = [
+    "ipython>=9.0,<10.0",
+]
+
+prod = [
+    "gunicorn>=23.0,<24.0",
+    "psycopg[binary]>=3.2,<4.0",
+    "mysqlclient>=2.2,<3.0",
+]
+
+[tool.uv]
+default-groups = ["dev"]
