@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block page_heading %}
+{{ student }} - {{ exam.display_name }} Result
+{% endblock %}
+
+{% block content %}
+
+<section class="card">
+
+    <div class="table-header">
+
+        <div>
+
+            <p class="eyebrow">
+                {{ school_class.school.name }}
+            </p>
+
+            <h2>
+                {{ student }}
+            </h2>
+
+            <small>
+                {{ exam.display_name }}
+                •
+                {{ exam.academic_year }}
+                •
+                {{ exam.get_status_display|default:exam.status|title }}                
+            </small>
+        </div>
+
+        <div class="table-actions">
+            <button class="btn" onclick="window.print()">Print Report</button>
+            <a href="{% url 'results:exam_class_results' exam.id school_class.id %}" class="btn btn-secondary">← Back</a>
+            {% if exam.status == exam.Status.ACTIVE %}
+                <a href="{% url 'results:edit_student_results' exam.id student.id %}" class="btn btn-secondary">Edit</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="report-summary">
+
+        <div><strong>Student</strong></div>
+        <div>{{ student }}</div>
+
+        <div><strong>Roll No.</strong></div>
+        <div>{{ student.roll_number|default:"-" }}</div>
+
+        <div><strong>Class</strong></div>
+        <div>{{ school_class.name }} {{ school_class.section }}</div>
+
+        <div><strong>Exam</strong></div>
+        <div>{{ exam.display_name|default:exam.name }}</div>
+
+        <div><strong>Academic Year</strong></div>
+        <div>{{ exam.academic_year }}</div>
+
+        <div><strong>Status</strong></div>
+        <div>
+            {% if published %}
+                <span class="status status-paid">Published</span>
+            {% else %}
+                <span class="status status-pending">Draft</span>
+            {% endif %}
+        </div>
+
+        <div><strong>Total Marks</strong></div>
+        <div>{{ total_marks }}/{{ total_max_marks }}</div>
+
+        <div><strong>Percentage</strong></div>
+        <div>{{ overall_percentage|floatformat:1 }}%</div>
+
+        <div><strong>Grade</strong></div>
+        <div>{{ overall_grade }}</div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Max Marks</th>
+                    <th>Obtained</th>
+                    <th>Percentage</th>
+                    <th>Grade</th>
+
+                    
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for result in results %}
+                <tr>
+
+                    <td>{{ result.subject.name }}</td>
+
+                    <td>{{ result.max_marks|floatformat:0 }}</td>
+
+                    <td>
+
+                        {% if exam.status == exam.Status.ACTIVE and result.subject_id in editable_subjects %}
+
+                            <input
+                                type="number"
+                                name="marks_{{ result.id }}"
+                                value="{{ result.marks_obtained }}"
+                                min="0"
+                                max="{{ result.max_marks }}"
+                                step="0.01"
+                                class="form-control"
+                            >
+
+                        {% else %}
+
+                            {{ result.marks_obtained|floatformat:0 }}
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>{{ result.percentage|default:0|floatformat:1 }}%</td>
+
+                    <td>
+
+                        {% if result.grade == "A+" or result.grade == "A" %}
+                            <span class="status status-paid">
+                                {{ result.grade }}
+                            </span>
+
+                        {% elif result.grade == "B+" or result.grade == "B" %}
+                            <span class="status status-info">
+                                {{ result.grade }}
+                            </span>
+
+                        {% elif result.grade == "C+" or result.grade == "C" %}
+                            <span class="status status-pending">
+                                {{ result.grade }}
+                            </span>
+
+                        {% elif result.grade == "D" %}
+                            <span class="status status-warning">
+                                {{ result.grade }}
+                            </span>
+
+                        {% else %}
+                            <span class="status status-danger">
+                                {{ result.grade }}
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="{% if exam.status == exam.Status.ACTIVE %}6{% else %}5{% endif %}">
+                        No subject results have been entered for this examination.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+                <tr class="summary-row">
+
+                    <td><strong>Total</strong></td>
+
+                    <td><strong>{{ total_max_marks }}</strong></td>
+
+                    <td><strong>{{ total_marks }}</strong></td>
+
+                    <td><strong>{{ overall_percentage|floatformat:1 }}%</strong></td>
+
+                    <td><strong>{{ overall_grade }}</strong></td>
+
+                    {% if exam.status == exam.Status.ACTIVE %}
+                        <td></td>
+                    {% endif %}
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </form>
+
+    <div class="signature-section">
+        <div>
+            ______________________
+            <br>
+            <small>Class Teacher</small>
+        </div>
+
+        <div>
+            ______________________
+            <br>
+            <small>Exam In-charge</small>
+        </div>
+
+        <div>
+            ______________________
+            <br>
+            <small>Principal</small>
+        </div>
+
+    </div>
+
+</section>
+
+<style>
+    .report-summary{
+        display:grid;
+        grid-template-columns:180px 1fr 180px 1fr;
+        gap:10px 18px;
+        margin:1.5rem 0 2rem;
+        padding:1rem;
+        background:#f8fafc;
+        border:1px solid #e5e7eb;
+        border-radius:8px;
+        align-items:center;
+    }
+
+    .report-summary strong{
+        color:#475569;
+    }
+
+    @media print{
+
+        .report-summary{
+            grid-template-columns:140px 1fr 140px 1fr;
+            gap:6px 12px;
+            padding:10px;
+            margin:10px 0 16px;
+            border:1px solid #999;
+            background:#fff;
+            font-size:13px;
+        }
+
+    }
+    .signature-section{
+        display:flex;
+        justify-content:space-between;
+        margin-top:60px;
+        text-align:center;
+        gap:40px;
+    }
+
+    .signature-section div{
+        flex:1;
+    }
+</style>
+
+{% endblock %}

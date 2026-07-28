@@ -1,49 +1,48 @@
 {% extends "base.html" %}
+
 {% block page_heading %}Results{% endblock %}
+
 {% block content %}
+
 <section class="card">
-  <div class="table-header">
-    <div>
-      <p class="eyebrow">Exam schedule</p>
-      <h2>Results by Exam</h2>
+
+    <div class="section-header">
+        <div>
+            <p class="eyebrow">Results Module</p>
+            <h2>Manage Examinations and Student Results</h2>
+            <p>
+                Create examinations, publish student results, generate report
+                cards, and analyze academic performance from a single place.
+            </p>
+        </div>
     </div>
-    <div class="table-actions">
-      <input data-filter="result-exams" placeholder="Filter exams">
-      {% if can_export_all %}
-        <a class="btn" href="{% url 'results:export_all' %}">Export All Classes</a>
-      {% endif %}
+    <div class="stat-grid">
+
+        {% for card in cards %}
+
+            {% if card.coming_soon %}
+
+                <a class="stat-card stat-card-disabled">
+                    <i class="{{ card.icon }} module-icon"></i>
+                    <span>{{ card.title }}</span>
+                    <small>{{ card.description }}</small>
+                    <span class="status status-pending">Coming Soon</span>
+                </a>
+
+            {% else %}
+
+                <a href="{{ card.url }}" class="stat-card">
+                    <i class="{{ card.icon }} module-icon"></i>
+                    <span>{{ card.title }}</span>
+                    <small>{{ card.description }}</small>
+                </a>
+
+            {% endif %}
+
+        {% endfor %}
+
     </div>
-  </div>
-  <table data-table="result-exams" data-page-size="12">
-    <thead>
-      <tr>
-        <th data-sort>Exam</th>
-        <th data-sort>Year</th>
-        <th data-sort>Type</th>
-        <th data-sort>Classes</th>
-        <th data-sort>Results</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for exam in exams %}
-        <tr>
-          <td>{{ exam.name }}</td>
-          <td>{{ exam.academic_year }}</td>
-          <td>{{ exam.exam_type|default:"-" }}</td>
-          <td>{{ exam.class_count }}</td>
-          <td>{{ exam.result_count }}</td>
-          <td>
-            <div class="row-actions">
-              <a class="btn btn-sm btn-muted" href="{% url 'results:exam_results' exam.pk %}">View Exam</a>
-            </div>
-          </td>
-        </tr>
-      {% empty %}
-        <tr><td colspan="6">No exams available.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <div class="pager" data-pager="result-exams"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+
 </section>
+
 {% endblock %}

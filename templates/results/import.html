@@ -1,21 +1,155 @@
 {% extends "base.html" %}
+
 {% block page_heading %}Import Results{% endblock %}
 {% block content %}
+
 <div class="form-layout">
   <form class="card form-card" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
+    {% csrf_token %} {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+      {% for error in form.non_field_errors %}
+      <div>{{ error }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
     <div class="table-header">
       <div>
         <p class="eyebrow">{{ school_class.school.name }}</p>
-        <h2>{{ school_class.name }} {{ school_class.section }}</h2>
+
+        <h2>Bulk Import Results</h2>
+
+        <small> {{ school_class.name }} {{ school_class.section }} </small>
       </div>
-      <a class="btn btn-muted" href="{% url 'results:download_template' school_class.pk %}">Download Template</a>
+
+      <a
+          id="download-template-btn"
+          class="btn btn-muted disabled"
+          href="#"
+      >
+          Download Excel Template
+      </a>
     </div>
-    {{ form.as_p }}
+
+    <div class="report-summary">
+      <div><strong>School : </strong>{{ school_class.school.name }}</div>
+      <div><strong>Class : </strong>{{ school_class.name }} {{ school_class.section }}</div>
+      <div><strong>Academic Year : </strong>{{ school_class.school.academic_year }}</div>
+      <div><strong>File Type : </strong>Microsoft Excel (.xlsx)</div>
+    </div>
+
+    <div class="alert alert-info">
+      <strong>Before You Import</strong>
+
+      <ul>
+        <li>Download the Excel template before entering data.</li>
+        <li>Do not rename or remove any columns.</li>
+        <li>Each row represents one student's marks for one subject.</li>
+        <li>Only <strong>.xlsx</strong> files are supported.</li>
+      </ul>
+    </div>
+    
+
+    <div class="card">
+      <h3>Expected Columns</h3>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Column</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td><code>student_email</code></td>
+            <td>Student email address</td>
+          </tr>
+
+          <tr>
+            <td><code>subject_code</code></td>
+            <td>Subject code</td>
+          </tr>
+
+          <tr>
+            <td><code>marks_obtained</code></td>
+            <td>Marks obtained</td>
+          </tr>
+
+          <tr>
+            <td><code>max_marks</code></td>
+            <td>Maximum marks</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.exam.id_for_label }}"> Examination </label>
+
+      {{ form.exam }} {% for error in form.exam.errors %}
+      <div class="error-text">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.file.id_for_label }}"> Excel File </label>
+
+      <div class="upload-icon">
+        <i class="fa-solid fa-file-excel"></i>
+      </div>
+
+      {{ form.file }}
+
+      <small> Select the completed Excel template. </small>
+
+      {% if form.file.help_text %}
+      <small>{{ form.file.help_text }}</small>
+      {% endif %} {% for error in form.file.errors %}
+      <div class="error-text">{{ error }}</div>
+      {% endfor %}
+    </div>
+
     <div class="form-actions">
-      <a class="btn btn-muted" href="{% url 'results:class_results' school_class.pk %}">Cancel</a>
+      <a
+        class="btn btn-muted"
+        href="{% url 'results:class_results' school_class.pk %}"
+      >
+        Back
+      </a>
+
       <button class="btn" type="submit">Import Results</button>
     </div>
   </form>
 </div>
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const examSelect = document.getElementById("{{ form.exam.id_for_label }}");
+    const downloadBtn = document.getElementById("download-template-btn");
+
+    function updateDownloadLink() {
+        const examId = examSelect.value;
+
+        if (!examId) {
+            downloadBtn.href = "#";
+            downloadBtn.classList.add("disabled");
+            return;
+        }
+
+        downloadBtn.classList.remove("disabled");
+        downloadBtn.href =
+            "{% url 'results:download_template' school_class.pk %}?exam=" +
+            examId;
+    }
+
+    examSelect.addEventListener("change", updateDownloadLink);
+
+    updateDownloadLink();
+});
+</script>
+{% endblock %}
+
 {% endblock %}

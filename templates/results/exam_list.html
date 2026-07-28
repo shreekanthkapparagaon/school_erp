@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block page_heading %}
+Examinations
+{% endblock %}
+
+{% block content %}
+<div class="table-header">
+    <div>
+        <p class="eyebrow">Academic</p>
+        <h2>Exams</h2>
+    </div>
+    <div class="table-actions">
+        <input data-filter="list-exams" placeholder="Search examinations...">
+        {% if can_manage %}
+        <a href="{% url 'results:create_exam' %}" class="btn">Create Exam</a>
+        {% endif %}
+    </div>
+</div>
+<div class="stat-grid mb-4">
+
+    <div class="stat-card">
+        <span>Total Exams</span>
+        <h2>{{ exams|length }}</h2>
+    </div>
+
+    <div class="stat-card">
+        <span>Draft</span>
+        <h2>{{ draft_count }}</h2>
+    </div>
+
+    <div class="stat-card">
+        <span>Active</span>
+        <h2>{{ active_count }}</h2>
+    </div>
+
+    <div class="stat-card">
+        <span>Published</span>
+        <h2>{{ published_count }}</h2>
+    </div>
+
+</div>
+<table data-table="list-exams">
+    <thead>
+        <tr>
+            <th data-sort>Name</th>
+            <th data-sort>Academic Year</th>
+            <th data-sort>Type</th>
+            <th data-sort>Status</th>
+            <th data-sort>Classes</th>
+            <th data-sort>Results</th>
+            <th data-sort>Created</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for exam in exams %}
+
+    <tr>
+
+        <td>
+            <a href="{% url 'results:exam_detail' exam.pk %}">
+                {{ exam.name }}
+            </a>
+        </td>
+
+        <td>
+            {{ exam.academic_year }}
+        </td>
+
+        <td>
+            {{ exam.get_exam_type_display|default:exam.exam_type|title }}
+        </td>
+
+        <td>
+            {% if exam.status == "draft" %}
+                <span class="status status-pending">
+                    Draft
+                </span>
+            {% elif exam.status == "active" %}
+                <span class="status status-info">
+                    Active
+                </span>
+            {% elif exam.status == "completed" %}
+                <span class="status status-warning">
+                    Completed
+                </span>
+
+            {% elif exam.status == "published" %}
+                <span class="status status-paid">
+                    Published
+                </span>
+
+            {% else %}
+                <span class="status">
+                    {{ exam.status|title }}
+                </span>
+            {% endif %}
+        </td>
+
+        <td>
+            {{ exam.class_count|default:0 }}
+        </td>
+
+        <td>
+            {{ exam.result_count|default:0 }}
+        </td>
+
+        <td>
+            {{ exam.created_at|timesince }} ago
+        </td>
+
+        <td>
+
+            <div class="row-actions">
+
+                <a
+                    class="btn btn-sm btn-muted"
+                    href="{% url 'results:exam_detail' exam.pk %}">
+                    View
+                </a>
+
+                {% if exam.show_activate %}
+                    <a
+                        class="btn btn-sm"
+                        href="{% url 'results:activate_exam' exam.pk %}">
+                        Activate
+                    </a>
+                {% endif %}
+
+                {% if exam.show_complete %}
+                    <a
+                        class="btn btn-sm"
+                        href="{% url 'results:complete_exam' exam.pk %}">
+                        Complete
+                    </a>
+                {% endif %}
+
+                {% if exam.show_publish %}
+                    <a
+                        class="btn btn-sm"
+                        href="{% url 'results:publish_exam' exam.pk %}">
+                        Publish
+                    </a>
+                {% endif %}
+
+                {% if exam.show_report_cards %}
+                    <a
+                        class="btn btn-sm btn-muted"
+                        href="{% url 'results:report_card_home' %}">
+                        Report Cards
+                    </a>
+                {% endif %}
+
+                {% if exam.is_active or exam.is_completed or exam.is_published %}
+                    <a
+                        class="btn btn-sm btn-muted"
+                        href="{% url 'results:exam_results' exam.pk %}">
+                        Results
+                    </a>
+                {% endif %}
+
+                {% if can_manage and exam.can_edit %}
+                    <a
+                        class="btn btn-sm"
+                        href="{% url 'results:update_exam' exam.pk %}">
+                        Edit
+                    </a>
+
+                    <a
+                        class="btn btn-sm btn-danger"
+                        href="{% url 'results:delete_exam' exam.pk %}"
+                        onclick="return confirm('Delete this examination?')">
+                        Delete
+                    </a>
+                {% endif %}
+
+            </div>
+
+        </td>
+
+    </tr>
+
+    {% empty %}
+
+    <tr>
+
+        <td colspan="8">
+            No examinations found.
+        </td>
+
+    </tr>
+
+    {% endfor %}
+
+    </tbody>
+</table>
+{% endblock %}
+
+<style>
+    .status-info{
+        background:#3b82f6;
+        color:#fff;
+    }
+    .btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+</style>

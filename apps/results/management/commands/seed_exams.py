@@ -3,7 +3,7 @@ from django.db import transaction
 
 from apps.accounts.models import User
 from apps.results.models import Exam
-from apps.schools.models import School
+from apps.schools.models import School, SchoolClass
 
 
 class Command(BaseCommand):
@@ -47,14 +47,19 @@ class Command(BaseCommand):
 
             for exam_name, exam_type in self.EXAMS:
 
-                _, created = Exam.objects.get_or_create(
+                exam, created = Exam.objects.get_or_create(
                     school=school,
                     name=exam_name,
                     academic_year=self.ACADEMIC_YEAR,
                     defaults={
                         "exam_type": exam_type,
+                        "status": Exam.Status.ACTIVE,
                         "created_by": principal,
                     },
+                )
+
+                exam.classes.set(
+                    SchoolClass.objects.filter(school=school)
                 )
 
                 if created:

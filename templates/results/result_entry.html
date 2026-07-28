@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block page_heading %}Results{% endblock %}
+
+{% block content %}
+
+<style>
+    .exam-card {
+        width: 100%;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .exam-body {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 24px;
+        flex-wrap: wrap;
+    }
+
+    .exam-details {
+        flex: 1;
+        min-width: 220px;
+    }
+
+    .exam-details h3 {
+        margin: 0 0 6px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.15rem;
+    }
+
+    .exam-details small {
+        color: var(--text-muted);
+    }
+
+    .exam-details i {
+        color: var(--primary);
+    }
+
+    .exam-stats {
+        display: flex;
+        gap: 40px;
+        text-align: center;
+        flex-wrap: wrap;
+    }
+
+    .exam-stats div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        min-width: 90px;
+    }
+
+    .exam-stats i {
+        font-size: 1.2rem;
+        color: var(--primary);
+    }
+
+    .exam-stats span {
+        font-size: .8rem;
+        color: var(--text-muted);
+    }
+
+    .exam-stats strong {
+        font-size: 1.2rem;
+    }
+
+    .progress {
+        width: 100%;
+        height: 8px;
+        background: var(--surface-3);
+        border-radius: 999px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), #22c55e);
+        transition: width .3s ease;
+    }
+
+    .progress-text {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: .85rem;
+        font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+
+        .exam-body {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .exam-stats {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+    }
+    .status-info{
+            background:#3b82f6;
+            color:#fff;
+        }
+    .exam-card{
+        transition:.25s ease;
+    }
+
+    .exam-card:hover{
+        transform:translateY(-4px);
+        box-shadow:0 10px 24px rgba(0,0,0,.08);
+    }
+    .exam-arrow{
+        font-size:22px;
+        color:var(--text-muted);
+    }
+</style>
+
+<section class="card">
+
+    <div class="section-header">
+        <div>
+            <p class="eyebrow">Result Entry</p>
+            <h2>Select an Examination</h2>
+            <p>Choose an active examination to enter, review, or publish student results.<p>
+        </div>
+    </div>
+
+    <div class="stat-grid">
+
+        {% for exam in exams %}
+
+        <a class="stat-card exam-card" href="{% url 'results:exam_results' exam.pk %}">
+
+            <div class="exam-body">
+
+                <div class="exam-details">
+
+                    <h3>
+                        <i class="fa-solid fa-file-lines"></i>
+                        {{ exam.name }}
+                    </h3>
+
+                    <small>{{ exam.academic_year }}•{{ exam.get_exam_type_display|default:exam.exam_type|title }}</small>
+
+                    <div style="margin-top:10px;">
+                        {% if exam.status == "draft" %}
+
+                            <span class="status status-pending">
+                                Draft
+                            </span>
+
+                        {% elif exam.status == "active" %}
+
+                            <span class="status status-info">
+                                Active
+                            </span>
+
+                        {% elif exam.status == "completed" %}
+
+                            <span class="status status-warning">
+                                Completed
+                            </span>
+
+                        {% elif exam.status == "published" %}
+
+                            <span class="status status-paid">
+                                Published
+                            </span>
+
+                        {% else %}
+
+                            <span class="status">
+                                {{ exam.status|title }}
+                            </span>
+
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <div class="exam-stats">
+
+                    <div>
+                        <i class="fa-solid fa-school"></i>
+                        <span>Classes</span>
+                        <strong>{{ exam.class_count|default:0 }}</strong>
+                    </div>
+
+                    <div>
+                        <i class="fa-solid fa-user-graduate"></i>
+                        <span>Students</span>
+                        <strong>{{ exam.student_count|default:0 }}</strong>
+                    </div>
+
+                    <div>
+                        <i class="fa-solid fa-square-poll-vertical"></i>
+                        <span>Results</span>
+                        <strong>{{ exam.result_count|default:0 }}/{{ exam.expected_results|default:0 }}</strong>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="exam-arrow">
+                <i class="fa-solid fa-arrow-right"></i>
+            </div>
+
+            <div class="progress">
+                <div class="progress-fill" style="width: {{ exam.progress|default:0 }}%;"></div>
+            </div>
+
+            <div class="progress-text">
+                <span>Result Entry Progress</span>
+
+                <div>
+                    <strong>{{ exam.progress|floatformat:0 }}%</strong>
+                    <span style="margin-left:12px;">
+                        Open →
+                    </span>
+                </div>
+            </div>
+
+        </a>
+
+        {% empty %}
+
+        <div class="empty-state">
+            <i class="fa-solid fa-file-circle-xmark fa-2x"></i>
+            <p>No examinations have been created yet.</p>
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}
+Report Cards
+{% endblock %}
+
+{% block page_heading %}
+Report Cards
+{% endblock %}
+
+{% block content %}
+
+<section class="card">
+
+    <div class="table-header">
+
+        <div>
+
+            <p class="eyebrow">
+                Results
+            </p>
+
+            <h2>
+                Report Cards
+            </h2>
+
+            <small>
+                Select a class to view student report cards.
+            </small>
+
+        </div>
+
+        <div class="table-actions">
+
+            <input
+                type="search"
+                data-filter="report-cards"
+                placeholder="Search by class or section...">
+
+        </div>
+
+    </div>
+
+    <table
+        data-table="report-cards"
+        data-page-size="10">
+
+        <thead>
+
+            <tr>
+
+                <th data-sort>Class</th>
+
+                <th data-sort>Section</th>
+
+                <th data-sort>Students</th>
+
+                <th>Action</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for school_class in classes %}
+
+            <tr>
+                <td>{{ school_class.name }}</td>
+                <td>{{ school_class.section|default:"-" }}</td>
+                <td>{{ school_class.student_count|default:0 }}</td>
+                <td>
+                    <a class="btn btn-sm" href="{% url 'results:class_report_cards' school_class.pk %}">
+                        View Report Cards
+                    </a>
+                </td>
+            </tr>
+
+            {% empty %}
+
+            <tr>
+                <td colspan="4">
+                    <div class="empty-state">
+                        <i class="fa-solid fa-users-slash fa-2x"></i>
+                        <p>No classes available.</p>
+                    </div>
+                </td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+    <div
+        class="pager"
+        data-pager="report-cards">
+
+        <button data-prev>
+
+            Previous
+
+        </button>
+
+        <span data-page></span>
+
+        <button data-next>
+
+            Next
+
+        </button>
+
+    </div>
+
+</section>
+
+{% endblock %}

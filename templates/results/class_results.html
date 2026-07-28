@@ -1,75 +1,271 @@
 {% extends "base.html" %}
-{% block page_heading %}{{ school_class.name }} {{ school_class.section }} Results{% endblock %}
+
+{% block page_heading %}
+{{ school_class.name }} {{ school_class.section }} Results
+{% endblock %}
+
 {% block content %}
+
 <section class="card">
-  <div class="table-header">
-    <div>
-      <p class="eyebrow">{{ school_class.school.name }}</p>
-      <h2>{{ school_class.name }} {{ school_class.section }}</h2>
+
+    <div class="table-header">
+
+        <div>
+
+            <p class="eyebrow">
+                {{ school_class.school.name }}
+            </p>
+
+            <h2>
+                {{ school_class.name }} {{ school_class.section }}
+            </h2>
+
+            {% if exam %}
+                <small>
+                    {{ exam.display_name }}
+                    •
+                    {{ exam.academic_year }}
+                </small>
+
+                <div style="margin-top:8px">
+                    {% if exam.is_active %}
+                        <span class="status status-info">
+                            Active
+                        </span>
+
+                    {% elif exam.is_completed %}
+                        <span class="status status-warning">
+                            Completed
+                        </span>
+
+                    {% elif exam.is_published %}
+                        <span class="status status-paid">
+                            Published
+                        </span>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+        </div>
+
+        <div class="table-actions">
+
+            <input
+                data-filter="class-results"
+                placeholder="Filter results">
+
+            {% if show_download_template %}
+                <a
+                    class="btn btn-muted"
+                    href="{% url 'results:download_template' school_class.pk %}?exam={{ exam.pk }}">
+                    Download Template
+                </a>
+            {% endif %}
+
+            {% if show_import %}
+                {% if exam %}
+                    <a
+                        class="btn btn-muted"
+                        href="{% url 'results:import_results' school_class.pk %}?exam={{exam.pk}}">
+                        Import Results
+                    </a>
+                {% else %}
+                    <a
+                        class="btn btn-muted"
+                        href="{% url 'results:import_results' school_class.pk %}">
+                        Import Results
+                    </a>
+                {% endif %}
+            {% endif %}
+
+            {% if show_add_result %}
+                <a
+                    class="btn"
+                    href="{% url 'results:create_result' school_class.pk %}?exam={{ exam.pk }}">
+                    Add Result
+                </a>
+            {% endif %}
+
+            {% if show_export %}
+                <a
+                    class="btn btn-muted"
+                    href="{% url 'results:export_class_results' school_class.pk exam.pk %}" >
+                    Export Results
+                </a>
+            {% endif %}
+
+        </div>
+
     </div>
-    <div class="table-actions">
-      {% if exams %}
-        <select onchange="if (this.value) window.location.href = this.value">
-          <option value="{% url 'results:class_results' school_class.pk %}">All Exams</option>
-          {% for exam_option in exams %}
-            <option value="{% url 'results:exam_class_results' exam_option.pk school_class.pk %}"
-              {% if exam and exam_option.pk == exam.pk %}selected{% endif %}>
-              {{ exam_option.name }} / {{ exam_option.academic_year }}
-            </option>
-          {% endfor %}
-        </select>
-      {% endif %}
-      <input data-filter="class-results" placeholder="Filter results">
-      {% if can_manage and perms.plans.feature_results_manage %}
-        <a class="btn btn-muted" href="{% url 'results:download_template' school_class.pk %}">Template</a>
-        <a class="btn btn-muted" href="{% url 'results:import_results' school_class.pk %}">Import</a>
-        <a class="btn" href="{% url 'results:create_result' school_class.pk %}">Add Result</a>
-      {% endif %}
-      {% if can_export %}
-        <a class="btn btn-muted" href="{% url 'results:export_class' school_class.pk %}">Export</a>
-      {% endif %}
+    
+    <div class="stat-grid mb-4">
+
+        <div class="stat-card">
+            <i class="fa-solid fa-user-graduate module-icon"></i>
+            <span>Students</span>
+            <h2>{{ student_count }}</h2>
+        </div>
+
+        <div class="stat-card">
+            <i class="fa-solid fa-book-open module-icon"></i>
+            <span>Subjects</span>
+            <h2>{{ subject_count }}</h2>
+        </div>
+
+        <div class="stat-card">
+            <i class="fa-solid fa-square-poll-vertical module-icon"></i>
+            <span>Results</span>
+            <h2>{{ result_count }}</h2>
+        </div>
+
+        <div class="stat-card">
+            <i class="fa-solid fa-chart-line module-icon"></i>
+            <span>Average</span>
+            <h2>{{ average_percentage|default:0|floatformat:1 }}%</h2>
+        </div>
+
     </div>
-  </div>
-  <table data-table="class-results" data-page-size="12">
-    <thead>
-      <tr>
-        <th data-sort>Student</th>
-        <th data-sort>Subject</th>
-        <th data-sort>Exam</th>
-        <th data-sort>Year</th>
-        <th data-sort>Marks</th>
-        <th data-sort>Percentage</th>
-        <th data-sort>Grade</th>
-        <th data-sort>Status</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for result in results %}
-        <tr>
-          <td>{{ result.student }}</td>
-          <td>{{ result.subject.name }}</td>
-          <td>{{ result.exam_name }}</td>
-          <td>{{ result.academic_year }}</td>
-          <td>{{ result.marks_obtained|floatformat:2 }} / {{ result.max_marks|floatformat:2 }}</td>
-          <td>{{ result.percentage|floatformat:2 }}%</td>
-          <td>{{ result.grade }}</td>
-          <td><span class="status status-{% if result.published %}paid{% else %}pending{% endif %}">{% if result.published %}Published{% else %}Draft{% endif %}</span></td>
-          <td>
-            <div class="row-actions">
-              <a class="btn btn-sm btn-muted" href="{% url 'results:result_detail' result.pk %}">View</a>
-              {% if can_manage %}
-                <a class="btn btn-sm" href="{% url 'results:update_result' result.pk %}">Edit</a>
-                <a class="btn btn-sm btn-danger" href="{% url 'results:delete_result' result.pk %}">Delete</a>
-              {% endif %}
-            </div>
-          </td>
-        </tr>
-      {% empty %}
-        <tr><td colspan="9">No results available.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <div class="pager" data-pager="class-results"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+
+
+    <table
+        data-table="class-results"
+        data-page-size="12">
+
+        <thead>
+
+            <tr>
+                <th data-sort>Username</th>
+                <th data-sort>Student</th>
+                <th data-sort>Subjects</th>
+                <th data-sort>Average</th>
+                <th data-sort>Progress</th>
+                <th data-sort>Status</th>
+                <th>Action</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for student in students %}
+
+            <tr>
+
+                <td>
+                    {{ student.username|default:"-" }}
+                </td>
+
+                <td>
+
+                    <strong>{{ student }}</strong>
+
+                    {% if student.email %}
+                        <br>
+                        <small>{{ student.email }}</small>
+                    {% endif %}
+
+                </td>
+
+                <td>
+                    {{ student.subject_count }}
+                </td>
+
+                <td>
+                    {{ student.average_percentage|default:0|floatformat:1 }}%
+                </td>
+
+                <td>
+                    {{ student.progress|default:"0%" }}
+                </td>
+
+                <td>
+
+                    {% if student.status == "Complete" %}
+                        <span class="status status-paid">
+                            Complete
+                        </span>
+
+                    {% elif student.status == "Partial" %}
+                        <span class="status status-pending">
+                            Partial
+                        </span>
+
+                    {% else %}
+                        <span class="status status-danger">
+                            Pending
+                        </span>
+                    {% endif %}
+
+                </td>
+
+                <td>
+                    {% if exam %}
+                        {% if exam.can_enter_results %}
+                            <a
+                                class="btn btn-sm"
+                                href="{% url 'results:edit_student_results' exam.pk student.pk %}">
+                                Enter Marks
+                            </a>
+                            <a
+                                class="btn btn-sm btn-muted"
+                                href="{% url 'results:student_result_detail' exam.pk student.pk %}">
+                                View Results
+                            </a>
+                        {% else %}
+                            <a
+                                class="btn btn-sm btn-muted"
+                                href="{% url 'results:student_result_detail' exam.pk student.pk %}">
+                                View Results
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <span class="text-muted">
+                            Select an exam
+                        </span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">
+                    No students found.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div
+        class="pager"
+        data-pager="class-results">
+
+        <button data-prev>
+            Previous
+        </button>
+
+        <span data-page></span>
+
+        <button data-next>
+            Next
+        </button>
+
+    </div>
+
 </section>
+
+<style>
+
+.table td strong{
+    font-weight:600;
+}
+
+.table td small{
+    color:var(--text-muted);
+}
+
+.status-danger{
+    background:#ef4444;
+    color:#fff;
+}
+</style>
+
 {% endblock %}

@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- ================= Header ================= -->
+
+    <div class="d-flex justify-content-between align-items-center mb-5">
+
+        <div>
+
+            <h2 class="mb-2">
+                <i class="bi bi-file-earmark-bar-graph-fill me-2"></i>
+                Export Class Results
+            </h2>
+
+            <p class="text-muted mb-0">
+
+                {{ school_class.name }} - {{ school_class.section }}
+
+            </p>
+
+        </div>
+
+        <a
+            href="{% url 'results:export_class_list' %}"
+            class="btn btn-muted">
+
+            <i class="bi bi-arrow-left"></i>
+
+            Back
+
+        </a>
+
+    </div>
+
+    <!-- ================= Information Card ================= -->
+
+    <div class="card mb-5">
+
+        <div class="d-flex align-items-center">
+
+            <i class="bi bi-journal-check module-icon me-4"></i>
+
+            <div>
+
+                <h4 class="mb-2">
+
+                    Available Examinations
+
+                </h4>
+
+                <p class="mb-0">
+
+                    Select an examination to export results for
+                    <strong>{{ school_class }}</strong>.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================= Exam Table ================= -->
+
+    <div class="card">
+
+        <div class="table-header">
+
+            <div>
+
+                <h4 class="mb-1">
+
+                    Examinations
+
+                </h4>
+
+                <p class="text-muted mb-0">
+
+                    {{ exams|length }} examination{{ exams|pluralize }}
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th width="60">
+
+                            #
+
+                        </th>
+
+                        <th>
+
+                            Examination
+
+                        </th>
+
+                        <th width="180">
+
+                            Type
+
+                        </th>
+
+                        <th width="170">
+
+                            Academic Year
+
+                        </th>
+
+                        <th width="170">
+
+                            Status
+
+                        </th>
+
+                        <th width="170">
+
+                            Action
+
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for exam in exams %}
+
+                    <tr>
+
+                        <td>
+
+                            {{ forloop.counter }}
+
+                        </td>
+
+                        <td>
+
+                            <strong>
+
+                                {{ exam.name }}
+
+                            </strong>
+
+                        </td>
+
+                        <td>
+
+                            {{ exam.exam_type|default:"General" }}
+
+                        </td>
+
+                        <td>
+
+                            {{ exam.academic_year }}
+
+                        </td>
+
+                        <td>
+
+                            {% if exam.status == "published" %}
+
+                                <span class="status status-paid">
+
+                                    {{ exam.get_status_display }}
+
+                                </span>
+
+                            {% elif exam.status == "completed" %}
+
+                                <span class="status status-pending">
+
+                                    {{ exam.get_status_display }}
+
+                                </span>
+
+                            {% elif exam.status == "active" %}
+
+                                <span class="status">
+
+                                    {{ exam.get_status_display }}
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="status status-unpaid">
+
+                                    {{ exam.get_status_display }}
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            <a
+                                href="{% url 'results:export_class_results' school_class.id exam.id %}"
+                                class="btn btn-sm">
+
+                                <i class="bi bi-download me-1"></i>
+
+                                Export
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="6"
+                            class="text-center py-5">
+
+                            <i class="bi bi-folder2-open upload-icon"></i>
+
+                            <h5>
+
+                                No Examinations Found
+
+                            </h5>
+
+                            <p class="mb-0">
+
+                                No examinations are available for this class.
+
+                            </p>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+.table-responsive{
+
+    overflow-x:auto;
+
+}
+
+.card{
+
+    padding:24px;
+
+}
+
+.table-header{
+
+    margin-bottom:24px;
+
+}
+
+table tbody tr{
+
+    transition:.2s ease;
+
+}
+
+table tbody tr:hover{
+
+    background:#f8fbff;
+
+}
+
+table td{
+
+    vertical-align:middle;
+
+}
+
+.status{
+
+    min-width:100px;
+
+    justify-content:center;
+
+}
+
+</style>
+
+{% endblock %}

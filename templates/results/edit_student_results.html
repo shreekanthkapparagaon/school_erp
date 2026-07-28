@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block page_heading %}
+Edit Student Results
+{% endblock %}
+
+{% block content %}
+
+<section class="card">
+
+    <div class="table-header">
+
+        <div>
+
+            <p class="eyebrow">
+                {{ school_class.school.name }}
+            </p>
+
+            <h2>
+                {{ student }}
+            </h2>
+
+            <small>
+                {{ exam.display_name }}
+                •
+                {{ school_class.name }}
+                {{ school_class.section }}
+            </small>
+
+        </div>
+
+        <div class="table-actions">
+
+            <a
+                href="{% url 'results:student_result_detail' exam.id student.id %}"
+                class="btn btn-secondary"
+            >
+                ← Back
+            </a>
+
+        </div>
+
+    </div>
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <input
+            type="hidden"
+            name="result_id"
+            id="result_id"
+        >
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Subject</th>
+                    <th>Max Marks</th>
+                    <th>Marks Obtained</th>
+                    <th>Current Grade</th>
+                    <th>Action</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for item in result_forms %}
+                    <tr>
+
+                        <td>
+                            {{ item.result.subject.name }}
+                        </td>
+
+                        <td>
+                            {{ item.result.max_marks|floatformat:0 }}
+                        </td>
+
+                        <td>
+
+                            {{ item.form.marks_obtained }}
+
+                            {% if item.form.marks_obtained.errors %}
+                                <div class="text-danger">
+                                    {{ item.form.marks_obtained.errors }}
+                                </div>
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            {% if item.result.grade == "A+" or item.result.grade == "A" %}
+                                <span class="status status-paid">
+                                    {{ item.result.grade }}
+                                </span>
+
+                            {% elif item.result.grade == "B+" or item.result.grade == "B" %}
+                                <span class="status status-info">
+                                    {{ item.result.grade }}
+                                </span>
+
+                            {% elif item.result.grade == "C+" or item.result.grade == "C" %}
+                                <span class="status status-pending">
+                                    {{ item.result.grade }}
+                                </span>
+
+                            {% elif item.result.grade == "D" %}
+                                <span class="status status-warning">
+                                    {{ item.result.grade }}
+                                </span>
+
+                            {% else %}
+                                <span class="status status-danger">
+                                    {{ item.result.grade }}
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            {% if item.result.subject_id in editable_subjects %}
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-sm"
+                                    onclick="document.getElementById('result_id').value='{{ item.result.id }}'"
+                                >
+                                    Update
+                                </button>
+
+                            {% else %}
+
+                                <span class="text-muted">
+                                    Read Only
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+                {% empty %}
+
+                <tr>
+                    <td colspan="5">
+                        No results found.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </form>
+
+</section>
+
+{% endblock %}

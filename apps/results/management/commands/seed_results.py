@@ -59,11 +59,17 @@ class Command(BaseCommand):
                 subjects = school_class.subjects.all()
 
                 for exam in exams:
+                    if exam.status != Exam.Status.ACTIVE:
+                        exam.status = Exam.Status.ACTIVE
+                        exam.save(update_fields=["status"])
+
+                    if not exam.classes.filter(pk=school_class.pk).exists():
+                        exam.classes.add(school_class)
 
                     for subject in subjects:
 
-                       marks = self.generate_marks()
-                       _, created = Result.objects.get_or_create(
+                        marks = self.generate_marks()
+                        _, created = Result.objects.get_or_create(
                             school=school,
                             school_class=school_class,
                             student=student,
@@ -72,11 +78,10 @@ class Command(BaseCommand):
                             defaults={
                                 "marks_obtained": marks,
                                 "max_marks": self.MAX_MARKS,
-                                "published": random.random() < 0.90,
                                 "created_by": principal,
                             },
                         )
-                       if created:
+                        if created:
                             school_total += 1
                             total += 1
 
@@ -92,6 +97,7 @@ class Command(BaseCommand):
                 f"Created {total} results."
             )
         )
+
     def generate_marks(self):
         chance = random.random()
 

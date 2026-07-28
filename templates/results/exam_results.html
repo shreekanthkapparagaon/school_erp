@@ -5,13 +5,65 @@
   <div class="table-header">
     <div>
       <p class="eyebrow">{{ exam.school.name }}</p>
-      <h2>{{ exam.name }} — {{ exam.academic_year }}</h2>
+      <h2>{{ exam.name }}</h2>
+      <small>Academic Year : {{ exam.academic_year }}</small>
     </div>
     <div class="table-actions">
-      <input data-filter="exam-classes" placeholder="Filter classes">
+      <input data-filter="exam-classes" placeholder="Search classes...">
       {% if can_export_all %}
-        <a class="btn" href="{% url 'results:export_all' %}">Export All Classes</a>
+          <a class="btn" href="{% url 'results:export_all_exam_list' %}">
+              Export All Classes
+          </a>
       {% endif %}
+      
+    </div>
+  </div>
+  <div class="stat-grid mb-4">
+
+    <div class="stat-card">
+      <span>Exam Status</span>
+      <h2>
+        {% if exam.is_draft %}
+
+            <span class="status status-pending">
+                Draft
+            </span>
+
+        {% elif exam.is_active %}
+
+            <span class="status status-info">
+                Active
+            </span>
+
+        {% elif exam.is_completed %}
+
+            <span class="status status-warning">
+                Completed
+            </span>
+
+        {% elif exam.is_published %}
+
+            <span class="status status-paid">
+                Published
+            </span>
+
+        {% endif %}
+      </h2>
+    </div>
+
+    <div class="stat-card">
+        <span>Academic Year</span>
+        <h2>{{ exam.academic_year }}</h2>
+    </div>
+
+    <div class="stat-card">
+        <span>Total Classes</span>
+        <h2>{{ classes.count|default:classes|length }}</h2>
+    </div>
+
+    <div class="stat-card">
+        <span>Total Results</span>
+        <h2>{{ exam.results.count|default:0 }}</h2>
     </div>
   </div>
   <table data-table="exam-classes" data-page-size="12">
@@ -19,8 +71,11 @@
       <tr>
         <th data-sort>Class</th>
         <th data-sort>Section</th>
-        <th data-sort>Result Count</th>
-        <th>Action</th>
+        <th data-sort>Students</th>
+        <th data-sort>Subjects</th>
+        <th data-sort>Results</th>
+        <th>Progress</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -28,15 +83,58 @@
         <tr>
           <td>{{ school_class.name }}</td>
           <td>{{ school_class.section|default:"-" }}</td>
-          <td>{{ school_class.result_count }}</td>
+          <td>{{ school_class.student_count }}</td>
+          <td>{{ school_class.subject_count }}</td>
+          <td>{{ school_class.result_count|default:0 }} / {{ school_class.expected_results|default:0 }}</td>
+          <td style="min-width:220px">
+            <progress
+                value="{{ school_class.progress|default:0 }}"
+                max="100"
+                style="width:150px">
+            </progress>
+            <small>
+                {{ school_class.progress|default:0|floatformat:0 }}%
+            </small>
+          </td>
           <td>
             <div class="row-actions">
-              <a class="btn btn-sm btn-muted" href="{% url 'results:exam_class_results' exam.pk school_class.pk %}">View Class</a>
+
+                <a
+                    class="btn btn-sm"
+                    href="{% url 'results:exam_class_results' exam.pk school_class.pk %}">
+                    Open Results
+                </a>
+
+                {% if exam.can_enter_results %}
+                    <a
+                        class="btn btn-sm btn-muted"
+                        href="{% url 'results:import_results' school_class.pk %}">
+                        Import Marks
+                    </a>
+                {% endif %}
+
+                {% if exam.can_export_results %}
+                    <a
+                        class="btn btn-sm btn-muted"
+                        href="{% url 'results:export_class_results' school_class.pk exam.pk %}">
+                        Export Results
+                    </a>
+                {% endif %}
+
+                {% if exam.can_generate_report_cards %}
+                    <a
+                        class="btn btn-sm btn-muted"
+                        href="{% url 'results:class_report_cards' school_class.pk %}">
+                        <i class="fa-solid fa-file-lines"></i>
+                        Report Cards
+                    </a>
+                {% endif %}
+
             </div>
-          </td>
+        </td>
         </tr>
       {% empty %}
-        <tr><td colspan="4">No classes found for this exam.</td></tr>
+        <tr><td colspan="7">No classes found for this exam.</td></tr>
       {% endfor %}
     </tbody>
   </table>

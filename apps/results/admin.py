@@ -22,7 +22,7 @@ class ResultAdmin(ImportExportModelAdmin):
         "marks_obtained",
         "max_marks",
         "grade",
-        "published",
     )
-    list_filter = ("school", "school_class", "exam_name", "academic_year", "published")
+    list_filter = ("school", "school_class", "exam_name", "academic_year")
     search_fields = ("student__email", "student__first_name", "subject__name")
+    readonly_fields = ("grade",)

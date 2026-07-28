@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- Header -->
+
+    <div class="d-flex justify-content-between align-items-center mb-5">
+
+        <div>
+
+            <h2 class="mb-2">
+                <i class="bi bi-mortarboard-fill me-2"></i>
+                Export Class Results
+            </h2>
+
+            <p class="text-muted mb-0">
+                Select a class to continue exporting examination results.
+            </p>
+
+        </div>
+
+        <a
+            href="{% url 'results:export_home' %}"
+            class="btn btn-muted">
+
+            <i class="bi bi-arrow-left"></i>
+
+            Back
+
+        </a>
+
+    </div>
+
+    <!-- Information Card -->
+
+    <div class="card mb-5">
+
+        <div class="d-flex align-items-center">
+
+            <i class="bi bi-info-circle-fill module-icon me-4"></i>
+
+            <div>
+
+                <h4 class="mb-2">
+
+                    Choose a Class
+
+                </h4>
+
+                <p class="mb-0">
+
+                    Click <strong>Continue</strong> to view the examinations
+                    available for that class and export the results.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Table -->
+
+    <div class="card">
+
+        <div class="table-header">
+
+            <div>
+
+                <h4 class="mb-1">
+
+                    Available Classes
+
+                </h4>
+
+                <p class="mb-0 text-muted">
+
+                    {{ classes|length }} class{{ classes|pluralize }} available
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th width="60">
+                            #
+                        </th>
+
+                        <th>
+                            Class
+                        </th>
+
+                        <th width="180">
+                            Section
+                        </th>
+
+                        <th width="220">
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for class in classes %}
+
+                    <tr>
+
+                        <td>
+
+                            {{ forloop.counter }}
+
+                        </td>
+
+                        <td>
+
+                            <strong>
+
+                                {{ class.name }}
+
+                            </strong>
+
+                        </td>
+
+                        <td>
+
+                            {{ class.section }}
+
+                        </td>
+
+                        <td>
+
+                            <a
+                                href="{% url 'results:export_class_exam_list' class.id %}"
+                                class="btn btn-sm">
+
+                                <i class="bi bi-arrow-right-circle me-1"></i>
+
+                                Continue
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="4"
+                            class="text-center py-5">
+
+                            <i class="bi bi-folder2-open upload-icon"></i>
+
+                            <h5>
+
+                                No Classes Found
+
+                            </h5>
+
+                            <p class="mb-0">
+
+                                There are no classes available.
+
+                            </p>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+.table-responsive{
+
+    overflow-x:auto;
+
+}
+
+table tbody tr{
+
+    transition:.2s;
+
+}
+
+table tbody tr:hover{
+
+    background:#f8fbff;
+
+}
+
+table td{
+
+    vertical-align:middle;
+
+}
+
+.table-header{
+
+    margin-bottom:24px;
+
+}
+
+.card{
+
+    padding:24px;
+
+}
+
+</style>
+
+{% endblock %}

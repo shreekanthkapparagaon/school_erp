@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="mb-1">
+                <i class="bi bi-file-earmark-arrow-down"></i>
+                Export Results
+            </h2>
+
+            <p class="text-muted mb-0">
+                Export examination results in Microsoft Excel format.
+                Choose one of the export options below.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'results:home' %}"
+            class="btn btn-muted">
+
+            <i class="bi bi-arrow-left"></i>
+            Back
+
+        </a>
+
+    </div>
+
+    <!-- Hero Card -->
+
+    <div class="card mb-4">
+
+        <div class="d-flex align-items-center">
+
+            <div class="me-4">
+
+                <i class="bi bi-cloud-arrow-down module-icon"></i>
+
+            </div>
+
+            <div>
+
+                <h3 class="mb-2">
+                    Export Center
+                </h3>
+
+                <p class="mb-0">
+
+                    Download examination results as Excel workbooks.
+                    Export a complete examination or only a single class.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+    <br/>
+
+    <!-- Options -->
+
+    <div class="stat-grid">
+
+        {% for card in cards %}
+
+        <a
+            href="{% url card.url %}"
+            class="text-decoration-none">
+
+            <div class="stat-card h-100">
+
+                <i class="{{ card.icon }} module-icon"></i>
+
+                <span>
+                    {{ card.title }}
+                </span>
+
+                <small>
+                    {{ card.description }}
+                </small>
+
+            </div>
+
+        </a>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

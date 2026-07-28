@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block page_heading %}
+{{ student.get_full_name|default:student }} - Report Card
+{% endblock %}
+
+{% block content %}
+
+<section class="card">
+
+    <div class="table-header">
+        <div>
+            <p class="eyebrow">
+                {{ school_class.school.name }}
+            </p>
+            
+            <h2>
+                {{ school_class.name }} {{ school_class.section }}
+            </h2>
+        </div>
+
+        <div class="table-actions">
+
+            <form method="get">
+
+                <select
+                    name="exam"
+                    onchange="this.form.submit()">
+
+                    <option value="">
+                        All Published Exams
+                    </option>
+
+                    {% for exam in exams %}
+
+                        <option
+                            value="{{ exam.pk }}"
+                            {% if selected_exam and selected_exam.pk == exam.pk %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ exam.display_name }} • {{ exam.academic_year }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </form>
+
+            <button
+                class="btn"
+                onclick="window.print()">
+                Print Report
+            </button>
+            <a
+                class="btn btn-secondary"
+                href="{% url 'results:class_report_cards' school_class.pk %}">
+                ← Back
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="report-summary">
+
+    <div><strong>Student</strong></div>
+    <div>{{ student.get_full_name|default:student }}</div>
+
+    <div><strong>Roll No.</strong></div>
+    <div>{{ student.roll_number|default:"-" }}</div>
+
+    <div><strong>Class</strong></div>
+    <div>{{ school_class.name }} {{ school_class.section }}</div>
+
+    <div><strong>Exam</strong></div>
+    <div>
+        {% if selected_exam %}
+            {{ selected_exam.display_name|default:selected_exam.name }}
+        {% else %}
+            All Published Exams
+        {% endif %}
+    </div>
+
+    <div><strong>Total Marks</strong></div>
+    <div>{{ total_marks }}/{{ total_max_marks }}</div>
+
+    <div><strong>Average</strong></div>
+        <div>{{ average_percentage|floatformat:1 }}%</div>
+
+        <div><strong>Overall Percentage</strong></div>
+        <div>{{ overall_percentage|floatformat:1 }}%</div>
+
+        <div><strong>Overall Grade</strong></div>
+        <div>
+            {% if overall_grade == "A+" or overall_grade == "A" %}
+                <span class="status status-paid">{{ overall_grade }}</span>
+            {% elif overall_grade == "B" %}
+                <span class="status">{{ overall_grade }}</span>
+            {% elif overall_grade == "C" %}
+                <span class="status status-pending">{{ overall_grade }}</span>
+            {% else %}
+                <span class="status status-danger">{{ overall_grade }}</span>
+            {% endif %}
+        </div>
+
+    </div>
+
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>Exam</th>
+
+                <th>Subject</th>
+
+                <th>Maximum</th>
+
+                <th>Obtained</th>
+
+                <th>Percentage</th>
+
+                <th>Grade</th>
+
+                <th>Status</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for result in results %}
+
+            <tr>
+                <td>{{ result.exam.display_name }}</td>
+                <td>{{ result.subject.name }}</td>
+                <td>{{ result.max_marks|floatformat:0 }}</td>
+                <td>{{ result.marks_obtained|floatformat:0 }}</td>
+                <td>{{ result.percentage|floatformat:1 }}%</td>
+                <td>
+                    {% if result.grade == "A+" or result.grade == "A" %}
+                        <span class="status status-paid">
+                            {{ result.grade }}
+                        </span>
+                    {% elif result.grade == "B" %}
+                        <span class="status">
+                            {{ result.grade }}
+                        </span>
+                    {% elif result.grade == "C" %}
+                        <span class="status status-pending">
+                            {{ result.grade }}
+                        </span>
+                    {% else %}
+                        <span class="status status-danger">
+                            {{ result.grade }}
+                        </span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if result.is_published %}
+                        <span class="status status-paid">
+                            Published
+                        </span>
+                    {% else %}
+                        <span class="status status-pending">
+                            Draft
+                        </span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">
+                    No report card available.
+                </td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</section>
+
+
+<style>
+.report-summary{
+    display:grid;
+    grid-template-columns:180px 1fr 180px 1fr;
+    gap:10px 18px;
+    margin:1.5rem 0 2rem;
+    padding:1rem;
+    background:#f8fafc;
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+    align-items:center;
+}
+
+.report-summary strong{
+    color:#475569;
+}
+
+@media print{
+
+    .report-summary{
+        grid-template-columns:140px 1fr 140px 1fr;
+        gap:6px 12px;
+        padding:10px;
+        margin:10px 0 16px;
+        border:1px solid #999;
+        background:#fff;
+        font-size:13px;
+    }
+
+}
+</style>
+
+{% endblock %}
