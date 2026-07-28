@@ -9,7 +9,7 @@
     </div>
     <div class="table-actions">
       <input data-filter="teacher-salaries" placeholder="Filter salaries">
-      {% if perms.plans.feature_payroll_manage %}
+      {% if can_manage %}
         <a class="btn" href="{% url 'fees:create_salary' %}">Add Salary</a>
       {% endif %}
     </div>
@@ -17,7 +17,7 @@
   <table data-table="teacher-salaries" data-page-size="12">
     <thead><tr><th data-sort>Teacher</th><th data-sort>Month</th><th data-sort>Amount</th><th data-sort>Status</th><th data-sort>Paid On</th><th>Action</th></tr></thead>
     <tbody>
-      {% for salary in salaries %}
+      {% for salary in page_obj %}
         <tr>
           <td>{{ salary.teacher }}</td>
           <td>{{ salary.salary_month|date:"F Y" }}</td>
@@ -37,6 +37,40 @@
       {% endfor %}
     </tbody>
   </table>
-  <div class="pager" data-pager="teacher-salaries"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+  {% if page_obj.paginator.num_pages > 1 %}
+  <div class="pager">
+
+      {% if page_obj.has_previous %}
+          <a class="btn btn-sm"
+            href="?page=1">
+              First
+          </a>
+
+          <a class="btn btn-sm"
+            href="?page={{ page_obj.previous_page_number }}">
+              Previous
+          </a>
+      {% endif %}
+
+      <span>
+          Page {{ page_obj.number }}
+          of
+          {{ page_obj.paginator.num_pages }}
+      </span>
+
+      {% if page_obj.has_next %}
+          <a class="btn btn-sm"
+            href="?page={{ page_obj.next_page_number }}">
+              Next
+          </a>
+
+          <a class="btn btn-sm"
+            href="?page={{ page_obj.paginator.num_pages }}">
+              Last
+          </a>
+      {% endif %}
+
+  </div>
+  {% endif %}
 </section>
 {% endblock %}

@@ -9,7 +9,7 @@
     </div>
     <div class="table-actions">
       <input data-filter="student-fees" placeholder="Filter fees">
-      {% if can_manage and perms.plans.feature_fees_manage %}
+      {% if can_manage %}
         <a class="btn btn-muted" href="{% url 'fees:fee_structure_list' %}">Fee Structures</a>
         <a class="btn" href="{% url 'fees:create_fee' %}">Add Fee</a>
       {% endif %}
@@ -29,7 +29,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for fee in fees %}
+      {% for fee in page_obj %}
         <tr>
           <td>{{ fee.student }}</td>
           <td>
@@ -58,6 +58,40 @@
       {% endfor %}
     </tbody>
   </table>
-  <div class="pager" data-pager="student-fees"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+  {% if page_obj.paginator.num_pages > 1 %}
+  <div class="pager">
+
+      {% if page_obj.has_previous %}
+          <a class="btn btn-sm"
+            href="?page=1">
+              First
+          </a>
+
+          <a class="btn btn-sm"
+            href="?page={{ page_obj.previous_page_number }}">
+              Previous
+          </a>
+      {% endif %}
+
+      <span>
+          Page {{ page_obj.number }}
+          of
+          {{ page_obj.paginator.num_pages }}
+      </span>
+
+      {% if page_obj.has_next %}
+          <a class="btn btn-sm"
+            href="?page={{ page_obj.next_page_number }}">
+              Next
+          </a>
+
+          <a class="btn btn-sm"
+            href="?page={{ page_obj.paginator.num_pages }}">
+              Last
+          </a>
+      {% endif %}
+
+  </div>
+  {% endif %}
 </section>
 {% endblock %}

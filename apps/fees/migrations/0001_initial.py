@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 ("payment_date", models.DateField(default=django.utils.timezone.localdate)),
                 ("method", models.CharField(choices=[("cash", "Cash"), ("card", "Card"), ("bank", "Bank Transfer"), ("upi", "UPI"), ("other", "Other")], default="cash", max_length=20)),
                 ("reference", models.CharField(blank=True, max_length=100)),
-                ("receipt_number", models.CharField(default=apps.fees.models.generate_receipt_number, editable=False, max_length=40, unique=True)),
+                ("receipt_number", models.CharField(default=apps.fees.utils.receipts.generate_receipt_number, editable=False, max_length=40, unique=True)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("received_by", models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name="fee_payments_received", to=settings.AUTH_USER_MODEL)),
                 ("fee", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="payments", to="fees.studentfee")),
