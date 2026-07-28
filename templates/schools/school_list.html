@@ -12,10 +12,10 @@
       <a class="btn" href="{% url 'schools:create_school' %}">Add School</a>
     </div>
   </div>
-  <table data-table="schools" data-page-size="12">
+  <table>
     <thead><tr><th data-sort>Name</th><th data-sort>Code</th><th data-sort>Phone</th><th data-sort>Address</th><th>Action</th></tr></thead>
     <tbody>
-      {% for school in schools %}
+      {% for school in page_obj %}
         <tr>
           <td>{{ school.name }}</td>
           <td>{{ school.code }}</td>
@@ -34,6 +34,40 @@
       {% endfor %}
     </tbody>
   </table>
-  <div class="pager" data-pager="schools"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+  {% if page_obj.paginator.num_pages > 1 %}
+    <div class="pager">
+
+        {% if page_obj.has_previous %}
+            <a class="btn btn-sm"
+              href="?page=1">
+                First
+            </a>
+
+            <a class="btn btn-sm"
+              href="?page={{ page_obj.previous_page_number }}">
+                Previous
+            </a>
+        {% endif %}
+
+        <span>
+            Page {{ page_obj.number }}
+            of
+            {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a class="btn btn-sm"
+              href="?page={{ page_obj.next_page_number }}">
+                Next
+            </a>
+
+            <a class="btn btn-sm"
+              href="?page={{ page_obj.paginator.num_pages }}">
+                Last
+            </a>
+        {% endif %}
+
+    </div>
+  {% endif %}
 </section>
 {% endblock %}

@@ -14,10 +14,10 @@
       {% endif %}
     </div>
   </div>
-  <table data-table="assignments" data-page-size="12">
+  <table>
     <thead><tr><th data-sort>Teacher</th><th data-sort>Subject</th><th data-sort>Class</th><th data-sort>School</th><th data-sort>Assigned</th><th>Action</th></tr></thead>
     <tbody>
-      {% for item in assignments %}
+      {% for item in page_obj %}
         <tr>
           <td>{{ item.teacher }}</td>
           <td>{{ item.subject.name }}</td>
@@ -37,6 +37,36 @@
       {% endfor %}
     </tbody>
   </table>
-  <div class="pager" data-pager="assignments"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+  {% if page_obj.paginator.num_pages > 1 %}
+    <div class="pager">
+
+        {% if page_obj.has_previous %}
+            <a class="btn btn-sm" href="?page=1">
+                First
+            </a>
+
+            <a class="btn btn-sm" href="?page={{ page_obj.previous_page_number }}">
+                Previous
+            </a>
+        {% endif %}
+
+        <span>
+            Page {{ page_obj.number }}
+            of
+            {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a class="btn btn-sm" href="?page={{ page_obj.next_page_number }}">
+                Next
+            </a>
+
+            <a class="btn btn-sm" href="?page={{ page_obj.paginator.num_pages }}">
+                Last
+            </a>
+        {% endif %}
+
+    </div>
+  {% endif %}
 </section>
 {% endblock %}
