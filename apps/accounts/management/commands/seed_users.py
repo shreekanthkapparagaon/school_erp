@@ -1,5 +1,5 @@
-from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from apps.schools.models import School
@@ -28,8 +28,6 @@ class Command(BaseCommand):
                 "last_name": "Manager",
                 "email": "manager@demo.com",
                 "role": User.Role.MANAGER,
-                "is_staff": True,
-                "is_superuser": True,
             },
         )
 
@@ -92,7 +90,7 @@ class Command(BaseCommand):
                     teacher.set_password("password")
                     teacher.save()
 
-            # Students
+            # Students (without class assignment)
             for i in range(1, self.STUDENTS_PER_SCHOOL + 1):
 
                 student, created = User.objects.get_or_create(
@@ -110,7 +108,9 @@ class Command(BaseCommand):
                     student.save()
 
             self.stdout.write(
-                self.style.SUCCESS(f"✓ Users created for {school.name}")
+                self.style.SUCCESS(
+                    f"✓ Users created for {school.name}"
+                )
             )
 
         self.stdout.write(

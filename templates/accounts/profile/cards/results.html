@@ -1,0 +1,143 @@
+<div class="profile-card">
+
+    <div class="profile-card-header">
+
+        <div class="profile-card-heading">
+
+            <span class="profile-card-icon">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </span>
+
+            <div>
+
+                <p class="profile-card-eyebrow">
+                    Academics
+                </p>
+
+                <h3 class="profile-card-title">
+                    Results Summary
+                </h3>
+
+            </div>
+
+        </div>
+
+        {% if card.context.view_url %}
+            <a
+                href="{{ card.context.view_url }}"
+                class="btn btn-outline-primary btn-sm"
+            >
+                <i class="fa-solid fa-file-lines"></i>
+                {{ card.context.view_label }}
+            </a>
+        {% endif %}
+
+    </div>
+
+    <div class="profile-stats-grid">
+
+        <div class="profile-stat-card">
+
+            <span class="profile-stat-label">
+                Average
+            </span>
+
+            <span class="profile-stat-value">
+                {{ card.context.average_percentage }}%
+            </span>
+
+        </div>
+
+        <div class="profile-stat-card">
+
+            <span class="profile-stat-label">
+                Latest Exam
+            </span>
+
+            <span class="profile-stat-value">
+                {{ card.context.latest_exam.name }}
+            </span>
+
+        </div>
+
+        <div class="profile-stat-card">
+
+            <span class="profile-stat-label">
+                Result Status
+            </span>
+
+            <span class="profile-stat-value {% if card.context.published %}status-paid{% else %}status-pending{% endif %}">
+
+                {% if card.context.published %}
+                    Published
+                {% else %}
+                    Draft
+                {% endif %}
+
+            </span>
+
+        </div>
+
+    </div>
+
+    <hr>
+
+    <h4 class="mb-3">
+        Recent Exams
+    </h4>
+
+    {% if card.context.recent_exams %}
+
+        <div class="detail-list">
+
+            {% for exam in card.context.recent_exams %}
+
+                <div>
+
+                    <dt>
+                        {{ exam.exam.name }}
+                    </dt>
+
+                    <dd>
+
+                        {{ exam.average_percentage }}%
+
+                        <small>
+
+                            •
+                            <span class="{{ exam.grade_color }}">
+                                {{ exam.grade }}
+                            </span>
+
+                            •
+
+                            <span class="{% if exam.published %}status-paid{% else %}status-pending{% endif %}">
+
+                                {% if exam.published %}
+                                    Published
+                                {% else %}
+                                    Draft
+                                {% endif %}
+
+                            </span>
+
+                        </small>
+
+                    </dd>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="profile-empty-state">
+            <i class="fa-solid fa-circle-info"></i>
+            <p>No examination results available.</p>
+        </div>
+
+    {% endif %}
+
+</div>

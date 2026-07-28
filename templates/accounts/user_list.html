@@ -1,56 +1,119 @@
 {% extends "base.html" %}
-{% block page_heading %}{{ title }}{% endblock %}
+
+{% block page_heading %}
+{{ title }}
+{% endblock %}
+
 {% block content %}
 <section class="card">
+
   <div class="table-header">
     <div>
       <p class="eyebrow">Latest first</p>
       <h2>{{ title }}</h2>
     </div>
+
     <div class="table-actions">
-      <input data-filter="users" placeholder="Filter {{ title|lower }}">
+      <input type="text" placeholder="Filter {{ title|lower }}" disabled>
+
       {% if managed_role == "principal" and perms.plans.feature_student_management %}
-        <a class="btn btn-muted" href="{% url 'accounts:assign_principal_school' %}">Assign school</a>
+        <a class="btn btn-muted"
+           href="{% url 'accounts:assign_principal_school' %}">
+          Assign school
+        </a>
       {% endif %}
+
       {% if perms.plans.feature_student_management %}
-        <a class="btn" href="{% url 'accounts:create_user' %}?role={{ managed_role }}">Add {{ title|slice:":-1" }}</a>
+        <a class="btn"
+           href="{% url 'accounts:create_user' %}?role={{ managed_role }}">
+          Add {{ title|slice:":-1" }}
+        </a>
       {% endif %}
     </div>
   </div>
-  <table data-table="users" data-page-size="12">
+
+  <table>
     <thead>
       <tr>
-        <th data-sort>Name</th>
-        <th data-sort>Email</th>
-        <th data-sort>Phone</th>
-        <th data-sort>School</th>
-        <th data-sort>Class</th>
-        <th data-sort>Joined</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>School</th>
+        <th>Class</th>
+        <th>Joined</th>
         <th>Action</th>
       </tr>
     </thead>
+
     <tbody>
-      {% for account in users %}
-        <tr>
-          <td>{{ account }}</td>
-          <td>{{ account.email }}</td>
-          <td>{{ account.phone|default:"-" }}</td>
-          <td>{{ account.school|default:"Not assigned" }}</td>
-          <td>{{ account.school_class|default:"-" }}</td>
-          <td>{{ account.date_joined|date:"M d, Y" }}</td>
-          <td>
-            <div class="row-actions">
-              <a class="btn btn-sm btn-muted" href="{% url 'accounts:user_detail' account.pk %}">View</a>
-              <a class="btn btn-sm" href="{% url 'accounts:update_user' account.pk %}">Edit</a>
-              <a class="btn btn-sm btn-danger" href="{% url 'accounts:delete_user' account.pk %}">Delete</a>
-            </div>
-          </td>
-        </tr>
+      {% for account in page_obj %}
+      <tr>
+        <td>{{ account }}</td>
+        <td>{{ account.email }}</td>
+        <td>{{ account.phone|default:"-" }}</td>
+        <td>{{ account.school|default:"Not assigned" }}</td>
+        <td>{{ account.school_class|default:"-" }}</td>
+        <td>{{ account.date_joined|date:"M d, Y" }}</td>
+        <td>
+          <div class="row-actions">
+            <a class="btn btn-sm btn-muted"
+               href="{% url 'accounts:user_detail' account.pk %}">
+              View
+            </a>
+
+            <a class="btn btn-sm"
+               href="{% url 'accounts:update_user' account.pk %}">
+              Edit
+            </a>
+
+            <a class="btn btn-sm btn-danger"
+               href="{% url 'accounts:delete_user' account.pk %}">
+              Delete
+            </a>
+          </div>
+        </td>
+      </tr>
       {% empty %}
-        <tr><td colspan="7">No records yet.</td></tr>
+      <tr>
+        <td colspan="7">No records found.</td>
+      </tr>
       {% endfor %}
     </tbody>
   </table>
-  <div class="pager" data-pager="users"><button data-prev>Previous</button><span data-page></span><button data-next>Next</button></div>
+
+  {% if page_obj.paginator.num_pages > 1 %}
+  <div class="pager">
+
+    {% if page_obj.has_previous %}
+      <a class="btn btn-sm"
+         href="?page=1">
+        First
+      </a>
+
+      <a class="btn btn-sm"
+         href="?page={{ page_obj.previous_page_number }}">
+        Previous
+      </a>
+    {% endif %}
+
+    <span>
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+      <a class="btn btn-sm"
+         href="?page={{ page_obj.next_page_number }}">
+        Next
+      </a>
+
+      <a class="btn btn-sm"
+         href="?page={{ page_obj.paginator.num_pages }}">
+        Last
+      </a>
+    {% endif %}
+
+  </div>
+  {% endif %}
+
 </section>
 {% endblock %}

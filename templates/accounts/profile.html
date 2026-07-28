@@ -1,303 +1,193 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block page_heading %}
-{{ title }}
+{% block page_heading %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
 {% endblock %}
 
 {% block content %}
+<form method="post" enctype="multipart/form-data" id="profile-form">
+{% csrf_token %}
 
-<style>
-.profile-header{
-    display:flex;
-    align-items:center;
-    gap:20px;
-}
+<div class="card profile-card">
+    <div class="profile-header">
 
-.profile-avatar{
-    position:relative;
-    width:84px;
-    height:84px;
-    min-width:84px;
-    min-height:84px;
-    max-width:84px;
-    max-height:84px;
-    flex:0 0 84px;
-    border-radius:50%;
-    overflow:hidden;
-    border:3px solid #fff;
-    box-shadow:var(--shadow);
-}
+        <div class="profile-avatar-section">
 
-.profile-avatar img{
-    width:100%;
-    height:100%;
-    display:block;
-    object-fit:cover;
-    object-position:center;
-}
+            <div class="profile-avatar">
+                <img
+                    id="profile-image-preview"
+                    src="{{ request.user.profile.image_url }}"
+                    alt="{{ request.user.get_full_name }}">
 
-.profile-avatar input[type=file]{
-    display:none;
-}
+                {% if photo_edit %}
+                    {{ form.profile_image }}
 
-.avatar-overlay{
-    position:absolute;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:rgba(0,0,0,.45);
-    color:#fff;
-    font-size:11px;
-    font-weight:600;
-    cursor:pointer;
-    opacity:0;
-    transition:.2s;
-    text-align:center;
-}
+                    <label
+                        for="{{ form.profile_image.id_for_label }}"
+                        class="avatar-overlay">
+                        Change
+                    </label>
+                {% endif %}
+            </div>
 
-.profile-avatar:hover .avatar-overlay{
-    opacity:1;
-}
+            {% if photo_edit %}
+                <div class="profile-image-actions">
 
-.profile-info{
-    flex:1;
-    min-width:0;
-}
+                    <label
+                        for="{{ form.profile_image.id_for_label }}"
+                        class="btn btn-sm">
+                        Change Photo
+                    </label>
 
-.profile-info h2{
-    margin:0 0 6px;
-}
-
-.profile-info p{
-    margin:0;
-}
-
-.profile-progress{
-    margin-top:16px;
-    width:320px;
-    max-width:100%;
-    height:8px;
-    background:var(--border);
-    border-radius:999px;
-    overflow:hidden;
-}
-
-.profile-progress-bar{
-    height:100%;
-    background:var(--primary);
-}
-
-.profile-info small{
-    display:block;
-    margin-top:8px;
-    font-size:13px;
-    color:var(--text-muted);
-}
-
-.profile-image-actions{
-    margin-top:10px;
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-}
-.profile-image-error{
-    margin-top:10px;
-    color:#dc3545;
-    font-size:13px;
-    font-weight:600;
-}
-.profile-badge{
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-
-    margin-top:12px;
-    margin-bottom:10px;
-
-    padding:6px 12px;
-
-    border-radius:999px;
-
-    font-size:13px;
-    font-weight:600;
-}
-
-.profile-badge.success{
-    background:#d1fae5;
-    color:#065f46;
-}
-
-.profile-badge.warning{
-    background:#fef3c7;
-    color:#92400e;
-}
-
-.profile-badge.danger{
-    background:#fee2e2;
-    color:#991b1b;
-}   
-</style>
-
-<form
-    method="post"
-    enctype="multipart/form-data"
-    id="profile-form">
-
-    {% csrf_token %}
-
-    <div class="card">
-        <div class="table-header">
-            <div class="profile-header">
-                <div>
-                    <div class="profile-avatar">
-                        <img
-                            id="profile-image-preview"
-                            src="{{ request.user.profile.image_url }}"
-                            alt="{{ request.user.get_full_name }}">
-                        {% if edit_mode %}
-                            {{ form.profile_image }}
-                            <label
-                                for="{{ form.profile_image.id_for_label }}"
-                                class="avatar-overlay">
-                                Change
-                            </label>
-                        {% endif %}
-                    </div>
-                    {% if edit_mode and form.profile_image.errors %}
-                        <div class="text-danger small mt-2 profile-image-error">
-                            {% for error in form.profile_image.errors %}
-                                <div>⚠ {{ error }}</div>
-                            {% endfor %}
-                        </div>
+                    {% if request.user.profile.profile_image %}
+                        <button
+                            type="submit"
+                            name="remove_profile_image"
+                            value="1"
+                            class="btn btn-danger btn-sm"
+                            onclick="return confirm('Remove your profile photo?');">
+                            Remove
+                        </button>
                     {% endif %}
-                    {% if edit_mode %}
-                        <div class="profile-image-actions">
-                            <label
-                                for="{{ form.profile_image.id_for_label }}"
-                                class="btn btn-sm">
-                                Change Photo
-                            </label>
-                            {% if request.user.profile.profile_image %}
-                                <button
-                                    type="submit"
-                                    name="remove_profile_image"
-                                    value="1"
-                                    class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Remove your profile photo?');">
-                                    Remove Photo
-                                </button>
-                            {% endif %}
-                        </div>
-                    {% endif %}
+
                 </div>
-                <div class="profile-info">
-                    <h2>
-                        {{ request.user.get_full_name|default:request.user.username }}
-                    </h2>
-                    <p>
-                        {{ request.user.get_role_display }}
+            {% else %}
 
-                        {% if request.user.school %}
-                            • {{ request.user.school }}
-                        {% endif %}
+                <a
+                    href="?edit=photo"
+                    class="btn btn-sm">
+                    Edit Photo
+                </a>
 
-                        {% if request.user.school_class %}
-                            • {{ request.user.school_class }}
-                        {% endif %}
-                    </p>
-                    <div class="profile-progress">
+            {% endif %}
 
-                        <div
-                            class="profile-progress-bar"
-                            style="width:{{ completion }}%;">
-                        </div>
+        </div>
 
-                    </div>
+        <div class="profile-info">
 
-                    <div class="profile-completion">
+            <h2>
+                {{ request.user.get_full_name|default:request.user.username }}
+            </h2>
 
-                        {% if completion == 100 %}
+            <div class="profile-meta">
 
-                            <span class="profile-badge success">
-                                ✓ Complete
-                            </span>
+                <span class="status status-info">
+                    {{ request.user.get_role_display }}
+                </span>
 
-                        {% elif completion >= 70 %}
+                {% if request.user.school %}
+                    <span>{{ request.user.school }}</span>
+                {% endif %}
 
-                            <span class="profile-badge warning">
-                                Almost Complete
-                            </span>
+                {% if request.user.school_class %}
+                    <span>{{ request.user.school_class }}</span>
+                {% endif %}
 
-                        {% else %}
+            </div>
 
-                            <span class="profile-badge danger">
-                                Incomplete
-                            </span>
-
-                        {% endif %}
-
-                        <small>
-                            {{ completed_fields }} of {{ total_fields }} profile fields completed
-                            ({{ completion }}%)
-                        </small>
-
-                    </div>
+            <div class="profile-progress">
+                <div
+                    class="profile-progress-bar"
+                    style="width: {{ completion }}%;">
                 </div>
             </div>
-            <div class="table-actions">
-                {% if edit_mode %}
-                    <a
-                        href="{% url 'accounts:profile' %}"
-                        class="btn btn-muted">
+
+            <div class="profile-completion">
+
+                <span class="profile-badge {{ completion_badge.class }}">
+                    {{ completion_badge.icon }}
+                    {{ completion_badge.label }}
+                </span>
+
+                <small>
+                    {{ completed_fields }} of {{ total_fields }}
+                    fields completed ({{ completion }}%)
+                </small>
+
+            </div>
+
+        </div>
+
+        {% if photo_edit %}
+        <div class="form-actions">
+
+            <a
+                href="{% url 'accounts:profile' %}"
+                class="btn btn-muted">
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                name="section"
+                value="photo">
+                Save Changes
+            </button>
+
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<div class="grid-two">
+    <!-- Basic Information -->
+    <div class="card">
+
+        <div class="table-header">
+
+            <div>
+                <p class="eyebrow">Account Details</p>
+                <h2>Basic Information</h2>
+            </div>
+
+            <div>
+                {% if basic_edit %}
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-muted">
                         Cancel
                     </a>
+
                     <button
-                        type="submit">
+                        type="submit"
+                        name="section"
+                        value="basic">
                         Save Changes
                     </button>
                 {% else %}
                     <a
-                        href="?edit=1"
+                        href="?edit=basic"
                         class="btn">
-                        Edit Profile
+                        Edit
                     </a>
                 {% endif %}
             </div>
+
         </div>
-    </div>
 
-    <div class="grid-two">
-        <div class="card">
-    <div class="table-header">
-        <h2>Basic Information</h2>
-    </div>
+        <div class="detail-list">
 
-    <div class="detail-list">
+            {% for item in basic_info %}
 
-        {% for item in basic_info %}
+            <div>
 
-        <div>
+                <dt>{{ item.label }}</dt>
 
-            <dt>
+                <dd>
 
-                {{ item.label }}
+                    {% if basic_edit and item.form_field %}
 
-            </dt>
+                        {{ item.form_field }}
 
-            <dd>
+                        {% if item.form_field.errors %}
+                            <div class="form-errors">
+                                {{ item.form_field.errors }}
+                            </div>
+                        {% endif %}
 
-                {% if edit_mode and item.form_field %}
-
-                    {{ item.form_field }}
-
-                    {% if item.form_field.errors %}
-                        {{ item.form_field.errors }}
-                    {% endif %}
-
-                {% else %}
-
-                    {% if item.label == "Joined" %}
+                    {% elif item.label == "Joined" %}
 
                         {{ item.value|date:"d M Y" }}
 
@@ -307,228 +197,212 @@
 
                     {% endif %}
 
-                {% endif %}
+                </dd>
 
-            </dd>
+            </div>
+
+            {% endfor %}
 
         </div>
 
-        {% endfor %}
-
     </div>
 
-</div>
-<div class="card">
+    <!-- Additional Information -->
+    <div class="card">
 
-    <div class="table-header">
+        <div class="table-header">
 
-        <h2>Additional Information</h2>
+            <div>
+                <p class="eyebrow">Custom Fields</p>
+                <h2>Additional Information</h2>
+            </div>
 
-    </div>
+            <div>
+                {% if additional_edit %}
 
-    <div class="detail-list">
+                    <a
+                        href="{% url 'accounts:profile' %}"
+                        class="btn btn-muted">
+                        Cancel
+                    </a>
 
-        {% for field in custom_fields %}
-
-        <div>
-
-            <dt>
-
-                {{ field.label }}
-
-                {% if field.required %}
-                    <span style="color:var(--danger)">*</span>
-                {% endif %}
-
-            </dt>
-
-            <dd>
-
-                {% if edit_mode %}
-
-                    {{ field.form_field }}
-
-                    {% if field.form_field.errors %}
-                        {{ field.form_field.errors }}
-                    {% endif %}
-
-                    {% if field.help_text %}
-                        <p>{{ field.help_text }}</p>
-                    {% endif %}
+                    <button
+                        type="submit"
+                        name="section"
+                        value="additional">
+                        Save Changes
+                    </button>
 
                 {% else %}
 
-                    {% if field.type == "file" %}
+                    <a
+                        href="?edit=additional"
+                        class="btn">
+                        Edit
+                    </a>
 
-                        {% if field.value %}
+                {% endif %}
+            </div>
 
-                            <a
-                                href="{{ field.value.url }}"
-                                target="_blank"
-                                class="btn btn-sm">
+        </div>
 
-                                View File
+        <div class="detail-list">
 
-                            </a>
+            {% for field in custom_fields %}
 
-                        {% else %}
+            <div>
 
-                            —
+                <dt>
+                    {{ field.label }}
+                    {% if field.required %}
+                        <span style="color:var(--danger)">*</span>
+                    {% endif %}
+                </dt>
 
+                <dd>
+
+                    {% if additional_edit %}
+
+                        {{ field.form_field }}
+
+                        {% if field.form_field.errors %}
+                            <div class="form-errors">
+                                {{ field.form_field.errors }}
+                            </div>
                         {% endif %}
 
-                    {% elif field.type == "date" %}
-
-                        {{ field.value|date:"d M Y"|default:"—" }}
+                        {% if field.help_text %}
+                            <p>{{ field.help_text }}</p>
+                        {% endif %}
 
                     {% else %}
 
-                        {{ field.value|default:"—" }}
+                        {% if field.type == "file" %}
+
+                            {% if field.value %}
+                                <a
+                                    href="{{ field.value.url }}"
+                                    target="_blank"
+                                    class="btn btn-sm">
+                                    View File
+                                </a>
+                            {% else %}
+                                —
+                            {% endif %}
+
+                        {% elif field.type == "date" %}
+
+                            {{ field.value|date:"d M Y"|default:"—" }}
+
+                        {% else %}
+
+                            {{ field.value|default:"—" }}
+
+                        {% endif %}
+
+                        {% if field.is_new %}
+                            <div class="field-status">
+                                <span class="status status-pending">
+                                    Update Required
+                                </span>
+                            </div>
+                        {% endif %}
+
+                        {% if field.help_text %}
+                            <p class="field-help">
+                                {{ field.help_text }}
+                            </p>
+                        {% endif %}
 
                     {% endif %}
 
-                    {% if field.is_new %}
+                </dd>
 
-                        <div style="margin-top:10px;">
+            </div>
 
-                            <span class="status status-pending">
+            {% empty %}
 
-                                Update Required
+            <div>
+                <dt>Information</dt>
+                <dd>No additional profile fields available.</dd>
+            </div>
 
-                            </span>
-
-                        </div>
-
-                    {% endif %}
-
-                    {% if field.help_text %}
-
-                        <p style="margin-top:8px;">
-
-                            {{ field.help_text }}
-
-                        </p>
-
-                    {% endif %}
-
-                {% endif %}
-
-            </dd>
+            {% endfor %}
 
         </div>
-
-        {% empty %}
-
-        <div>
-
-            <dt>Information</dt>
-
-            <dd>
-
-                No additional profile fields available.
-
-            </dd>
-
-        </div>
-
-        {% endfor %}
 
     </div>
 
 </div>
+
+{% for card in profile_cards %}
+    <br>
+    {% include card.template %}
+    <br>
+{% endfor %}
+
+{% if edit_mode %}
+<div class="card">
+    <div class="form-actions">
+
+        <a
+            href="{% url 'accounts:profile' %}"
+            class="btn btn-muted">
+            Cancel
+        </a>
+
+        <button
+            type="submit"
+            name="section"
+            value="{{ edit_section }}">
+            Save Changes
+        </button>
+
     </div>
-
-    {% if edit_mode %}
-
-    <div class="card">
-
-        <div class="form-actions">
-
-            <a
-                href="{% url 'accounts:profile' %}"
-                class="btn btn-muted">
-
-                Cancel
-
-            </a>
-
-            <button type="submit">
-
-                Save Changes
-
-            </button>
-
-        </div>
-
-    </div>
-
-    {% endif %}
+</div>
+{% endif %}
 
 </form>
 
-
-
 {% if edit_mode %}
-
 <script>
-const imageInput = document.getElementById(
-    "{{ form.profile_image.id_for_label }}"
-);
 
-const preview = document.getElementById("profile-image-preview");
+const imageInput=document.getElementById("{{ form.profile_image.id_for_label }}");
+const preview=document.getElementById("profile-image-preview");
 
-if (imageInput && preview) {
-
-    imageInput.addEventListener("change", function () {
-
-        const file = this.files[0];
-
-        if (!file) return;
-
-        preview.src = URL.createObjectURL(file);
-
+if(imageInput&&preview){
+    imageInput.addEventListener("change",function(){
+        const file=this.files[0];
+        if(file){
+            preview.src=URL.createObjectURL(file);
+        }
     });
-
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded",()=>{
 
-    const form = document.getElementById("profile-form");
+    const form=document.getElementById("profile-form");
+    if(!form)return;
 
-    if (!form) return;
+    let changed=false;
 
-    let changed = false;
-
-    form.querySelectorAll("input, select, textarea").forEach(function (element) {
-
-        element.addEventListener("change", function () {
-
-            changed = true;
-
-        });
-
+    form.querySelectorAll("input,select,textarea").forEach(field=>{
+        field.addEventListener("change",()=>changed=true);
     });
 
-    form.addEventListener("submit", function () {
-
-        changed = false;
-
+    form.addEventListener("submit",()=>{
+        changed=false;
     });
 
-    window.addEventListener("beforeunload", function (event) {
-
-        if (!changed) return;
-
+    window.addEventListener("beforeunload",event=>{
+        if(!changed)return;
         event.preventDefault();
-
-        event.returnValue = "";
-
+        event.returnValue="";
     });
 
 });
 
 </script>
-
 {% endif %}
 
 {% endblock %}

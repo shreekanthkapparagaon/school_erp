@@ -1,0 +1,95 @@
+<div class="card">
+
+    <div class="table-header">
+
+        <div>
+
+            <p class="eyebrow">
+                Documents
+            </p>
+
+            <h2>
+                Uploaded Documents
+            </h2>
+
+        </div>
+
+    </div>
+
+    <div class="stats-grid">
+
+        <div class="stat-item">
+            <span class="stat-label">Total</span>
+            <span class="stat-value">
+                {{ card.context.total_documents }}
+            </span>
+        </div>
+
+        <div class="stat-item">
+            <span class="stat-label">Approved</span>
+            <span class="stat-value">
+                {{ card.context.approved_documents }}
+            </span>
+        </div>
+
+        <div class="stat-item">
+            <span class="stat-label">Pending</span>
+            <span class="stat-value">
+                {{ card.context.pending_documents }}
+            </span>
+        </div>
+
+        <div class="stat-item">
+            <span class="stat-label">Rejected</span>
+            <span class="stat-value">
+                {{ card.context.rejected_documents }}
+            </span>
+        </div>
+
+    </div>
+
+    <hr>
+
+    <h4 class="mb-3">
+        Recent Documents
+    </h4>
+
+    {% if card.context.recent_documents %}
+
+        <div class="detail-list">
+
+            {% for document in card.context.recent_documents %}
+
+                <div>
+
+                    <dt>
+                        {{ document.document_type.name }}
+                    </dt>
+
+                    <dd>
+
+                        {{ document.get_status_display }}
+
+                        <small class="text-muted">
+
+                            • {{ document.created_at|date:"d M Y" }}
+
+                        </small>
+
+                    </dd>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <p class="text-muted mb-0">
+            No documents uploaded.
+        </p>
+
+    {% endif %}
+
+</div>
