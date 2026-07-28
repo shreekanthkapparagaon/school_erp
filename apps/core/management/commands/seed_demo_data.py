@@ -8,19 +8,15 @@ class Command(BaseCommand):
     CORE_COMMANDS = [
         "seed_plans",
         "seed_schools",
-        "seed_users",
+        "seed_users",          # Manager, Principal, Head, Teachers
         "seed_subscriptions",
     ]
 
     ACADEMIC_COMMANDS = [
         "seed_academics",
+        "seed_students",
         "seed_exams",
         "seed_results",
-    ]
-
-    DOCUMENT_COMMANDS = [
-        "seed_document_types",
-        "seed_documents",
     ]
 
     FINANCE_COMMANDS = [
@@ -29,11 +25,16 @@ class Command(BaseCommand):
         "seed_teacher_salaries",
     ]
 
+    DOCUMENT_COMMANDS = [
+        "seed_document_types",
+        "seed_documents",
+    ]
+
     COMMANDS = (
         CORE_COMMANDS
         + ACADEMIC_COMMANDS
-        + DOCUMENT_COMMANDS
         + FINANCE_COMMANDS
+        + DOCUMENT_COMMANDS
     )
 
     def handle(self, *args, **options):
