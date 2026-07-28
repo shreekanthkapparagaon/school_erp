@@ -656,3 +656,45 @@ input:focus, select:focus, textarea:focus {
     color: var(--muted);;
     line-height: 1.6;
 }
+.stat-card-disabled{
+    opacity:.65;
+    cursor:not-allowed;
+}
+
+.stat-card-disabled:hover{
+    transform:none;
+}
+.module-icon{
+    font-size:2rem;
+}
+.upload-icon{
+    text-align:center;
+    font-size:48px;
+    color:#16a34a;
+    margin-bottom:1rem;
+}
+.upload-icon{
+    text-align:center;
+    font-size:48px;
+    color:#16a34a;
+    margin:1rem 0;
+}
+
+.report-summary{
+    margin-bottom:1.5rem;
+}
+
+.table code{
+    font-size:0.9rem;
+    color:#2563eb;
+    font-weight:600;
+}
+
+.alert ul{
+    margin:0.5rem 0 0;
+    padding-left:1.25rem;
+}
+
+.alert li{
+    margin-bottom:0.35rem;
+}
