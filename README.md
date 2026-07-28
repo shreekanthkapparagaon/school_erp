@@ -1,25 +1,50 @@
 # School ERP
 
-A modular, multi-tenant School ERP built with Django, designed for managing multiple schools through a feature-based subscription system. The project includes role-based access control, academic management, fee management, examination & results, document management, and a scalable architecture for future modules.
+A modern, modular School ERP built with Django for managing educational institutions through a feature-based subscription system. The project provides role-based access control, academic management, fee management, examination and results, document management, and a scalable architecture designed for future expansion.
 
-> **Current Release:** v2.1.0
+> **Current Release:** v1.1.0
 
 ---
 
 ## Features
 
-* Multi-school (SaaS) architecture
-* Role-based authentication and authorization
-* Feature-based subscription plans
-* Student management
-* Teacher management
-* Academic management
-* Fee management
-* Examination & Result management
-* Document management
-* Configurable school features
-* Admin dashboard with Jazzmin
-* Demo data generation utilities
+### Core
+
+- Multi-school management
+- Role-based authentication & authorization
+- Feature-based subscription system
+- School administration
+
+### Academic
+
+- Student management
+- Teacher management
+- Class & Subject management
+- Academic year management
+- Student promotion
+
+### Examination
+
+- Examination management
+- Result management
+- Excel import/export
+- Report cards
+
+### Finance
+
+- Fee management
+- Salary management
+
+### Documents
+
+- Document management
+- Document status tracking
+
+### Developer Features
+
+- Demo data generators
+- Modular architecture
+- Django Jazzmin admin
 
 ---
 
@@ -34,6 +59,25 @@ A modular, multi-tenant School ERP built with Django, designed for managing mult
 * HTML5
 * CSS3
 * JavaScript
+
+---
+
+## Project Architecture
+
+The project follows a modular Django application structure.
+
+Each application is organized into reusable packages:
+
+- admin/
+- forms/
+- management/
+- migrations/
+- models/
+- tests/
+- utils/
+- views/
+
+This structure improves maintainability, scalability, and code organization.
 
 ---
 
@@ -193,14 +237,14 @@ python manage.py delete_demo_data --yes
 # Project Structure
 
 ```text
-config/
-├── settings/
-│   ├── base.py
-│   ├── dev.py
-│   └── prod.py
-│
 apps/
 ├── accounts/
+│   ├── admin/
+│   ├── forms/
+│   ├── models/
+│   ├── utils/
+│   └── views/
+│
 ├── schools/
 ├── fees/
 ├── results/
@@ -208,10 +252,28 @@ apps/
 ├── plans/
 └── core/
 
+config/
+├── settings/
+│   ├── base.py
+│   ├── dev.py
+│   ├── prod.py
+│   └── jazz.py
+
+templates/
 static/
 media/
-templates/
 ```
+
+---
+
+## Version History
+
+| Version | Description |
+|----------|-------------|
+| v1.1.0 | Modular architecture, UI improvements, document status, results export improvements |
+| v1.0.2 | Dashboard and homepage improvements |
+| v1.0.1 | Results, Fees, Subscription Management |
+| v1.0.0 | Initial Release |
 
 ---
 
