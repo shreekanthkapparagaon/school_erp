@@ -19,11 +19,6 @@ class Command(BaseCommand):
             "description": "Manage teachers.",
         },
         {
-            "name": "Attendance",
-            "code": "attendance",
-            "description": "Student attendance.",
-        },
-        {
             "name": "Fees",
             "code": "fees",
             "description": "Fee management.",
@@ -69,7 +64,6 @@ class Command(BaseCommand):
             "features": [
                 "student_management",
                 "teacher_management",
-                "attendance",
                 "fees",
                 "documents",
             ],
@@ -87,7 +81,6 @@ class Command(BaseCommand):
             "features": [
                 "student_management",
                 "teacher_management",
-                "attendance",
                 "fees",
                 "results",
                 "documents",
