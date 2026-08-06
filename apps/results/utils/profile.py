@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from apps.accounts.models import User
-from apps.results.models import Result
+from apps.results.models import Result,Exam
 from django.urls import reverse
 
 
@@ -15,7 +15,10 @@ def get_results_profile_data(user):
 
     results = (
         Result.objects
-        .filter(student=user)
+        .filter(
+            student=user,
+            exam__status=Exam.Status.PUBLISHED,
+        )
         .select_related("exam")
         .order_by("-exam__created_at", "subject__name")
     )

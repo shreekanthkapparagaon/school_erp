@@ -132,7 +132,7 @@
 
     </div>
 </div>
-
+<br/>
 <div class="grid-two">
     <!-- Basic Information -->
     <div class="card">
@@ -342,24 +342,24 @@
 {% endfor %}
 
 {% if edit_mode %}
-<div class="card">
-    <div class="form-actions">
+    <div class="card">
+        <div class="form-actions">
 
-        <a
-            href="{% url 'accounts:profile' %}"
-            class="btn btn-muted">
-            Cancel
-        </a>
+            <a
+                href="{% url 'accounts:profile' %}"
+                class="btn btn-muted">
+                Cancel
+            </a>
 
-        <button
-            type="submit"
-            name="section"
-            value="{{ edit_section }}">
-            Save Changes
-        </button>
+            <button
+                type="submit"
+                name="section"
+                value="{{ edit_section }}">
+                Save Changes
+            </button>
 
+        </div>
     </div>
-</div>
 {% endif %}
 
 </form>

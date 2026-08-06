@@ -2,9 +2,10 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
+from apps.accounts.utils.profile import get_profile_cards
+
 from ..forms import ProfileUpdateForm
 from ..models import ProfileField
-from apps.accounts.utils.profile import get_profile_cards
 
 
 @login_required
@@ -13,7 +14,7 @@ def profile_detail(request):
     profile = user.profile
 
     # ----------------------------------------
-    # Edit Mode
+    # Edit Mode (GET)
     # ----------------------------------------
     edit_section = request.GET.get("edit", "").lower()
 
@@ -30,23 +31,35 @@ def profile_detail(request):
     )
 
     # ----------------------------------------
-    # Form
+    # Form (Always Available)
     # ----------------------------------------
-    if request.method == "POST" and "remove_profile_image" in request.POST:
+    form = ProfileUpdateForm(
+        request.POST or None,
+        request.FILES or None,
+        instance=profile,
+    )
 
-        profile = request.user.profile
-
+    # ----------------------------------------
+    # Remove Profile Photo
+    # ----------------------------------------
+    if (
+        request.method == "POST"
+        and "remove_profile_image" in request.POST
+    ):
         if profile.profile_image:
-
             profile.profile_image.delete(save=False)
-
             profile.profile_image = None
             profile.save(update_fields=["profile_image"])
 
-        messages.success(request, "Profile photo removed successfully.")
-
+        messages.success(
+            request,
+            "Profile photo removed successfully.",
+        )
         return redirect("accounts:profile")
 
+    # ----------------------------------------
+    # Handle POST
+    # ----------------------------------------
     if request.method == "POST":
 
         edit_section = request.POST.get("section", "").lower()
@@ -72,58 +85,43 @@ def profile_detail(request):
 
             if image:
 
-                if image.size > ProfileUpdateForm.MAX_PROFILE_IMAGE_SIZE:
+                if (
+                    image.size
+                    > ProfileUpdateForm.MAX_PROFILE_IMAGE_SIZE
+                ):
                     messages.error(
                         request,
                         "Profile image must be smaller than 1 MB.",
                     )
-
                 else:
-
                     profile.profile_image = image
-                    profile.save()
+                    profile.save(update_fields=["profile_image"])
 
                     messages.success(
                         request,
                         "Profile photo updated successfully.",
                     )
-
                     return redirect("accounts:profile")
 
             else:
-
                 messages.warning(
                     request,
                     "Please choose a profile photo.",
                 )
 
         # ----------------------------------
-        # Basic / Additional
+        # Basic / Additional Update
         # ----------------------------------
         else:
 
-            form = ProfileUpdateForm(
-                request.POST,
-                request.FILES,
-                instance=profile,
-            )
-
             if form.is_valid():
-
                 form.save()
 
                 messages.success(
                     request,
                     "Profile updated successfully.",
                 )
-
                 return redirect("accounts:profile")
-
-    else:
-
-        form = ProfileUpdateForm(
-            instance=profile,
-        )
 
     # ----------------------------------------
     # Basic Information
@@ -188,7 +186,6 @@ def profile_detail(request):
     }
 
     custom_fields = []
-
     completed_fields = 0
 
     for profile_field in profile_fields:
@@ -223,7 +220,9 @@ def profile_detail(request):
                 "help_text": profile_field.help_text,
                 "value": value,
                 "is_new": is_new,
-                "form_field": form[f"profile_{profile_field.id}"],
+                "form_field": form[
+                    f"profile_{profile_field.id}"
+                ],
             }
         )
 
@@ -256,18 +255,18 @@ def profile_detail(request):
             "icon": "🔴",
             "class": "danger",
         }
+
     profile_cards = get_profile_cards(request.user)
+
     context = {
         "title": "My Profile",
         "profile": profile,
         "form": form,
-
         "edit_mode": edit_mode,
         "edit_section": edit_section,
         "basic_edit": basic_edit,
         "additional_edit": additional_edit,
         "photo_edit": photo_edit,
-
         "basic_info": basic_info,
         "custom_fields": custom_fields,
         "completion": completion,
