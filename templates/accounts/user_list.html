@@ -14,22 +14,24 @@
     </div>
 
     <div class="table-actions">
-      <input type="text" placeholder="Filter {{ title|lower }}" disabled>
+      <input type="text"
+            placeholder="Filter {{ title|lower }}"
+            disabled>
 
-      {% if managed_role == "principal" and perms.plans.feature_student_management %}
-        <a class="btn btn-muted"
-           href="{% url 'accounts:assign_principal_school' %}">
-          Assign school
-        </a>
+      {% if managed_role == "principal" and can_create_user %}
+          <a class="btn btn-muted"
+            href="{% url 'accounts:assign_principal_school' %}">
+              Assign School
+          </a>
       {% endif %}
 
-      {% if perms.plans.feature_student_management %}
-        <a class="btn"
-           href="{% url 'accounts:create_user' %}?role={{ managed_role }}">
-          Add {{ title|slice:":-1" }}
-        </a>
+      {% if can_create_user %}
+          <a class="btn"
+            href="{% url 'accounts:create_user' %}?role={{ managed_role }}">
+              Add {{ title|slice:":-1" }}
+          </a>
       {% endif %}
-    </div>
+  </div>
   </div>
 
   <table>
@@ -37,6 +39,7 @@
       <tr>
         <th>Name</th>
         <th>Email</th>
+        <th>Verification</th>
         <th>Phone</th>
         <th>School</th>
         <th>Class</th>
@@ -50,32 +53,54 @@
       <tr>
         <td>{{ account }}</td>
         <td>{{ account.email }}</td>
+        <td>
+            {% if account.is_email_verified %}
+                <span class="status-badge status-success">
+                    <i class="bi bi-patch-check-fill"></i>
+                    Verified
+                </span>
+            {% else %}
+                <span class="status-badge status-warning">
+                    <i class="bi bi-envelope-exclamation"></i>
+                    Pending
+                </span>
+            {% endif %}
+        </td>
         <td>{{ account.phone|default:"-" }}</td>
         <td>{{ account.school|default:"Not assigned" }}</td>
         <td>{{ account.school_class|default:"-" }}</td>
         <td>{{ account.date_joined|date:"M d, Y" }}</td>
         <td>
           <div class="row-actions">
+
             <a class="btn btn-sm btn-muted"
-               href="{% url 'accounts:user_detail' account.pk %}">
-              View
+              href="{% url 'accounts:user_detail' account.pk %}">
+                View
             </a>
 
             <a class="btn btn-sm"
-               href="{% url 'accounts:update_user' account.pk %}">
-              Edit
+              href="{% url 'accounts:update_user' account.pk %}">
+                Edit
             </a>
 
+            {% if not account.is_active %}
+                <a class="btn btn-sm btn-warning"
+                  href="{% url 'accounts:resend_verification_email' account.pk %}">
+                    Resend
+                </a>
+            {% endif %}
+
             <a class="btn btn-sm btn-danger"
-               href="{% url 'accounts:delete_user' account.pk %}">
-              Delete
+              href="{% url 'accounts:delete_user' account.pk %}">
+                Delete
             </a>
-          </div>
+
+        </div>
         </td>
       </tr>
       {% empty %}
       <tr>
-        <td colspan="7">No records found.</td>
+        <td colspan="8">No records found.</td>
       </tr>
       {% endfor %}
     </tbody>

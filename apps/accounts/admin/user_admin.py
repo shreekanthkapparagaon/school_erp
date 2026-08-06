@@ -40,6 +40,7 @@ class UserAdmin(DjangoUserAdmin):
                     "phone",
                     "school",
                     "school_class",
+                    "is_email_verified",
                 )
             },
         ),

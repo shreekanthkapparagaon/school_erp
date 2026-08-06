@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+from django.conf import settings
 
 from apps.plans.models import Subscription
 from apps.schools.models import School, SchoolClass
@@ -95,6 +96,13 @@ class ManagedUserCreationForm(UserCreationForm):
             in [User.Role.HEAD, User.Role.PRINCIPAL]
         ):
             user.school = self.manager.school
+
+        # Enable/disable account based on environment
+        user.is_active = True
+
+        user.is_email_verified = (
+            not settings.EMAIL_VERIFICATION_REQUIRED
+        )
 
         if commit:
             user.save()

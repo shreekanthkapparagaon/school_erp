@@ -15,4 +15,6 @@ urlpatterns = [
     path("users/<int:user_id>/delete/", views.delete_user, name="delete_user"),
     path("users/<str:role>/", views.user_list, name="user_list"),
     path("principals/assign-school/", views.assign_principal_school, name="assign_principal_school"),
+    path("verify-email/<uidb64>/<token>/",views.verify_email,name="verify_email"),
+    path("users/<int:pk>/resend-verification/",views.resend_verification_email,name="resend_verification_email"),
 ]

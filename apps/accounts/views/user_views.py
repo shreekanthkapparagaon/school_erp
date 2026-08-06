@@ -3,12 +3,14 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.conf import settings
 
+from apps.accounts.utils.email import send_verification_email
 from apps.plans.utils import (
     feature_action_required,
     feature_required,
 )
-
+from apps.plans.utils import has_feature_action_permission
 from ..forms import (
     ManagedUserCreationForm,
     ManagedUserUpdateForm,
@@ -61,6 +63,11 @@ def user_list(request, role):
             "managed_role": role,
             "title": f"{role_label(role)}s",
             "page_obj": page_obj,
+            "can_create_user": has_feature_action_permission(
+                request.user,
+                "student_management",
+                "create",
+            ),
         },
     )
 
@@ -114,18 +121,39 @@ def create_user(request):
     )
 
     if request.method == "POST" and form.is_valid():
-        user = form.save()
+        user = form.save(commit=False)
 
-        messages.success(
-            request,
-            f"Created account for {user.email}.",
-        )
+        if settings.EMAIL_VERIFICATION_REQUIRED:
+            user.is_active = False
+        else:
+            user.is_active = True
+
+        user.save()
+
+        if settings.EMAIL_VERIFICATION_REQUIRED:
+            send_verification_email(
+                user=user,
+                request=request,
+            )
+
+            messages.success(
+                request,
+                (
+                    f"Account created for {user.email}. "
+                    "A verification email has been sent."
+                ),
+            )
+        else:
+            messages.success(
+                request,
+                f"Created account for {user.email}.",
+            )
 
         return redirect(
             "accounts:user_list",
             role=user.role,
         )
-
+    
     return render(
         request,
         "schools/form.html",
