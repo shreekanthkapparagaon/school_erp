@@ -1,51 +1,263 @@
 {% extends "base.html" %}
-{% block page_heading %}Contact Requests{% endblock %}
+{% load static %}
+{% block title %}Contact Requests{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/contact_requests.css' %}">
+{% endblock %}
+
 {% block content %}
-<section class="card">
-  <div class="table-header">
-    <div>
-      <h2>Contact Requests</h2>
-      <p>Filter and review messages sent by authenticated users.</p>
+
+<section class="inbox-page">
+
+    <div class="inbox-header">
+
+        <div>
+
+            <span class="eyebrow">
+
+                Customer Support
+
+            </span>
+
+            <h2>
+
+                Contact Requests
+
+            </h2>
+
+            <p>
+
+                Review and manage enquiries submitted through your website.
+
+            </p>
+
+        </div>
+
+        <div class="inbox-stats">
+
+            <div class="stat-box">
+
+                <i class="fa-regular fa-envelope"></i>
+
+                <div>
+
+                    <strong>
+
+                        {{ requests|length }}
+
+                    </strong>
+
+                    <span>
+
+                        Total Messages
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="stat-box unread">
+
+                <i class="fa-solid fa-envelope-circle-check"></i>
+
+                <div>
+
+                    <strong>
+
+                        {{ unread_count|default:0 }}
+
+                    </strong>
+
+                    <span>
+
+                        Unread
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
-    <div class="row-actions">
-      <form method="get" class="inline-form">
-        <input type="search" name="q" placeholder="Search subject, message, email" value="{{ query }}" />
-        <select name="status">
-          <option value="all" {% if status == "all" %}selected{% endif %}>All</option>
-          <option value="read" {% if status == "read" %}selected{% endif %}>Read</option>
-          <option value="unread" {% if status == "unread" %}selected{% endif %}>Unread</option>
-        </select>
-        <button class="btn btn-sm">Filter</button>
-      </form>
+
+
+
+    <div class="inbox-toolbar">
+
+        <form method="get" class="toolbar-form">
+
+            <div class="search-box">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="search"
+                    name="q"
+                    value="{{ query }}"
+                    placeholder="Search subject, email or message...">
+
+            </div>
+
+            <select name="status">
+
+                <option value="all"
+                    {% if status == "all" %}selected{% endif %}>
+
+                    All Messages
+
+                </option>
+
+                <option value="unread"
+                    {% if status == "unread" %}selected{% endif %}>
+
+                    Unread
+
+                </option>
+
+                <option value="read"
+                    {% if status == "read" %}selected{% endif %}>
+
+                    Read
+
+                </option>
+
+            </select>
+
+            <button class="btn">
+
+                <i class="fa-solid fa-filter"></i>
+
+                Filter
+
+            </button>
+
+        </form>
+
     </div>
-  </div>
-  <table>
-    <thead>
-      <tr>
-        <th>From</th>
-        <th>Subject</th>
-        <th>Received</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in requests %}
-      <tr>
-        <td>{{ item.user.email }}</td>
-        <td>{{ item.subject }}</td>
-        <td>{{ item.created_at|date:"M d, Y H:i" }}</td>
-        <td>{{ item.is_read|yesno:"Read,Unread" }}</td>
-        <td>
-          <a class="btn btn-sm" href="{% url 'core:contact_request_detail' item.id %}">View</a>
-        </td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="5">No contact requests found.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+
+
+
+    <div class="request-list">
+
+        {% for item in requests %}
+
+        <article class="request-card {% if not item.is_read %}unread{% endif %}">
+
+            <div class="request-avatar">
+
+                {{ item.user.first_name|default:item.user.email|first|upper }}
+
+            </div>
+
+            <div class="request-content">
+
+                <div class="request-top">
+
+                    <div>
+
+                        <h3>
+
+                            {{ item.subject }}
+
+                        </h3>
+
+                        <span class="request-email">
+
+                            <i class="fa-regular fa-user"></i>
+
+                            {{ item.user.email }}
+
+                        </span>
+
+                    </div>
+
+                    <span class="request-time">
+
+                        <i class="fa-regular fa-clock"></i>
+
+                        {{ item.created_at|date:"M d, Y • H:i" }}
+
+                    </span>
+
+                </div>
+
+                <p class="request-message">
+
+                    {{ item.message|truncatechars:170 }}
+
+                </p>
+
+            </div>
+
+            <div class="request-actions">
+
+                {% if item.is_read %}
+
+                    <span class="status-badge success">
+
+                        <i class="fa-solid fa-circle-check"></i>
+
+                        Read
+
+                    </span>
+
+                {% else %}
+
+                    <span class="status-badge warning">
+
+                        <i class="fa-solid fa-circle"></i>
+
+                        New
+
+                    </span>
+
+                {% endif %}
+
+                <a class="btn btn-sm"
+                   href="{% url 'core:contact_request_detail' item.id %}">
+
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+
+                    Open
+
+                </a>
+
+            </div>
+
+        </article>
+
+        {% empty %}
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+
+                <i class="fa-regular fa-envelope-open"></i>
+
+            </div>
+
+            <h3>
+
+                Inbox is Empty
+
+            </h3>
+
+            <p>
+
+                No contact requests have been received yet.
+
+            </p>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
 </section>
+
 {% endblock %}

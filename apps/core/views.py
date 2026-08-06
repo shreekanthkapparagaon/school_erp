@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.shortcuts import get_object_or_404, redirect, render
+from django.db.models import Count,Q
 
 from apps.accounts.models import User
 from apps.core.forms import ContactForm
@@ -12,7 +13,33 @@ from apps.schools.models import School, SchoolClass, Subject, TeacherSubjectAssi
 
 
 def home(request):
-    return render(request, "core/home.html")
+    context = {}
+    context["top_schools"] = (
+        School.objects
+        .annotate(
+            student_count=Count(
+                "users",
+                filter=Q(users__role=User.Role.STUDENT)
+            ),
+            teacher_count=Count(
+                "users",
+                filter=Q(users__role=User.Role.TEACHER)
+            ),
+            principal_count=Count(
+                "users",
+                filter=Q(users__role=User.Role.PRINCIPAL)
+            ),
+        )
+        .order_by("-student_count")[:10]
+    )
+
+    context["stats"] = {
+        "schools": School.objects.count(),
+        "students": User.objects.filter(role=User.Role.STUDENT).count(),
+        "teachers": User.objects.filter(role=User.Role.TEACHER).count(),
+        "plans": Plan.objects.count(),
+    }
+    return render(request, "core/home.html",context)
 
 
 def about(request):
