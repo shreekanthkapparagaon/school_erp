@@ -8,3 +8,5 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
+EMAIL_VERIFICATION_REQUIRED = False

@@ -17,6 +17,8 @@ from .utility_views import (
     role_queryset_for,
 )
 
+from .verification_views import verify_email,resend_verification_email
+
 from .user_views import (
     user_list,
     create_user,
@@ -46,4 +48,6 @@ __all__ = [
     "update_user",
     "delete_user",
     "assign_principal_school",
+    "verify_email",
+    "resend_verification_email",
 ]

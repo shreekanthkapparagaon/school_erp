@@ -1,6 +1,6 @@
 from pathlib import Path
 import os
-
+from datetime import timedelta
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
 
     "import_export",
 
@@ -36,6 +37,9 @@ INSTALLED_APPS = [
     "apps.document",
     "apps.plans",
     "apps.core",
+
+
+    "admin_honeypot",
 ]
 
 MIDDLEWARE = [
@@ -47,6 +51,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'django_auto_logout.middleware.auto_logout',
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -63,6 +68,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                'django_auto_logout.context_processors.auto_logout_client',
             ],
         },
     },
@@ -108,3 +114,58 @@ AUTH_USER_MODEL = "accounts.User"
 LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "accounts:role_redirect"
 LOGOUT_REDIRECT_URL = "core:home"
+
+
+# django-auto-logout package
+AUTO_LOGOUT = {
+    'IDLE_TIME': timedelta(minutes=5),
+    'SESSION_TIME': timedelta(hours=1),
+    'MESSAGE': 'Your session has expired due to inactivity. Please login again to continue.',
+    'REDIRECT_TO_LOGIN_IMMEDIATELY': True,
+}
+
+
+# ----------------------------------------------------
+# Site
+# ----------------------------------------------------
+
+SITE_URL = os.getenv(
+    "SITE_URL",
+    "http://localhost:8000",
+)
+
+# ----------------------------------------------------
+# Email
+# ----------------------------------------------------
+
+EMAIL_BACKEND = os.getenv(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.console.EmailBackend",
+)
+
+EMAIL_HOST = os.getenv(
+    "EMAIL_HOST",
+    "smtp.gmail.com",
+)
+
+EMAIL_PORT = int(
+    os.getenv("EMAIL_PORT", 587)
+)
+
+EMAIL_USE_TLS = (
+    os.getenv("EMAIL_USE_TLS", "True").lower() == "true"
+)
+
+EMAIL_USE_SSL = (
+    os.getenv("EMAIL_USE_SSL", "False").lower() == "true"
+)
+
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+
+DEFAULT_FROM_EMAIL = os.getenv(
+    "DEFAULT_FROM_EMAIL",
+    "School ERP <noreply@example.com>",
+)
+
+SERVER_EMAIL = DEFAULT_FROM_EMAIL

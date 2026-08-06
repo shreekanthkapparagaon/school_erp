@@ -38,7 +38,7 @@ class UserManager(BaseUserManager):
         # Import here to avoid circular imports
         from .user import User
 
-        extra_fields.setdefault("role", User.Role.MANAGER)
+        extra_fields.setdefault("role", User.Role.NOT_GIVEN)
 
         return self._create_user(
             email,

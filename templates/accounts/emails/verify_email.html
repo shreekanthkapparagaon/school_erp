@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f5f7fb;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #333333;
+        }
+
+        .wrapper {
+            width: 100%;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,.08);
+        }
+
+        .header {
+            background: #1F4E78;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .content {
+            padding: 35px;
+            line-height: 1.7;
+        }
+
+        .content h2 {
+            margin-top: 0;
+            color: #1F4E78;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 14px 32px;
+            margin: 25px 0;
+            background: #1F4E78;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .link-box {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 6px;
+            word-break: break-word;
+            font-size: 14px;
+        }
+
+        .footer {
+            background: #f8fafc;
+            padding: 25px;
+            text-align: center;
+            color: #777;
+            font-size: 13px;
+        }
+
+        .footer a {
+            color: #1F4E78;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+    <div class="container">
+
+        <div class="header">
+            <h1>{{ site_name }}</h1>
+        </div>
+
+        <div class="content">
+
+            <h2>Hello {{ user.first_name|default:user.email }},</h2>
+
+            <p>
+                Welcome to <strong>{{ site_name }}</strong>.
+            </p>
+
+            <p>
+                Your account has been created successfully.
+                Before you can sign in, please verify your email address.
+            </p>
+
+            <p style="text-align:center;">
+                <a
+                    href="{{ verification_url }}"
+                    class="button"
+                >
+                    Verify Email Address
+                </a>
+            </p>
+
+            <p>
+                If the button above does not work, copy and paste the
+                following link into your browser:
+            </p>
+
+            <div class="link-box">
+                {{ verification_url }}
+            </div>
+
+            <p>
+                If you did not request this account, you can safely ignore
+                this email.
+            </p>
+
+            <p>
+                Thank you,<br>
+                <strong>{{ site_name }}</strong>
+            </p>
+
+        </div>
+
+        <div class="footer">
+            © {% now "Y" %} {{ site_name }}<br>
+            {{ domain }}
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

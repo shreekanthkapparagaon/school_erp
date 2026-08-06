@@ -42,6 +42,11 @@ class User(AbstractUser):
         help_text="Used for student accounts.",
     )
 
+    is_email_verified = models.BooleanField(
+        default=False,
+        help_text="Designates whether the user has verified their email address.",
+    )
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
@@ -61,3 +66,4 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.get_full_name() or self.email
+
