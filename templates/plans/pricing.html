@@ -1,9 +1,29 @@
 {% extends "base.html" %}
+{% load static %}
 {% load plan_extras %}
+{% load humanize %}
 
 {% block page_heading %}Pricing{% endblock %}
 
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/pricing.css' %}">  
+{% endblock %}
+
 {% block content %}
+
+<section class="pricing-hero card">
+    <h1>Simple, Transparent Pricing</h1>
+    <p>
+        Everything your school needs—from attendance to examinations—
+        with plans that grow as your institution grows.
+    </p>
+
+    <div class="billing-toggle">
+        <button class="active">Monthly</button>
+        <button>Yearly <span>Save 20%</span></button>
+    </div>
+</section>
+
 <section class="card">
   <div class="table-header">
     <h2>Subscription Plans</h2>
@@ -14,7 +34,7 @@
       <article class="pricing-card{% if plan.slug == 'intermediate' %} popular{% endif %}{% if not plan.is_active %} coming-soon{% endif %}">
         <header>
           <span class="plan-badge">{{ plan.name }}</span>
-          <strong>${{ plan.price_monthly }}<small>/month</small></strong>
+          <strong>₹{{ plan.price_monthly|intcomma }}<small>/month</small></strong>
           <p>{{ plan.description }}</p>
         </header>
         <ul class="feature-list">

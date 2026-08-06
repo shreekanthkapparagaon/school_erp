@@ -2,7 +2,7 @@ from django import forms
 
 from apps.accounts.models import User
 from apps.document.models import Document, DocumentType
-
+from apps.document.utils import ROLE_ASSIGNMENT_MAP
 
 class DocumentForm(forms.ModelForm):
     role = forms.ChoiceField(
@@ -103,8 +103,49 @@ class DocumentTypeForm(forms.ModelForm):
     def __init__(self, *args, current_user=None, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.current_user = current_user
+
         if self.instance.pk:
             self.initial["roles"] = self.instance.roles
 
+        # Only managers can select a school
         if current_user and current_user.role != User.Role.MANAGER:
             self.fields.pop("school")
+
+        # Restrict available roles
+        if current_user:
+            allowed_roles = ROLE_ASSIGNMENT_MAP.get(
+                current_user.role,
+                set(),
+            )
+
+            self.fields["roles"].choices = [
+                (value, label)
+                for value, label in User.Role.choices
+                if value in allowed_roles
+            ]
+
+    def clean_roles(self):
+        """
+        Prevent users from assigning roles higher than their own,
+        even if they tamper with the form.
+        """
+        roles = self.cleaned_data.get("roles", [])
+
+        if not self.current_user:
+            return roles
+
+        allowed_roles = ROLE_ASSIGNMENT_MAP.get(
+            self.current_user.role,
+            set(),
+        )
+
+        invalid_roles = set(roles) - allowed_roles
+
+        if invalid_roles:
+            raise forms.ValidationError(
+                "You are not allowed to assign one or more selected roles."
+            )
+
+        return roles
+    

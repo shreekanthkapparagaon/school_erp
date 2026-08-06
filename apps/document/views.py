@@ -13,7 +13,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from .utils import get_documents, can_manage_documents,get_document_types
-
+from apps.document.utils import ROLE_ASSIGNMENT_MAP
 from django.template.response import TemplateResponse
 
 User = get_user_model()
@@ -24,9 +24,25 @@ def document_role_filter(request):
     role = request.GET.get("role")
 
     users = User.objects.none()
-    document_types = DocumentType.objects.none()
+    document_types = []
 
     if role:
+        allowed_roles = ROLE_ASSIGNMENT_MAP.get(
+            request.user.role,
+            set(),
+        )
+
+        # Prevent selecting roles above the user's permission
+        if role not in allowed_roles:
+            return TemplateResponse(
+                request,
+                "document/partials/document_filters.html",
+                {
+                    "users": users,
+                    "document_types": document_types,
+                },
+            )
+
         users = User.objects.filter(
             school=request.user.school,
             role=role,

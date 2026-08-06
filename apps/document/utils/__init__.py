@@ -12,6 +12,7 @@ from .queries import (
     get_documents,
     get_document_types,
 )
+from .constants import ROLE_ASSIGNMENT_MAP
 
 __all__ = [
     "can_edit_document",
@@ -20,4 +21,5 @@ __all__ = [
     "get_documents",
     "get_document_types",
     "get_documents_profile_data",
+    "ROLE_ASSIGNMENT_MAP",
 ]
