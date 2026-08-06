@@ -1,9 +1,233 @@
-{% if messages %}
-<section class="messages">
-  {% for message in messages %}
-    <div class="alert alert-{{ message.tags }}">
-      {{ message }}
+<section class="toast-container">
+
+{% for message in messages %}
+
+<div class="toast toast-{{ message.tags }}">
+
+    <div class="toast-icon">
+
+        {% if message.tags == "success" %}
+            <i class="fa-solid fa-circle-check"></i>
+
+        {% elif message.tags == "error" %}
+            <i class="fa-solid fa-circle-xmark"></i>
+
+        {% elif message.tags == "warning" %}
+            <i class="fa-solid fa-triangle-exclamation"></i>
+
+        {% else %}
+            <i class="fa-solid fa-circle-info"></i>
+        {% endif %}
+
     </div>
-  {% endfor %}
+
+    <div class="toast-content">
+
+        <div class="toast-title">
+
+            {{ message.tags|title }}
+
+        </div>
+
+        <div class="toast-message">
+
+            {{ message }}
+
+        </div>
+
+    </div>
+
+    <button class="toast-close">
+
+        <i class="fa-solid fa-xmark"></i>
+
+    </button>
+
+    <div class="toast-progress"></div>
+
+</div>
+
+{% endfor %}
+
 </section>
-{% endif %}
+
+<style>
+  .toast-container{
+  position:fixed;
+  top:24px;
+  right:24px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  width:380px;
+  max-width:calc(100vw - 32px);
+  z-index:9999;
+  }
+
+  .toast{
+  position:relative;
+  display:flex;
+  align-items:flex-start;
+  gap:16px;
+  padding:18px 18px 20px;
+  overflow:hidden;
+  border-radius:18px;
+  background:rgba(255,255,255,.82);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,.45);
+  box-shadow:
+  0 18px 40px rgba(15,23,42,.10),
+  0 4px 12px rgba(15,23,42,.05);
+  animation:toastIn .35s ease;
+  }
+
+  .toast-icon{
+  width:46px;
+  height:46px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:14px;
+  font-size:20px;
+  flex-shrink:0;
+  }
+
+  .toast-success .toast-icon{
+  background:#dcfce7;
+  color:#16a34a;
+  }
+
+  .toast-error .toast-icon{
+  background:#fee2e2;
+  color:#dc2626;
+  }
+
+  .toast-warning .toast-icon{
+  background:#fef3c7;
+  color:#ca8a04;
+  }
+
+  .toast-info .toast-icon{
+  background:#dbeafe;
+  color:#2563eb;
+  }
+
+  .toast-content{
+  flex:1;
+  min-width:0;
+  }
+
+  .toast-title{
+  font-size:15px;
+  font-weight:700;
+  margin-bottom:4px;
+  color:var(--text);
+  }
+
+  .toast-message{
+  font-size:14px;
+  line-height:1.6;
+  color:var(--muted);
+  }
+
+  .toast-close{
+  width:34px;
+  height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:none;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  color:#94a3b8;
+  transition:.25s;
+  box-shadow:none;
+  }
+
+  .toast-close:hover{
+  background:#f1f5f9;
+  color:#0f172a;
+  transform:none;
+  }
+
+  .toast-progress{
+  position:absolute;
+  left:0;
+  bottom:0;
+  height:3px;
+  width:100%;
+  background:rgba(148,163,184,.15);
+  overflow:hidden;
+  }
+
+  .toast-progress::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  height:100%;
+  width:100%;
+  background:linear-gradient(90deg,var(--primary),var(--primary-light));
+  animation:toastProgress 5s linear forwards;
+  }
+
+  .toast-success .toast-progress::before{
+  background:#22c55e;
+  }
+
+  .toast-error .toast-progress::before{
+  background:#ef4444;
+  }
+
+  .toast-warning .toast-progress::before{
+  background:#f59e0b;
+  }
+
+  .toast-info .toast-progress::before{
+  background:#3b82f6;
+  }
+
+  @keyframes toastIn{
+  from{
+  opacity:0;
+  transform:translateX(40px);
+  }
+  to{
+  opacity:1;
+  transform:none;
+  }
+  }
+
+  @keyframes toastOut{
+  to{
+  opacity:0;
+  transform:translateX(120%);
+  }
+  }
+
+  @keyframes toastProgress{
+  to{
+  transform:translateX(-100%);
+  }
+  }
+</style>
+
+<script>
+document.querySelectorAll(".toast").forEach(toast=>{
+
+const close=()=>{
+
+toast.style.animation="toastOut .35s forwards";
+
+setTimeout(()=>toast.remove(),350);
+
+};
+
+toast.querySelector(".toast-close").onclick=close;
+
+setTimeout(close,5000);
+
+});
+</script>

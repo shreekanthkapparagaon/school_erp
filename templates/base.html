@@ -10,14 +10,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <link rel="stylesheet" href="{% static 'css/theme.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pricing.css' %}">
-
-  {% block extra_css %}{% endblock %}
+  {% block extra_css %}
+  {% endblock %}
 </head>
+
 
 <body>
 
@@ -42,7 +40,7 @@
 
   {% block extra_js %}
   {% endblock %}
-  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-
+  {{ redirect_to_login_immediately }}
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>  
 </body>
 </html>

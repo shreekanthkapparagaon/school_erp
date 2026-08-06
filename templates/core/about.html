@@ -1,5 +1,618 @@
 {% extends "base.html" %}
-{% block page_heading %}About{% endblock %}
+{% load static %}
+
+{% block title %}About Us | SchoolERP{% endblock %}
+
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/about.css' %}">
+{% endblock %}
+
 {% block content %}
-<section class="card"><h2>University ERP style administration</h2><p>This platform keeps academic records, user roles, school classes, subjects, and teacher assignments organized in a consistent enterprise interface.</p></section>
+
+<section class="company-hero">
+  <div class="company-hero-content">
+    <span class="hero-badge"> About Our Company </span>
+
+    <h1>Empowering Educational Institutions Through Technology</h1>
+
+    <p>
+      School ERP is an education technology company dedicated to transforming
+      the way schools manage academics, administration and communication. We
+      build intelligent, secure and scalable software that enables institutions
+      to focus more on education and less on paperwork.
+    </p>
+
+    <div class="hero-actions">
+      <a href="{% url 'core:contact' %}" class="btn"> Contact Us </a>
+
+      <a href="{% url 'plans:pricing' %}" class="btn btn-muted">
+        Explore Plans
+      </a>
+    </div>
+  </div>
+
+  <div class="company-hero-image">
+    <img src="{% static 'images/hero.svg' %}" alt="About School ERP" />
+  </div>
+</section>
+
+<section class="company-intro">
+  <div class="company-text">
+    <span class="eyebrow"> Who We Are </span>
+
+    <h2>Building Modern Software For Modern Schools</h2>
+
+    <p>
+      Founded with the vision of simplifying educational administration, School
+      ERP develops modern software solutions that connect students, teachers,
+      administrators and parents through one unified platform.
+    </p>
+
+    <p>
+      Our focus is to deliver reliable, secure and easy-to-use solutions that
+      reduce manual work while improving efficiency across educational
+      institutions.
+    </p>
+  </div>
+
+  <div class="company-image">
+    <div class="company-image-card">
+      <i class="fa-solid fa-school"></i>
+
+      <h3>Education First</h3>
+
+      <p>
+        Every feature we build is designed to improve the educational
+        experience.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="story-section">
+  <div class="section-heading">
+    <span class="eyebrow"> Our Journey </span>
+
+    <h2>From An Idea To A Growing Platform</h2>
+  </div>
+
+  <div class="story-timeline">
+    <div class="story-item">
+      <div class="story-year">2024</div>
+
+      <div class="story-content">
+        <h3>The Beginning</h3>
+
+        <p>
+          School ERP started with one goal — to eliminate paperwork and simplify
+          school administration.
+        </p>
+      </div>
+    </div>
+
+    <div class="story-item">
+      <div class="story-year">2025</div>
+
+      <div class="story-content">
+        <h3>Platform Development</h3>
+
+        <p>
+          Core modules including school, student, teacher, examination and fee
+          management were developed.
+        </p>
+      </div>
+    </div>
+
+    <div class="story-item">
+      <div class="story-year">2026</div>
+
+      <div class="story-content">
+        <h3>Commercial SaaS</h3>
+
+        <p>
+          The platform evolved into a modern multi-school ERP with subscription
+          management and role-based access.
+        </p>
+      </div>
+    </div>
+
+    <div class="story-item">
+      <div class="story-year">Future</div>
+
+      <div class="story-content">
+        <h3>Global Expansion</h3>
+
+        <p>
+          Our vision is to provide educational institutions around the world
+          with modern, intelligent management solutions.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="leadership-section">
+
+    <div class="section-heading">
+
+        <span class="eyebrow">
+
+            Leadership
+
+        </span>
+
+        <h2>
+
+            Meet The Team Behind School ERP
+
+        </h2>
+
+        <p>
+
+            We are passionate about building modern software that empowers
+            educational institutions to embrace digital transformation.
+
+        </p>
+
+    </div>
+
+    <div class="leadership-grid">
+
+        <article class="leader-card featured">
+
+            <div class="leader-avatar">
+
+                <i class="fa-solid fa-user"></i>
+
+            </div>
+
+            <h3>
+
+                Shreekanth N. K.
+
+            </h3>
+
+            <span>
+
+                Founder & Lead Developer
+
+            </span>
+
+            <p>
+
+                Leading the vision, architecture and development of
+                School ERP with a focus on scalable and user-friendly
+                educational solutions.
+
+            </p>
+
+        </article>
+
+        <article class="leader-card">
+
+            <div class="leader-avatar">
+
+                <i class="fa-solid fa-users"></i>
+
+            </div>
+
+            <h3>
+
+                Growing Team
+
+            </h3>
+
+            <span>
+
+                Product • Design • Support
+
+            </span>
+
+            <p>
+
+                As School ERP grows, our team continues to expand to
+                deliver better products and services to educational
+                institutions.
+
+            </p>
+
+        </article>
+
+    </div>
+
+</section>
+
+<section class="mission-section">
+
+    <div class="mission-box">
+
+        <i class="fa-solid fa-bullseye"></i>
+
+        <h3>
+
+            Our Mission
+
+        </h3>
+
+        <p>
+
+            To simplify school administration by delivering reliable,
+            secure and intelligent software that improves productivity
+            and enhances the educational experience.
+
+        </p>
+
+    </div>
+
+    <div class="mission-box">
+
+        <i class="fa-solid fa-lightbulb"></i>
+
+        <h3>
+
+            Our Vision
+
+        </h3>
+
+        <p>
+
+            To become one of the leading education technology companies
+            by continuously innovating and providing modern digital
+            solutions for institutions around the world.
+
+        </p>
+
+    </div>
+
+</section>
+
+<section class="values-section">
+
+    <div class="section-heading">
+
+        <span class="eyebrow">
+
+            Our Values
+
+        </span>
+
+        <h2>
+
+            What Drives Us
+
+        </h2>
+
+    </div>
+
+    <div class="values-grid">
+
+        <div class="value-item">
+
+            <i class="fa-solid fa-shield-halved"></i>
+
+            <h3>
+
+                Security
+
+            </h3>
+
+            <p>
+
+                Protecting user data and ensuring reliable access.
+
+            </p>
+
+        </div>
+
+        <div class="value-item">
+
+            <i class="fa-solid fa-bolt"></i>
+
+            <h3>
+
+                Innovation
+
+            </h3>
+
+            <p>
+
+                Continuously improving through modern technology.
+
+            </p>
+
+        </div>
+
+        <div class="value-item">
+
+            <i class="fa-solid fa-handshake"></i>
+
+            <h3>
+
+                Trust
+
+            </h3>
+
+            <p>
+
+                Building long-term relationships with educational institutions.
+
+            </p>
+
+        </div>
+
+        <div class="value-item">
+
+            <i class="fa-solid fa-chart-line"></i>
+
+            <h3>
+
+                Growth
+
+            </h3>
+
+            <p>
+
+                Helping schools evolve through digital transformation.
+
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="impact-section">
+
+    <div class="section-heading">
+
+        <span class="eyebrow">
+
+            Company Impact
+
+        </span>
+
+        <h2>
+
+            Growing With Every Institution
+
+        </h2>
+
+    </div>
+
+    <div class="impact-grid">
+
+        <div class="impact-item">
+
+            <h2>
+
+                10+
+
+            </h2>
+
+            <span>
+
+                Schools
+
+            </span>
+
+        </div>
+
+        <div class="impact-item">
+
+            <h2>
+
+                1,000+
+
+            </h2>
+
+            <span>
+
+                Students
+
+            </span>
+
+        </div>
+
+        <div class="impact-item">
+
+            <h2>
+
+                100+
+
+            </h2>
+
+            <span>
+
+                Teachers
+
+            </span>
+
+        </div>
+
+        <div class="impact-item">
+
+            <h2>
+
+                20+
+
+            </h2>
+
+            <span>
+
+                ERP Modules
+
+            </span>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="company-contact">
+
+    <div class="company-contact-info">
+
+        <span class="eyebrow">
+
+            Get In Touch
+
+        </span>
+
+        <h2>
+
+            We'd Love To Hear From You
+
+        </h2>
+
+        <p>
+
+            Whether you're a school administrator, educator or institution
+            looking to modernize your operations, our team is here to help.
+
+        </p>
+
+        <div class="contact-list">
+
+            <div class="contact-item">
+
+                <i class="fa-solid fa-location-dot"></i>
+
+                <div>
+
+                    <strong>
+
+                        Headquarters
+
+                    </strong>
+
+                    <span>
+
+                        Bengaluru, Karnataka, India
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="contact-item">
+
+                <i class="fa-solid fa-envelope"></i>
+
+                <div>
+
+                    <strong>
+
+                        Email
+
+                    </strong>
+
+                    <span>
+
+                        contact@schoolerp.com
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="contact-item">
+
+                <i class="fa-solid fa-phone"></i>
+
+                <div>
+
+                    <strong>
+
+                        Phone
+
+                    </strong>
+
+                    <span>
+
+                        +91 XXXXX XXXXX
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="contact-item">
+
+                <i class="fa-solid fa-globe"></i>
+
+                <div>
+
+                    <strong>
+
+                        Website
+
+                    </strong>
+
+                    <span>
+
+                        www.schoolerp.com
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="company-message">
+
+        <div class="quote-card">
+
+            <i class="fa-solid fa-quote-left"></i>
+
+            <p>
+
+                Our mission is simple — empower educational institutions
+                with technology that saves time, improves efficiency and
+                creates better learning environments.
+
+            </p>
+
+            <h4>
+
+                Shreekanth N. K.
+
+            </h4>
+
+            <span>
+
+                Founder & Lead Developer
+
+            </span>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="company-cta">
+    <div class="cta-content">
+        <span class="eyebrow">Join Us</span>
+        <h2>Let's Build The Future Of Education Together</h2>
+        <p>
+            Discover how School ERP can simplify administration,
+            improve collaboration and help your institution grow.
+        </p>
+        <div class="cta-actions">
+            <a href="{% url 'plans:pricing' %}" class="btn">View Pricing</a>
+            <a href="{% url 'core:contact' %}" class="btn btn-muted">Contact Sales</a>
+        </div>
+    </div>
+</section>
+
 {% endblock %}
