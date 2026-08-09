@@ -42,7 +42,8 @@ def verify_email(request, uidb64, token):
         )
     ):
         user.is_email_verified = True
-        user.save(update_fields=["is_email_verified"])
+        user.is_active = True
+        user.save(update_fields=["is_email_verified","is_active"])
 
         messages.success(
             request,
@@ -84,7 +85,7 @@ def resend_verification_email(request, pk):
         )
         return redirect("accounts:role_redirect")
 
-    if user.is_active:
+    if user.is_email_verified:
         messages.info(
             request,
             "This account has already been verified.",

@@ -48,7 +48,14 @@ def about(request):
 
 def contact(request):
     contact_form = None
-    if request.user.is_authenticated:
+
+    can_contact = (
+        request.user.is_authenticated
+        and not request.user.is_superuser
+        and request.user.role != User.Role.MANAGER
+    )
+
+    if can_contact:
         if request.method == "POST":
             form = ContactForm(request.POST)
             if form.is_valid():
@@ -63,7 +70,10 @@ def contact(request):
     return render(
         request,
         "core/contact.html",
-        {"form": contact_form},
+        {
+            "form": contact_form,
+            "can_contact": can_contact,
+        },
     )
 
 
