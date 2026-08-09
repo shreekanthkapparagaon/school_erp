@@ -1,69 +1,231 @@
 {% extends "base.html" %}
+
 {% block page_heading %}Contact{% endblock %}
+
 {% block content %}
+
 <section class="card">
-  <h2>Contact</h2>
-  <p>Email the administration team for onboarding, access, and school setup support.</p>
+
+    <h2>Contact Management</h2>
+
+    <p>
+        Reach out to the management team for support, account assistance,
+        feature requests, or general inquiries.
+    </p>
+
 </section>
 
-{% if user.is_authenticated %}
+
+{% if not user.is_authenticated %}
+
 <section class="card">
-  <div class="table-header">
-    <div>
-      <h2>Send a message to management</h2>
-      <p>Use this form to request support, access, or changes from the manager team.</p>
+
+    <div class="profile-empty-state">
+
+        <i class="fa-solid fa-user-lock"></i>
+
+        <h3>Login Required</h3>
+
+        <p>
+
+            Please sign in to submit a contact request.
+
+        </p>
+
+        <a href="{% url 'accounts:login' %}" class="btn">
+
+            <i class="fa-solid fa-right-to-bracket"></i>
+
+            Login
+
+        </a>
+
     </div>
-  </div>
-  <form method="post" class="form-card">
-    {% csrf_token %}
-    <div>
-      <label>Email</label>
-      <input type="email" value="{{ user.email }}" readonly />
-    </div>
-    <div>
-      <label for="id_subject">Subject</label>
-      {{ form.subject }}
-    </div>
-    <div>
-      <label for="id_message">Message</label>
-      {{ form.message }}
-    </div>
-    <div class="form-actions">
-      <button class="btn" type="submit">Send request</button>
-    </div>
-  </form>
+
 </section>
+
+{% elif user.is_superuser or user.role == "manager" %}
+
+<section class="card">
+
+    <div class="profile-empty-state">
+
+        <i class="fa-solid fa-user-shield"></i>
+
+        <h3>Contact Form Unavailable</h3>
+
+        <p>
+
+            Managers and administrators receive contact requests and therefore
+            cannot submit new requests.
+
+        </p>
+
+    </div>
+
+</section>
+
+{% else %}
+
+<section class="card">
+
+    <div class="table-header">
+
+        <div>
+
+            <h2>
+
+                Send a Message
+
+            </h2>
+
+            <p>
+
+                Your request will be delivered directly to the management team.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <form method="post" class="form-card">
+
+        {% csrf_token %}
+
+        <div>
+
+            <label>Email</label>
+
+            <input
+                type="email"
+                value="{{ user.email }}"
+                readonly
+            >
+
+        </div>
+
+        <div>
+
+            <label for="id_subject">
+
+                Subject
+
+            </label>
+
+            {{ form.subject }}
+
+        </div>
+
+        <div>
+
+            <label for="id_message">
+
+                Message
+
+            </label>
+
+            {{ form.message }}
+
+        </div>
+
+        <div class="form-actions">
+
+            <button class="btn" type="submit">
+
+                <i class="fa-solid fa-paper-plane"></i>
+
+                Send Request
+
+            </button>
+
+        </div>
+
+    </form>
+
+</section>
+
 {% endif %}
+
 
 {% if user.is_authenticated and manager_messages is not None %}
+
 <section class="card">
-  <div class="table-header">
-    <h2>Contact requests</h2>
-  </div>
-  <table>
-    <thead>
-      <tr>
-        <th>From</th>
-        <th>Subject</th>
-        <th>Message</th>
-        <th>Sent</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for message in manager_messages %}
-      <tr>
-        <td>{{ message.user }}</td>
-        <td>{{ message.subject }}</td>
-        <td>{{ message.message|truncatechars:120 }}</td>
-        <td>{{ message.created_at|date:"M d, Y H:i" }}</td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="4">No contact requests yet.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+
+    <div class="table-header">
+
+        <div>
+
+            <h2>
+
+                Contact Requests
+
+            </h2>
+
+            <p>
+
+                Messages submitted by platform users.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>From</th>
+
+                <th>Subject</th>
+
+                <th>Message</th>
+
+                <th>Sent</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for message in manager_messages %}
+
+            <tr>
+
+                <td>{{ message.user }}</td>
+
+                <td>{{ message.subject }}</td>
+
+                <td>{{ message.message|truncatechars:120 }}</td>
+
+                <td>{{ message.created_at|date:"d M Y, H:i" }}</td>
+
+            </tr>
+
+            {% empty %}
+
+            <tr>
+
+                <td colspan="4">
+
+                    No contact requests available.
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
 </section>
+
 {% endif %}
+
 {% endblock %}

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block page_heading %}Plans{% endblock %}
 
@@ -24,8 +25,8 @@
       {% for plan in plans %}
       <tr>
         <td>{{ plan.name }}</td>
-        <td>${{ plan.price_monthly }}</td>
-        <td>${{ plan.price_yearly }}</td>
+        <td>₹{{ plan.price_monthly|intcomma }}</td>
+        <td>₹{{ plan.price_yearly|intcomma }}</td>
         <td>{{ plan.is_active|yesno:"Active,Inactive" }}</td>
         <td>{{ plan.feature_count }}</td>
         <td class="row-actions">
