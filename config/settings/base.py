@@ -169,3 +169,5 @@ DEFAULT_FROM_EMAIL = os.getenv(
 )
 
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+from .jazz import *
