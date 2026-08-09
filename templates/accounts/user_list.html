@@ -83,7 +83,7 @@
                 Edit
             </a>
 
-            {% if not account.is_active %}
+            {% if not account.is_email_verified %}
                 <a class="btn btn-sm btn-warning"
                   href="{% url 'accounts:resend_verification_email' account.pk %}">
                     Resend
