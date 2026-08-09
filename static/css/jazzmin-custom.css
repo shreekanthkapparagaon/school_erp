@@ -1,0 +1,8 @@
+.login-logo img {
+    max-width: 220px;
+    max-height: 120px;
+}
+
+.login-logo a {
+    display: block;
+}
