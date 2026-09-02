@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block title %}Contact Requests{% endblock %}
 
 {% block extra_css %}
@@ -12,24 +13,18 @@
 
     <div class="inbox-header">
 
-        <div>
+        <div class="inbox-title">
 
             <span class="eyebrow">
-
                 Customer Support
-
             </span>
 
             <h2>
-
                 Contact Requests
-
             </h2>
 
             <p>
-
                 Review and manage enquiries submitted through your website.
-
             </p>
 
         </div>
@@ -41,19 +36,13 @@
                 <i class="fa-regular fa-envelope"></i>
 
                 <div>
-
                     <strong>
-
-                        {{ requests|length }}
-
+                        {{ requests.paginator.count }}
                     </strong>
 
                     <span>
-
                         Total Messages
-
                     </span>
-
                 </div>
 
             </div>
@@ -63,19 +52,13 @@
                 <i class="fa-solid fa-envelope-circle-check"></i>
 
                 <div>
-
                     <strong>
-
                         {{ unread_count|default:0 }}
-
                     </strong>
 
                     <span>
-
                         Unread
-
                     </span>
-
                 </div>
 
             </div>
@@ -83,7 +66,6 @@
         </div>
 
     </div>
-
 
 
     <div class="inbox-toolbar">
@@ -98,40 +80,61 @@
                     type="search"
                     name="q"
                     value="{{ query }}"
-                    placeholder="Search subject, email or message...">
+                    placeholder="Search email, subject or message..."
+                    autocomplete="off"
+                >
+
+                {% if query %}
+                    <a
+                        href="?status={{ status }}"
+                        class="clear-search"
+                        title="Clear search"
+                    >
+                    </a>
+                {% endif %}
 
             </div>
 
-            <select name="status">
 
-                <option value="all"
-                    {% if status == "all" %}selected{% endif %}>
+            <div class="filter-group">
 
-                    All Messages
+                <label for="status">
+                    Status
+                </label>
 
-                </option>
+                <select id="status" name="status">
 
-                <option value="unread"
-                    {% if status == "unread" %}selected{% endif %}>
+                    <option
+                        value="all"
+                        {% if status == "all" %}selected{% endif %}
+                    >
+                        All
+                    </option>
 
-                    Unread
+                    <option
+                        value="unread"
+                        {% if status == "unread" %}selected{% endif %}
+                    >
+                        Unread
+                    </option>
 
-                </option>
+                    <option
+                        value="read"
+                        {% if status == "read" %}selected{% endif %}
+                    >
+                        Read
+                    </option>
 
-                <option value="read"
-                    {% if status == "read" %}selected{% endif %}>
+                </select>
 
-                    Read
+            </div>
 
-                </option>
 
-            </select>
-
-            <button class="btn">
+            <button type="submit" class="btn filter-btn">
 
                 <i class="fa-solid fa-filter"></i>
 
-                Filter
+                Apply
 
             </button>
 
@@ -140,97 +143,341 @@
     </div>
 
 
+    {% if requests.paginator.count %}
 
-    <div class="request-list">
+        <div class="results-bar">
 
-        {% for item in requests %}
+            <div class="results-info">
 
-        <article class="request-card {% if not item.is_read %}unread{% endif %}">
+                Showing
 
-            <div class="request-avatar">
+                <strong>
+                    {{ requests.start_index }}
+                </strong>
 
-                {{ item.user.first_name|default:item.user.email|first|upper }}
+                –
+
+                <strong>
+                    {{ requests.end_index }}
+                </strong>
+
+                of
+
+                <strong>
+                    {{ requests.paginator.count }}
+                </strong>
+
+                requests
 
             </div>
 
-            <div class="request-content">
+            {% if query or status != "all" %}
 
-                <div class="request-top">
+                <div class="active-filters">
 
-                    <div>
-
-                        <h3>
-
-                            {{ item.subject }}
-
-                        </h3>
-
-                        <span class="request-email">
-
-                            <i class="fa-regular fa-user"></i>
-
-                            {{ item.user.email }}
-
+                    {% if query %}
+                        <span class="filter-chip">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            {{ query }}
                         </span>
+                    {% endif %}
 
-                    </div>
-
-                    <span class="request-time">
-
-                        <i class="fa-regular fa-clock"></i>
-
-                        {{ item.created_at|date:"M d, Y • H:i" }}
-
-                    </span>
+                    {% if status != "all" %}
+                        <span class="filter-chip">
+                            <i class="fa-solid fa-filter"></i>
+                            {{ status|title }}
+                        </span>
+                    {% endif %}
 
                 </div>
 
-                <p class="request-message">
+            {% endif %}
 
-                    {{ item.message|truncatechars:170 }}
+        </div>
 
-                </p>
+
+        <div class="request-table-card">
+
+            <div class="request-table-wrapper">
+
+                <table class="request-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th class="user-column">
+                                User
+                            </th>
+
+                            <th class="subject-column">
+                                Subject
+                            </th>
+
+                            <th class="message-column">
+                                Message
+                            </th>
+
+                            <th class="date-column">
+                                Received
+                            </th>
+
+                            <th class="status-column">
+                                Status
+                            </th>
+
+                            <th class="action-column">
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for item in requests %}
+
+                            <tr class="{% if not item.is_read %}is-unread{% endif %}">
+
+                                <td class="user-cell">
+
+                                    <div class="user-info">
+
+                                        <div class="request-avatar">
+
+                                            {{ item.user.first_name|default:item.user.email|first|upper }}
+
+                                        </div>
+
+                                        <div class="user-details">
+
+                                            <strong>
+                                                {{ item.user.get_full_name|default:"User" }}
+                                            </strong>
+
+                                            <span>
+                                                {{ item.user.email }}
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <td class="subject-cell">
+
+                                    <a
+                                        href="{% url 'core:contact_request_detail' item.id %}"
+                                        class="subject-link"
+                                    >
+                                        {{ item.subject }}
+                                    </a>
+
+                                </td>
+
+
+                                <td class="message-cell">
+
+                                    <span title="{{ item.message }}">
+                                        {{ item.message|truncatechars:90 }}
+                                    </span>
+
+                                </td>
+
+
+                                <td class="date-cell">
+
+                                    <span class="date-main">
+                                        {{ item.created_at|date:"M d, Y" }}
+                                    </span>
+
+                                    <span class="date-time">
+                                        {{ item.created_at|date:"H:i" }}
+                                    </span>
+
+                                </td>
+
+
+                                <td class="status-cell">
+
+                                    {% if item.is_read %}
+
+                                        <span class="status-badge success">
+
+                                            <i class="fa-solid fa-circle-check"></i>
+
+                                            Read
+
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="status-badge warning">
+
+                                            <i class="fa-solid fa-circle"></i>
+
+                                            New
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td class="action-cell">
+
+                                    <a
+                                        class="btn btn-sm open-btn"
+                                        href="{% url 'core:contact_request_detail' item.id %}"
+                                    >
+
+                                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+
+                                        Open
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
 
             </div>
 
-            <div class="request-actions">
+        </div>
 
-                {% if item.is_read %}
 
-                    <span class="status-badge success">
+        {% if requests.paginator.num_pages > 1 %}
 
-                        <i class="fa-solid fa-circle-check"></i>
+            <div class="pagination-container">
 
-                        Read
+                <div class="pagination-summary">
 
-                    </span>
+                    Page
 
-                {% else %}
+                    <strong>
+                        {{ requests.number }}
+                    </strong>
 
-                    <span class="status-badge warning">
+                    of
 
-                        <i class="fa-solid fa-circle"></i>
+                    <strong>
+                        {{ requests.paginator.num_pages }}
+                    </strong>
 
-                        New
+                </div>
 
-                    </span>
 
-                {% endif %}
+                <div class="pagination">
 
-                <a class="btn btn-sm"
-                   href="{% url 'core:contact_request_detail' item.id %}">
+                    {% if requests.has_previous %}
 
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        <a
+                            class="pagination-btn"
+                            href="?page={{ requests.previous_page_number }}&q={{ query|urlencode }}&status={{ status }}"
+                        >
 
-                    Open
+                            <i class="fa-solid fa-chevron-left"></i>
 
-                </a>
+                            Previous
+
+                        </a>
+
+                    {% else %}
+
+                        <span class="pagination-btn disabled">
+
+                            <i class="fa-solid fa-chevron-left"></i>
+
+                            Previous
+
+                        </span>
+
+                    {% endif %}
+
+
+                    <div class="pagination-pages">
+
+                        {% for page_num in requests.paginator.page_range %}
+
+                            {% if page_num == requests.number %}
+
+                                <span class="pagination-page active">
+                                    {{ page_num }}
+                                </span>
+
+                            {% elif page_num == 1 or page_num == requests.paginator.num_pages %}
+
+                                <a
+                                    class="pagination-page"
+                                    href="?page={{ page_num }}&q={{ query|urlencode }}&status={{ status }}"
+                                >
+                                    {{ page_num }}
+                                </a>
+
+                            {% elif page_num >= requests.number|add:"-2" and page_num <= requests.number|add:"2" %}
+
+                                <a
+                                    class="pagination-page"
+                                    href="?page={{ page_num }}&q={{ query|urlencode }}&status={{ status }}"
+                                >
+                                    {{ page_num }}
+                                </a>
+
+                            {% elif page_num == requests.number|add:"-3" or page_num == requests.number|add:"3" %}
+
+                                <span class="pagination-dots">
+                                    ...
+                                </span>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    {% if requests.has_next %}
+
+                        <a
+                            class="pagination-btn"
+                            href="?page={{ requests.next_page_number }}&q={{ query|urlencode }}&status={{ status }}"
+                        >
+
+                            Next
+
+                            <i class="fa-solid fa-chevron-right"></i>
+
+                        </a>
+
+                    {% else %}
+
+                        <span class="pagination-btn disabled">
+
+                            Next
+
+                            <i class="fa-solid fa-chevron-right"></i>
+
+                        </span>
+
+                    {% endif %}
+
+                </div>
 
             </div>
 
-        </article>
+        {% endif %}
 
-        {% empty %}
+    {% else %}
 
         <div class="empty-state">
 
@@ -241,22 +488,34 @@
             </div>
 
             <h3>
-
-                Inbox is Empty
-
+                No Contact Requests
             </h3>
 
-            <p>
+            {% if query or status != "all" %}
 
-                No contact requests have been received yet.
+                <p>
+                    No requests match your current search or filter.
+                </p>
 
-            </p>
+                <a
+                    href="{% url 'core:contact_requests' %}"
+                    class="btn"
+                >
+                    <i class="fa-solid fa-rotate-left"></i>
+                    Clear Filters
+                </a>
+
+            {% else %}
+
+                <p>
+                    No contact requests have been received yet.
+                </p>
+
+            {% endif %}
 
         </div>
 
-        {% endfor %}
-
-    </div>
+    {% endif %}
 
 </section>
 

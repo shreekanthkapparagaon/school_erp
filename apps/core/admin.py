@@ -1,9 +1,9 @@
 from django.contrib import admin
+from django.utils.html import format_html
 
 from .models import Contact
 
 
-# Global default for Django Admin
 admin.ModelAdmin.list_per_page = 25
 
 
@@ -12,7 +12,7 @@ class ContactAdmin(admin.ModelAdmin):
     list_display = (
         "user",
         "subject",
-        "read_status",
+        "status",
         "created_at",
     )
 
@@ -23,6 +23,8 @@ class ContactAdmin(admin.ModelAdmin):
 
     search_fields = (
         "user__email",
+        "user__first_name",
+        "user__last_name",
         "subject",
         "message",
     )
@@ -37,6 +39,10 @@ class ContactAdmin(admin.ModelAdmin):
 
     ordering = (
         "-created_at",
+    )
+
+    list_select_related = (
+        "user",
     )
 
     fieldsets = (
@@ -62,9 +68,31 @@ class ContactAdmin(admin.ModelAdmin):
     )
 
     @admin.display(
-        boolean=True,
+        description="Status",
         ordering="is_read",
-        description="Read",
     )
-    def read_status(self, obj):
-        return obj.is_read
+    def status(self, obj):
+        if obj.is_read:
+            return format_html(
+                '<span style="'
+                "display:inline-block;"
+                "padding:4px 10px;"
+                "border-radius:999px;"
+                "background:#e8f5e9;"
+                "color:#198754;"
+                "font-size:12px;"
+                "font-weight:600;"
+                '">Read</span>'
+            )
+
+        return format_html(
+            '<span style="'
+            "display:inline-block;"
+            "padding:4px 10px;"
+            "border-radius:999px;"
+            "background:#fff3cd;"
+            "color:#b58105;"
+            "font-size:12px;"
+            "font-weight:600;"
+            '">Unread</span>'
+        )

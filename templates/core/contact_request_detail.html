@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block title %}Contact Request{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/contact_request_detail.css' %}">
 {% endblock %}
@@ -9,140 +11,70 @@
 
 <section class="request-detail">
 
-    <div class="request-detail-header">
+    <!-- =====================================================
+         TOP BAR
+         ===================================================== -->
 
-        <a href="{% url 'core:contact_requests' %}"
-           class="request-back">
+    <div class="detail-topbar">
 
+        <a href="{% url 'core:contact_requests' %}" class="request-back">
             <i class="fa-solid fa-arrow-left"></i>
-
             Back to Requests
-
         </a>
 
         {% if contact_request.is_read %}
-
             <span class="status-badge success">
-
                 <i class="fa-solid fa-circle-check"></i>
-
                 Read
-
             </span>
-
         {% else %}
-
             <span class="status-badge warning">
-
                 <i class="fa-solid fa-circle"></i>
-
                 Unread
-
             </span>
-
         {% endif %}
 
     </div>
 
 
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
 
     <section class="request-header">
 
-        <h1>
+        <div class="request-subject">
 
-            {{ contact_request.subject }}
+            <span class="request-eyebrow">
+                Customer Support
+            </span>
 
-        </h1>
+            <h1>
+                {{ contact_request.subject }}
+            </h1>
 
-        <div class="request-meta">
+        </div>
 
-            <div class="request-meta-item">
 
-                <span class="request-meta-label">
+        <!-- =================================================
+             SENDER
+             ================================================= -->
 
-                    From
+        <div class="sender-profile">
 
-                </span>
+            <div class="sender-avatar">
+                {{ contact_request.user.first_name|default:contact_request.user.email|first|upper }}
+            </div>
 
-                <div class="request-meta-value">
+            <div class="sender-info">
 
-                    <i class="fa-regular fa-user"></i>
-
+                <strong>
                     {{ contact_request.user.get_full_name|default:contact_request.user.email }}
+                </strong>
 
-                </div>
-
-            </div>
-
-            <div class="request-meta-item">
-
-                <span class="request-meta-label">
-
-                    Email
-
-                </span>
-
-                <div class="request-meta-value">
-
-                    <i class="fa-regular fa-envelope"></i>
-
+                <span>
                     {{ contact_request.user.email }}
-
-                </div>
-
-            </div>
-
-            <div class="request-meta-item">
-
-                <span class="request-meta-label">
-
-                    Received
-
                 </span>
-
-                <div class="request-meta-value">
-
-                    <i class="fa-regular fa-clock"></i>
-
-                    {{ contact_request.created_at|date:"F d, Y • H:i" }}
-
-                </div>
-
-            </div>
-
-            <div class="request-meta-item">
-
-                <span class="request-meta-label">
-
-                    Status
-
-                </span>
-
-                <div class="request-meta-value">
-
-                    {% if contact_request.is_read %}
-
-                        <span class="status-badge success">
-
-                            <i class="fa-solid fa-circle-check"></i>
-
-                            Read
-
-                        </span>
-
-                    {% else %}
-
-                        <span class="status-badge warning">
-
-                            <i class="fa-solid fa-circle"></i>
-
-                            Unread
-
-                        </span>
-
-                    {% endif %}
-
-                </div>
 
             </div>
 
@@ -151,18 +83,108 @@
     </section>
 
 
+    <!-- =====================================================
+         META INFORMATION
+         ===================================================== -->
+
+    <div class="request-meta">
+
+        <div class="request-meta-item">
+
+            <span class="request-meta-label">
+                Email
+            </span>
+
+            <span class="request-meta-value">
+
+                <i class="fa-regular fa-envelope"></i>
+
+                {{ contact_request.user.email }}
+
+            </span>
+
+        </div>
+
+
+        <div class="request-meta-item">
+
+            <span class="request-meta-label">
+                Received
+            </span>
+
+            <span class="request-meta-value">
+
+                <i class="fa-regular fa-clock"></i>
+
+                {{ contact_request.created_at|date:"M d, Y • H:i" }}
+
+            </span>
+
+        </div>
+
+
+        <div class="request-meta-item">
+
+            <span class="request-meta-label">
+                Status
+            </span>
+
+            <span class="request-meta-value">
+
+                {% if contact_request.is_read %}
+
+                    <span class="status-badge success">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Read
+                    </span>
+
+                {% else %}
+
+                    <span class="status-badge warning">
+                        <i class="fa-solid fa-circle"></i>
+                        Unread
+                    </span>
+
+                {% endif %}
+
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         DIVIDER
+         ===================================================== -->
 
     <div class="request-divider"></div>
 
 
+    <!-- =====================================================
+         MESSAGE
+         ===================================================== -->
 
-    <section>
+    <section class="message-section">
 
-        <h3 class="request-message-title">
+        <div class="message-heading">
 
-            Message
+            <div>
 
-        </h3>
+                <span class="request-eyebrow">
+                    Message
+                </span>
+
+                <h2>
+                    {{ contact_request.subject }}
+                </h2>
+
+            </div>
+
+            <i class="fa-regular fa-envelope-open message-heading-icon"></i>
+
+        </div>
+
 
         <div class="request-message">
 
@@ -173,53 +195,76 @@
     </section>
 
 
+    <!-- =====================================================
+         ACTIONS
+         ===================================================== -->
 
-    <section class="request-actions">
+    <div class="request-actions">
 
-        <form method="post">
+        <div class="action-left">
 
-            {% csrf_token %}
+            <a href="{% url 'core:contact_requests' %}"
+               class="btn btn-muted">
 
-            {% if contact_request.is_read %}
+                <i class="fa-solid fa-arrow-left"></i>
 
-                <button
-                    type="submit"
-                    name="mark_unread"
-                    class="btn btn-warning">
+                Back
 
-                    <i class="fa-regular fa-envelope"></i>
+            </a>
 
-                    Mark Unread
+        </div>
 
-                </button>
 
-            {% else %}
+        <div class="action-right">
 
-                <button
-                    type="submit"
-                    name="mark_read"
-                    class="btn">
+            <form method="post">
 
-                    <i class="fa-solid fa-envelope-open"></i>
+                {% csrf_token %}
 
-                    Mark Read
+                {% if contact_request.is_read %}
 
-                </button>
+                    <button
+                        type="submit"
+                        name="mark_unread"
+                        class="btn btn-warning">
 
-            {% endif %}
+                        <i class="fa-regular fa-envelope"></i>
 
-        </form>
+                        Mark Unread
 
-        <a href="mailto:{{ contact_request.user.email }}"
-           class="btn btn-muted">
+                    </button>
 
-            <i class="fa-solid fa-reply"></i>
+                {% else %}
 
-            Reply
+                    <button
+                        type="submit"
+                        name="mark_read"
+                        class="btn">
 
-        </a>
+                        <i class="fa-solid fa-envelope-open"></i>
 
-    </section>
+                        Mark Read
+
+                    </button>
+
+                {% endif %}
+
+            </form>
+
+
+            <a href="mailto:{{ contact_request.user.email }}"
+               class="btn">
+
+                <i class="fa-solid fa-reply"></i>
+
+                Reply
+
+            </a>
+
+        </div>
+
+    </div>
 
 </section>
+
 {% endblock %}

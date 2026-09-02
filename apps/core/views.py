@@ -1,8 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db import models
 from django.shortcuts import get_object_or_404, redirect, render
-from django.db.models import Count,Q
+from django.db.models import Count, Q
+from django.core.paginator import Paginator
 
 from apps.accounts.models import User
 from apps.core.forms import ContactForm
@@ -17,29 +17,19 @@ def home(request):
     context["top_schools"] = (
         School.objects
         .annotate(
-            student_count=Count(
-                "users",
-                filter=Q(users__role=User.Role.STUDENT)
-            ),
-            teacher_count=Count(
-                "users",
-                filter=Q(users__role=User.Role.TEACHER)
-            ),
-            principal_count=Count(
-                "users",
-                filter=Q(users__role=User.Role.PRINCIPAL)
-            ),
+            student_count=Count("users", filter=Q(users__role=User.Role.STUDENT)),
+            teacher_count=Count("users", filter=Q(users__role=User.Role.TEACHER)),
+            principal_count=Count("users", filter=Q(users__role=User.Role.PRINCIPAL)),
         )
         .order_by("-student_count")[:10]
     )
-
     context["stats"] = {
         "schools": School.objects.count(),
         "students": User.objects.filter(role=User.Role.STUDENT).count(),
         "teachers": User.objects.filter(role=User.Role.TEACHER).count(),
         "plans": Plan.objects.count(),
     }
-    return render(request, "core/home.html",context)
+    return render(request, "core/home.html", context)
 
 
 def about(request):
@@ -58,15 +48,23 @@ def contact(request):
     if can_contact:
         if request.method == "POST":
             form = ContactForm(request.POST)
+
             if form.is_valid():
-                contact = form.save(commit=False)
-                contact.user = request.user
-                contact.save()
-                messages.success(request, "Your message has been sent to the manager team.")
+                contact_request = form.save(commit=False)
+                contact_request.user = request.user
+                contact_request.save()
+
+                messages.success(
+                    request,
+                    "Your message has been sent to the manager team.",
+                )
+
                 return redirect("core:contact")
         else:
             form = ContactForm()
+
         contact_form = form
+
     return render(
         request,
         "core/contact.html",
@@ -88,29 +86,19 @@ def school_scope(user):
 def manager_dashboard(request):
     context = {
         "page_title": "Manager Dashboard",
-
         "school_count": School.objects.count(),
-
         "principal_count": User.objects.filter(
             role=User.Role.PRINCIPAL
         ).count(),
-
         "plan_count": Plan.objects.count(),
-
         "subscription_count": Subscription.objects.count(),
-
         "contact_request_count": Contact.objects.count(),
-
         "unread_contact_request_count": Contact.objects.filter(
             is_read=False
         ).count(),
     }
 
-    return render(
-        request,
-        "dashboards/manager.html",
-        context,
-    )
+    return render(request, "dashboards/manager.html", context)
 
 
 @login_required
@@ -119,35 +107,23 @@ def head_dashboard(request):
 
     context = {
         "page_title": "Head Dashboard",
-
         "student_count": User.objects.filter(
             role=User.Role.STUDENT,
-            **filters
+            **filters,
         ).count(),
-
         "teacher_count": User.objects.filter(
             role=User.Role.TEACHER,
-            **filters
+            **filters,
         ).count(),
-
-        "subject_count": Subject.objects.filter(
-            **filters
-        ).count(),
-
-        "class_count": SchoolClass.objects.filter(
-            **filters
-        ).count(),
-
+        "subject_count": Subject.objects.filter(**filters).count(),
+        "class_count": SchoolClass.objects.filter(**filters).count(),
         "assignment_count": TeacherSubjectAssignment.objects.filter(
-            **filters
+            **filters,
         ).count(),
     }
 
-    return render(
-        request,
-        "dashboards/head.html",
-        context,
-    )
+    return render(request, "dashboards/head.html", context)
+
 
 @login_required
 def principal_dashboard(request):
@@ -155,40 +131,26 @@ def principal_dashboard(request):
 
     context = {
         "page_title": "Principal Dashboard",
-
         "student_count": User.objects.filter(
             role=User.Role.STUDENT,
-            **filters
+            **filters,
         ).count(),
-
         "teacher_count": User.objects.filter(
             role=User.Role.TEACHER,
-            **filters
+            **filters,
         ).count(),
-
         "head_count": User.objects.filter(
             role=User.Role.HEAD,
-            **filters
+            **filters,
         ).count(),
-
-        "subject_count": Subject.objects.filter(
-            **filters
-        ).count(),
-
-        "class_count": SchoolClass.objects.filter(
-            **filters
-        ).count(),
-
+        "subject_count": Subject.objects.filter(**filters).count(),
+        "class_count": SchoolClass.objects.filter(**filters).count(),
         "assignment_count": TeacherSubjectAssignment.objects.filter(
-            **filters
+            **filters,
         ).count(),
     }
 
-    return render(
-        request,
-        "dashboards/principal.html",
-        context,
-    )
+    return render(request, "dashboards/principal.html", context)
 
 
 @login_required
@@ -196,24 +158,45 @@ def principal_dashboard(request):
 def manager_contact_requests(request):
     query = request.GET.get("q", "").strip()
     status = request.GET.get("status", "all")
-    requests_qs = Contact.objects.select_related("user")
+    page_number = request.GET.get("page", 1)
+
+    requests_qs = (
+        Contact.objects
+        .select_related("user")
+        .only(
+            "id",
+            "user_id",
+            "user__email",
+            "subject",
+            "message",
+            "created_at",
+            "is_read",
+        )
+    )
+
     if query:
         requests_qs = requests_qs.filter(
-            models.Q(user__email__icontains=query)
-            | models.Q(subject__icontains=query)
-            | models.Q(message__icontains=query)
+            Q(user__email__icontains=query)
+            | Q(subject__icontains=query)
+            | Q(message__icontains=query)
         )
+
     if status == "read":
         requests_qs = requests_qs.filter(is_read=True)
     elif status == "unread":
         requests_qs = requests_qs.filter(is_read=False)
+
+    requests_qs = requests_qs.order_by("-created_at", "-id")
+
+    paginator = Paginator(requests_qs, 15)
+    requests_page = paginator.get_page(page_number)
 
     return render(
         request,
         "core/contact_request_list.html",
         {
             "page_title": "Contact Requests",
-            "requests": requests_qs.order_by("-created_at"),
+            "requests": requests_page,
             "query": query,
             "status": status,
         },
@@ -223,7 +206,11 @@ def manager_contact_requests(request):
 @login_required
 @manager_required
 def manager_contact_request_detail(request, request_id):
-    contact_request = get_object_or_404(Contact, pk=request_id)
+    contact_request = get_object_or_404(
+        Contact.objects.select_related("user"),
+        pk=request_id,
+    )
+
     if request.method == "POST":
         if "mark_read" in request.POST:
             contact_request.is_read = True
@@ -233,12 +220,18 @@ def manager_contact_request_detail(request, request_id):
             contact_request.is_read = False
             contact_request.save(update_fields=["is_read"])
             messages.success(request, "Request marked as unread.")
-        return redirect("core:contact_request_detail", request_id=contact_request.pk)
+
+        return redirect(
+            "core:contact_request_detail",
+            request_id=contact_request.pk,
+        )
 
     return render(
         request,
         "core/contact_request_detail.html",
-        {"contact_request": contact_request},
+        {
+            "contact_request": contact_request,
+        },
     )
 
 
@@ -250,7 +243,7 @@ def teacher_dashboard(request):
 
     class_ids = assignments.values_list(
         "school_class_id",
-        flat=True
+        flat=True,
     ).distinct()
 
     student_count = User.objects.filter(
@@ -260,25 +253,13 @@ def teacher_dashboard(request):
 
     context = {
         "page_title": "Teacher Dashboard",
-
-        "subject_count": assignments.values(
-            "subject"
-        ).distinct().count(),
-
-        "class_count": assignments.values(
-            "school_class"
-        ).distinct().count(),
-
+        "subject_count": assignments.values("subject").distinct().count(),
+        "class_count": assignments.values("school_class").distinct().count(),
         "student_count": student_count,
-
         "assignment_count": assignments.count(),
     }
 
-    return render(
-        request,
-        "dashboards/teacher.html",
-        context,
-    )
+    return render(request, "dashboards/teacher.html", context)
 
 
 @login_required
@@ -293,22 +274,11 @@ def student_dashboard(request):
 
     context = {
         "page_title": "Student Dashboard",
-
-        "subject_count": assignments.values(
-            "subject"
-        ).distinct().count(),
-
-        "teacher_count": assignments.values(
-            "teacher"
-        ).distinct().count(),
+        "subject_count": assignments.values("subject").distinct().count(),
+        "teacher_count": assignments.values("teacher").distinct().count(),
     }
 
-    return render(
-        request,
-        "dashboards/student.html",
-        context,
-    )
-
+    return render(request, "dashboards/student.html", context)
 
 
 def bad_request(request, exception=None):
