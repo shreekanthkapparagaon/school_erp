@@ -47,12 +47,196 @@
       {{ form.limits }}
       {{ form.limits.errors }}
     </div>
+    <style>
+      .feature-selection {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
 
+        max-height: 280px;
+        overflow-y: auto;
+
+        padding: 4px;
+        margin-top: 8px;
+
+        border: 1px solid var(--border-color, #ddd);
+        border-radius: 8px;
+      }
+
+      /* Small feature card */
+      .feature-option {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+
+        min-height: 38px;
+        padding: 6px 9px;
+
+        border: 1px solid #dc3545;
+        border-radius: 6px;
+
+        background: transparent;
+
+        cursor: pointer;
+
+        transition:
+          border-color 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+
+      .feature-option:hover {
+        border-color: #b02a37;
+      }
+
+      /* Checkbox */
+      .feature-option input[type="checkbox"] {
+        width: 15px;
+        height: 15px;
+
+        margin: 0;
+
+        flex-shrink: 0;
+
+        cursor: pointer;
+      }
+
+      /* Feature text */
+      .feature-option-content {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .feature-option-content strong {
+        display: block;
+
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.2;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .feature-option-content small {
+        display: block;
+
+        margin-top: 2px;
+
+        font-size: 10px;
+        line-height: 1.2;
+
+        opacity: 0.65;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /* Status icon */
+      .feature-check {
+        display: none;
+
+        flex-shrink: 0;
+
+        font-size: 11px;
+      }
+
+      /* =========================
+        NOT SELECTED - RED
+        ========================= */
+
+      .feature-option {
+        border-color: #dc3545;
+      }
+
+      /* =========================
+        SELECTED - GREEN
+        ========================= */
+
+      .feature-option:has(
+        input[type="checkbox"]:checked
+      ) {
+        border-color: #198754;
+      }
+
+      .feature-option:has(
+        input[type="checkbox"]:checked
+      ) .feature-check {
+        display: block;
+        color: #198754;
+      }
+
+      /* =========================
+        ALREADY ENABLED - BLUE
+        ========================= */
+
+      .feature-option.feature-existing {
+        border-color: #0d6efd;
+      }
+
+      .feature-option.feature-existing
+      .feature-check {
+        display: block;
+        color: #0d6efd;
+      }
+
+      /* =========================
+        Scrollbar
+        ========================= */
+
+      .feature-selection::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      .feature-selection::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .feature-selection::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        background: #bbb;
+      }
+
+      .feature-selection::-webkit-scrollbar-thumb:hover {
+        background: #888;
+      }
+    </style>
     <div class="form-group">
       {{ form.features.label_tag }}
-      {{ form.features }}
+
+      <div class="feature-selection">
+
+        {% for feature in form.fields.features.queryset %}
+          <label class="feature-option">
+
+            <input
+              type="checkbox"
+              name="features"
+              value="{{ feature.pk }}"
+              {% if feature in form.initial.features %}
+                checked
+              {% endif %}
+            >
+
+            <span class="feature-option-content">
+              <strong>{{ feature.name }}</strong>
+
+              {% if feature.description %}
+                <small>{{ feature.description }}</small>
+              {% endif %}
+            </span>
+
+            <span class="feature-check">
+              <i class="fa-solid fa-check"></i>
+            </span>
+
+          </label><br/>
+        {% endfor %}
+
+      </div>
+
       {{ form.features.errors }}
-      <div class="multi-select-chips" id="selected-features"></div>
     </div>
 
     <div class="form-group">

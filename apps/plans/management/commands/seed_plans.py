@@ -19,6 +19,11 @@ class Command(BaseCommand):
             "description": "Manage teachers.",
         },
         {
+            "name": "Attendance",
+            "code": "attendance",
+            "description": "Student attendance management.",
+        },
+        {
             "name": "Fees",
             "code": "fees",
             "description": "Fee management.",
@@ -64,6 +69,7 @@ class Command(BaseCommand):
             "features": [
                 "student_management",
                 "teacher_management",
+                "attendance",
                 "fees",
                 "documents",
             ],
@@ -81,6 +87,7 @@ class Command(BaseCommand):
             "features": [
                 "student_management",
                 "teacher_management",
+                "attendance",
                 "fees",
                 "results",
                 "documents",
@@ -90,37 +97,55 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **options):
-        self.stdout.write(self.style.NOTICE("Seeding plans and features..."))
+
+        self.stdout.write(
+            self.style.NOTICE(
+                "Seeding plans and features..."
+            )
+        )
 
         feature_map = {}
 
-        # ------------------------------------------------------------------
+        # --------------------------------------------------------------
         # Features
-        # ------------------------------------------------------------------
+        # --------------------------------------------------------------
+
         for data in self.FEATURES:
-            feature, created = Feature.objects.update_or_create(
-                code=data["code"],
-                defaults={
-                    "name": data["name"],
-                    "description": data["description"],
-                },
+
+            feature, created = (
+                Feature.objects.update_or_create(
+                    code=data["code"],
+                    defaults={
+                        "name": data["name"],
+                        "description": data["description"],
+                    },
+                )
             )
 
             feature_map[feature.code] = feature
 
             if created:
+
                 self.stdout.write(
-                    self.style.SUCCESS(f"  ✓ Feature: {feature.name}")
-                )
-            else:
-                self.stdout.write(
-                    self.style.WARNING(f"  • Updated Feature: {feature.name}")
+                    self.style.SUCCESS(
+                        f"  ✓ Feature: {feature.name}"
+                    )
                 )
 
-        # ------------------------------------------------------------------
+            else:
+
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"  • Updated Feature: {feature.name}"
+                    )
+                )
+
+        # --------------------------------------------------------------
         # Plans
-        # ------------------------------------------------------------------
+        # --------------------------------------------------------------
+
         for data in self.PLANS:
+
             feature_codes = data["features"]
 
             plan_defaults = {
@@ -132,24 +157,38 @@ class Command(BaseCommand):
                 "is_active": True,
             }
 
-            plan, created = Plan.objects.update_or_create(
-                slug=data["slug"],
-                defaults=plan_defaults,
+            plan, created = (
+                Plan.objects.update_or_create(
+                    slug=data["slug"],
+                    defaults=plan_defaults,
+                )
             )
 
             plan.features.set(
-                [feature_map[code] for code in feature_codes]
+                [
+                    feature_map[code]
+                    for code in feature_codes
+                ]
             )
 
             if created:
+
                 self.stdout.write(
-                    self.style.SUCCESS(f"  ✓ Plan: {plan.name}")
+                    self.style.SUCCESS(
+                        f"  ✓ Plan: {plan.name}"
+                    )
                 )
+
             else:
+
                 self.stdout.write(
-                    self.style.WARNING(f"  • Updated Plan: {plan.name}")
+                    self.style.WARNING(
+                        f"  • Updated Plan: {plan.name}"
+                    )
                 )
 
         self.stdout.write(
-            self.style.SUCCESS("\nPlans and Features seeded successfully.")
+            self.style.SUCCESS(
+                "\nPlans and Features seeded successfully."
+            )
         )

@@ -1,6 +1,6 @@
 from django import forms
 
-from apps.plans.models import Feature, Plan, PlanFeature
+from apps.plans.models import Feature, Plan
 
 
 class PlanForm(forms.ModelForm):
@@ -8,10 +8,9 @@ class PlanForm(forms.ModelForm):
         queryset=Feature.objects.all(),
         required=False,
         label="Enabled Features",
-        widget=forms.SelectMultiple(
+        widget=forms.CheckboxSelectMultiple(
             attrs={
-                "class": "multi-select",
-                "size": 6,
+                "class": "feature-checkbox-list",
             }
         ),
     )
@@ -48,28 +47,5 @@ class PlanForm(forms.ModelForm):
 
         if self.instance.pk:
             self.fields["features"].initial = (
-                self.instance.active_features
+                self.instance.features.all()
             )
-
-    def save(self, commit=True):
-        plan = super().save(commit=False)
-
-        if commit:
-            plan.save()
-            self.save_m2m()
-
-        return plan
-
-    def save_m2m(self):
-        selected_features = set(self.cleaned_data.get("features", []))
-
-        PlanFeature.objects.filter(plan=self.instance).update(enabled=False)
-
-        for feature in selected_features:
-            plan_feature, _ = PlanFeature.objects.get_or_create(
-                plan=self.instance,
-                feature=feature,
-            )
-
-            plan_feature.enabled = True
-            plan_feature.save()

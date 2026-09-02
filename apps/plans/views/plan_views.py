@@ -10,7 +10,7 @@ from apps.plans.utils import manager_required
 @login_required
 @manager_required
 def plan_list(request):
-    plans = Plan.objects.order_by("name")
+    plans = Plan.objects.order_by("price_monthly")
     return render(
         request,
         "plans/plan_list.html",

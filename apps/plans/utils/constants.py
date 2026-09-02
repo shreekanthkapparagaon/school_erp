@@ -96,6 +96,23 @@ FEATURE_ROLE_ACTIONS = {
         },
     },
 
+    "attendance": {
+        User.Role.PRINCIPAL: {
+            "view", "create", "update", "delete",
+            "import", "export",
+        },
+        User.Role.HEAD: {
+            "view", "create", "update", "delete",
+            "import", "export",
+        },
+        User.Role.TEACHER: {
+            "view", "create", "update",
+        },
+        User.Role.STUDENT: {
+            "view",
+        },
+    },
+
     "documents": {
         User.Role.PRINCIPAL: {
             "view", "create", "update", "delete",
