@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block page_heading %}
+Attendance
+{% endblock %}
+
+{% block content %}
+
+<div class="section-header">
+
+    <div>
+
+        <p class="eyebrow">
+            Attendance Module
+        </p>
+
+        {% if is_student %}
+
+            <h2>
+                My Attendance
+            </h2>
+
+            <p>
+                View your attendance records and attendance history
+                from a single place.
+            </p>
+
+        {% else %}
+
+            <h2>
+                Manage Student Attendance
+            </h2>
+
+            <p>
+                Record daily student attendance, view attendance records,
+                and monitor attendance from a single place.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<div class="stat-grid">
+
+
+    {% if is_student %}
+
+        <!-- My Attendance -->
+
+        {% if can_view %}
+
+            <a
+                href="{% url 'attendance:student_view' %}"
+                class="stat-card success"
+            >
+
+                <i class="fa-solid fa-calendar-check module-icon"></i>
+
+                <span>
+                    My Attendance
+                </span>
+
+                <small>
+                    View your attendance records
+                </small>
+
+            </a>
+
+        {% endif %}
+
+
+        <!-- Coming Soon -->
+
+        <a
+            href="#"
+            class="stat-card warning"
+        >
+
+            <i class="fa-solid fa-chart-line module-icon"></i>
+
+            <span>
+                Attendance Summary
+            </span>
+
+            <small>
+                View attendance performance
+            </small>
+
+            <span class="status status-pending">
+                Coming Soon
+            </span>
+
+        </a>
+
+
+    {% else %}
+
+
+        <!-- Mark Attendance -->
+
+        {% if can_create %}
+
+            <a
+                href="{% url 'attendance:mark_select' %}"
+                class="stat-card"
+            >
+
+                <i class="fa-solid fa-calendar-check module-icon"></i>
+
+                <span>
+                    Mark Attendance
+                </span>
+
+                <small>
+                    Record student attendance
+                </small>
+
+            </a>
+
+        {% endif %}
+
+
+        <!-- View Attendance -->
+
+        {% if can_view %}
+
+            <a
+                href="{% url 'attendance:view' %}"
+                class="stat-card success"
+            >
+
+                <i class="fa-solid fa-calendar-days module-icon"></i>
+
+                <span>
+                    View Attendance
+                </span>
+
+                <small>
+                    View attendance by class and date
+                </small>
+
+            </a>
+
+        {% endif %}
+
+
+        <!-- Student History -->
+
+        <a
+            href="#"
+            class="stat-card warning stat-card-disabled"
+        >
+
+            <i class="fa-solid fa-user-clock module-icon"></i>
+
+            <span>
+                Student History
+            </span>
+
+            <small>
+                View individual attendance history
+            </small>
+
+            <span class="status status-pending">
+                Coming Soon
+            </span>
+
+        </a>
+
+
+        <!-- Attendance Reports -->
+
+        <a
+            href="#"
+            class="stat-card info stat-card-disabled"
+        >
+
+            <i class="fa-solid fa-chart-column module-icon"></i>
+
+            <span>
+                Attendance Reports
+            </span>
+
+            <small>
+                Analyze and generate attendance reports
+            </small>
+
+            <span class="status status-pending">
+                Coming Soon
+            </span>
+
+        </a>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

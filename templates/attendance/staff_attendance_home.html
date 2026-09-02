@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block page_heading %}
+Staff Attendance
+{% endblock %}
+
+{% block content %}
+
+<div class="section-header">
+
+    <div>
+
+        <p class="eyebrow">
+            Staff Attendance
+        </p>
+
+        <h2>
+            Manage Staff Attendance
+        </h2>
+
+        <p>
+            Record and monitor attendance for teachers and heads
+            from a single place.
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="stat-grid">
+
+    <!-- Mark Staff Attendance -->
+
+    <a
+        href="{% url 'attendance:staff_mark' %}"
+        class="stat-card"
+    >
+
+        <i class="fa-solid fa-user-check module-icon"></i>
+
+        <span>
+            Mark Staff Attendance
+        </span>
+
+        <small>
+            Record today's staff attendance
+        </small>
+
+    </a>
+
+
+    <!-- View Staff Attendance -->
+
+    <a
+        href="{% url 'attendance:staff_view' %}"
+        class="stat-card success"
+    >
+
+        <i class="fa-solid fa-calendar-days module-icon"></i>
+
+        <span>
+            View Staff Attendance
+        </span>
+
+        <small>
+            View attendance by date
+        </small>
+
+    </a>
+
+
+    <!-- Staff History -->
+
+    <a
+        href="#"
+        class="stat-card warning"
+    >
+
+        <i class="fa-solid fa-user-clock module-icon"></i>
+
+        <span>
+            Staff History
+        </span>
+
+        <small>
+            View individual staff attendance
+        </small>
+
+        <span class="status status-pending">
+            Coming Soon
+        </span>
+
+    </a>
+
+
+    <!-- Reports -->
+
+    <a
+        href="#"
+        class="stat-card info"
+    >
+
+        <i class="fa-solid fa-chart-column module-icon"></i>
+
+        <span>
+            Attendance Reports
+        </span>
+
+        <small>
+            Analyze staff attendance
+        </small>
+
+        <span class="status status-pending">
+            Coming Soon
+        </span>
+
+    </a>
+
+</div>
+
+{% endblock %}

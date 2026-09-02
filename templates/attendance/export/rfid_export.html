@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <p class="eyebrow">
+            Attendance Management
+        </p>
+
+        <h1>
+            Export RFID Cards
+        </h1>
+
+        <p>
+            Export RFID card details for a selected school.
+        </p>
+
+    </div>
+
+
+    <div class="page-actions">
+
+        <a
+            href="{% url 'attendance:rfid_card_list' %}"
+            class="btn btn-muted"
+        >
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+            Back
+
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- Export Card                                           -->
+<!-- ===================================================== -->
+
+<div class="profile-card">
+
+
+    <!-- ================================================= -->
+    <!-- Header                                            -->
+    <!-- ================================================= -->
+
+    <div class="profile-card-header">
+
+        <div class="profile-card-heading">
+
+            <span class="profile-card-icon">
+
+                <i class="fa-solid fa-file-excel"></i>
+
+            </span>
+
+
+            <div>
+
+                <p class="profile-card-eyebrow">
+                    Excel Export
+                </p>
+
+                <h3 class="profile-card-title">
+                    RFID Attendance Export
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="profile-card-divider"></div>
+
+
+    <!-- ================================================= -->
+    <!-- Form                                              -->
+    <!-- ================================================= -->
+
+    <form
+        method="post"
+    >
+
+        {% csrf_token %}
+
+
+        <!-- ============================================= -->
+        <!-- School                                        -->
+        <!-- ============================================= -->
+
+        <div class="form-group">
+
+            <label
+                for="school"
+            >
+                School
+            </label>
+
+
+            <select
+                name="school"
+                id="school"
+                required
+            >
+
+                <option value="">
+                    Select School
+                </option>
+
+
+                {% for school in schools %}
+
+                    <option
+                        value="{{ school.id }}"
+                    >
+
+                        {{ school.name }}
+
+                        {% if school.code %}
+
+                            ({{ school.code }})
+
+                        {% endif %}
+
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- ============================================= -->
+        <!-- Include Staff                                 -->
+        <!-- ============================================= -->
+
+        <div
+            style="
+                margin-top:20px;
+                padding:16px;
+                border:1px solid #dee2e6;
+                border-radius:8px;
+                background:#f8f9fa;
+            "
+        >
+
+            <label
+                for="include_staff"
+                style="
+                    display:flex;
+                    align-items:flex-start;
+                    gap:12px;
+                    margin:0;
+                    cursor:pointer;
+                "
+            >
+
+                <input
+                    type="checkbox"
+                    name="include_staff"
+                    id="include_staff"
+                    style="
+                        margin-top:3px;
+                        width:16px;
+                        height:16px;
+                        cursor:pointer;
+                    "
+                >
+
+
+                <span>
+
+                    <strong
+                        style="
+                            display:block;
+                            font-size:14px;
+                        "
+                    >
+                        Include Staff
+                    </strong>
+
+
+                    <small
+                        style="
+                            display:block;
+                            margin-top:4px;
+                            color:#6c757d;
+                            line-height:1.5;
+                        "
+                    >
+                        Include teachers, heads and principals
+                        in a separate <strong>Staff</strong>
+                        worksheet.
+                    </small>
+
+                </span>
+
+            </label>
+
+        </div>
+
+
+        <div class="profile-card-divider"></div>
+
+
+        <!-- ============================================= -->
+        <!-- Export Information                             -->
+        <!-- ============================================= -->
+
+        <div
+            style="
+                display:flex;
+                align-items:flex-start;
+                gap:12px;
+                margin-bottom:20px;
+                padding:14px 16px;
+                border-radius:8px;
+                background:#f8f9fa;
+                color:#495057;
+            "
+        >
+
+            <i
+                class="fa-solid fa-circle-info"
+                style="
+                    margin-top:2px;
+                "
+            ></i>
+
+
+            <div>
+
+                <strong
+                    style="
+                        display:block;
+                        margin-bottom:4px;
+                    "
+                >
+                    Export structure
+                </strong>
+
+
+                <small
+                    style="
+                        line-height:1.5;
+                    "
+                >
+                    The Excel file will contain a separate
+                    worksheet for each class. Staff will be
+                    included in a separate worksheet when
+                    the option above is enabled.
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- ============================================= -->
+        <!-- Actions                                        -->
+        <!-- ============================================= -->
+
+        <div
+            style="
+                display:flex;
+                justify-content:flex-end;
+                align-items:center;
+                gap:8px;
+            "
+        >
+
+            <a
+                href="{% url 'attendance:rfid_card_list' %}"
+                class="btn btn-muted"
+            >
+
+                <i class="fa-solid fa-xmark"></i>
+
+                Cancel
+
+            </a>
+
+
+            <button
+                type="submit"
+                class="btn"
+            >
+
+                <i class="fa-solid fa-file-excel"></i>
+
+                Export Excel
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Create Attendance API Key
+{% endblock %}
+
+{% block extra_css %}
+<link
+    rel="stylesheet"
+    href="{% static 'css/api_key.css' %}"
+>
+{% endblock %}
+
+{% block content %}
+
+<div class="api-key-create-page">
+
+    <!-- =================================================
+         PAGE HEADER
+         ================================================= -->
+
+    <div class="page-header">
+
+        <div>
+
+            <p class="eyebrow">
+                Attendance Management
+            </p>
+
+            <h1>
+                Create API Key
+            </h1>
+
+            <p>
+                Generate credentials for an attendance device.
+            </p>
+
+        </div>
+
+        <div class="api-key-create-back">
+
+            <a
+                href="{% url 'attendance:api_key_list' %}"
+                class="btn btn-muted"
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+                Back
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         CARD
+         ================================================= -->
+
+    <div class="profile-card api-key-card">
+
+        <div class="profile-card-header">
+
+            <div class="profile-card-heading">
+
+                <span class="profile-card-icon">
+
+                    <i class="fa-solid fa-key"></i>
+
+                </span>
+
+                <div>
+
+                    <p class="profile-card-eyebrow">
+                        API Authentication
+                    </p>
+
+                    <h3 class="profile-card-title">
+                        Generate Attendance API Key
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="profile-card-divider"></div>
+
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <div class="api-key-form">
+
+                <div class="form-group">
+
+                    <label for="school">
+                        School
+                    </label>
+
+                    <select
+                        name="school"
+                        id="school"
+                        required
+                    >
+
+                        <option value="">
+                            Select School
+                        </option>
+
+                        {% for school in schools %}
+
+                        <option value="{{ school.pk }}">
+                            {{ school.name }} ({{ school.code }})
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                    <small>
+                        Each school can have only one
+                        attendance API key.
+                    </small>
+
+                </div>
+
+
+                <div class="alert alert-info">
+
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    <span>
+
+                        A secure API key will be generated
+                        automatically after you create it.
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-card-divider"></div>
+
+
+            <div class="api-key-actions">
+
+                <a
+                    href="{% url 'attendance:api_key_list' %}"
+                    class="btn btn-muted"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn"
+                >
+                    <i class="fa-solid fa-key"></i>
+                    Generate API Key
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

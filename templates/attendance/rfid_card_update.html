@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Update RFID Card
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/rfid_create.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+<div class="rfid-create-page">
+
+    <!-- =====================================================
+    PAGE HEADER
+    ===================================================== -->
+
+    <div class="page-header">
+
+        <div>
+
+            <p class="eyebrow">
+                Attendance Management
+            </p>
+
+            <h1>
+                Update RFID Card
+            </h1>
+
+            <p>
+                Update the RFID UID assigned to this card.
+            </p>
+
+        </div>
+
+        <div class="page-actions">
+
+            <a
+                href="{% url 'attendance:rfid_card_list' %}"
+                class="btn btn-muted"
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+                Back
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+    RFID UPDATE CARD
+    ===================================================== -->
+
+    <div class="profile-card rfid-page-card">
+
+        <!-- =================================================
+        CARD HEADER
+        ================================================= -->
+
+        <div class="profile-card-header">
+
+            <div class="profile-card-heading">
+
+                <span class="profile-card-icon">
+                    <i class="fa-solid fa-id-card"></i>
+                </span>
+
+                <div>
+
+                    <p class="profile-card-eyebrow">
+                        RFID Registration
+                    </p>
+
+                    <h3 class="profile-card-title">
+                        Update RFID Card
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="profile-card-divider"></div>
+
+
+        <!-- =================================================
+        FORM
+        ================================================= -->
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <div class="rfid-form-grid">
+
+
+                <!-- =========================================
+                SCHOOL
+                ========================================= -->
+
+                <div class="form-group">
+
+                    <label for="school">
+                        School
+                    </label>
+
+                    <input
+                        type="text"
+                        id="school"
+                        value="{{ card.school }}"
+                        class="rfid-readonly"
+                        disabled
+                    >
+
+                    <small>
+                        The school assigned to this RFID card
+                        cannot be changed.
+                    </small>
+
+                </div>
+
+
+                <!-- =========================================
+                USER
+                ========================================= -->
+
+                <div class="form-group">
+
+                    <label for="user">
+                        User
+                    </label>
+
+                    <input
+                        type="text"
+                        id="user"
+                        value="{{ card.user }}"
+                        class="rfid-readonly"
+                        disabled
+                    >
+
+                    <small>
+                        The user assigned to this RFID card
+                        cannot be changed.
+                    </small>
+
+                </div>
+
+
+                <!-- =========================================
+                RFID UID
+                ========================================= -->
+
+                <div class="form-group">
+
+                    <label for="uid">
+                        RFID UID
+                    </label>
+
+                    <input
+                        type="text"
+                        name="uid"
+                        id="uid"
+                        maxlength="32"
+                        value="{{ card.uid }}"
+                        placeholder="Example: A37F192C"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <small>
+                        Enter or scan the new RFID card UID.
+                    </small>
+
+                </div>
+
+
+                <!-- =========================================
+                STATUS
+                ========================================= -->
+
+                <div class="form-group">
+
+                    <label>
+                        Current Status
+                    </label>
+
+                    <div>
+
+                        {% if card.is_active %}
+
+                            <span class="status-badge success">
+
+                                <i class="bi bi-check-circle-fill"></i>
+
+                                Active
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="status-badge danger">
+
+                                <i class="bi bi-x-circle-fill"></i>
+
+                                Inactive
+
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                    <small>
+                        Use the Activate/Disable action
+                        from the RFID card list to change status.
+                    </small>
+
+                </div>
+
+
+                <!-- =========================================
+                INFORMATION
+                ========================================= -->
+
+                <div class="rfid-form-full">
+
+                    <div class="alert alert-info">
+
+                        <i class="fa-solid fa-circle-info"></i>
+
+                        <span>
+
+                            Only the
+                            <strong>RFID UID</strong>
+                            can be changed.
+
+                            The school and user assignment
+                            remain unchanged.
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+            DIVIDER
+            ================================================= -->
+
+            <div class="profile-card-divider"></div>
+
+
+            <!-- =================================================
+            ACTIONS
+            ================================================= -->
+
+            <div class="rfid-form-actions">
+
+                <a
+                    href="{% url 'attendance:rfid_card_list' %}"
+                    class="btn btn-muted"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn"
+                >
+
+                    <i class="fa-solid fa-floppy-disk"></i>
+
+                    Update RFID UID
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2>
+                Mark Attendance
+            </h2>
+
+            <p class="text-muted mb-0">
+
+                {{ school_class.name }}
+
+                {% if school_class.section %}
+                    - {{ school_class.section }}
+                {% endif %}
+
+                &nbsp; | &nbsp;
+
+                {{ date|date:"d M Y" }}
+
+            </p>
+
+        </div>
+
+
+        <a
+            href="{% url 'attendance:home' %}"
+            class="btn btn-secondary"
+        >
+            Back
+        </a>
+
+    </div>
+
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <input
+            type="hidden"
+            name="date"
+            value="{{ date|date:'Y-m-d' }}"
+        >
+
+
+        <div class="card">
+
+            <div class="card-header
+                        d-flex
+                        justify-content-between
+                        align-items-center">
+
+                <strong>
+                    Students
+                </strong>
+
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-outline-primary"
+                    id="mark-all-present"
+                >
+                    Mark All Present
+                </button>
+
+            </div>
+
+
+            <div class="card-body p-0">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover mb-0">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>#</th>
+
+                                <th>Student</th>
+
+                                <th>Email</th>
+
+                                <th>Attendance</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for student in students %}
+
+                            <tr>
+
+                                <td>
+                                    {{ forloop.counter }}
+                                </td>
+
+
+                                <td>
+                                    {{ student.get_full_name|default:student.email }}
+                                </td>
+
+
+                                <td>
+                                    {{ student.email }}
+                                </td>
+
+
+                                <td>
+
+                                    <div class="d-flex gap-3">
+
+                                        <!-- Present -->
+
+                                        <label>
+
+                                            <input
+                                                type="radio"
+                                                name="attendance_{{ student.id }}"
+                                                value="1"
+
+                                                {% if student.attendance_status == 1 %}
+                                                    checked
+                                                {% endif %}
+                                            >
+
+                                            Present
+
+                                        </label>
+
+
+                                        <!-- Absent -->
+
+                                        <label>
+
+                                            <input
+                                                type="radio"
+                                                name="attendance_{{ student.id }}"
+                                                value="2"
+
+                                                {% if student.attendance_status == 2 %}
+                                                    checked
+                                                {% endif %}
+                                            >
+
+                                            Absent
+
+                                        </label>
+
+
+                                        <!-- Late -->
+
+                                        <label>
+
+                                            <input
+                                                type="radio"
+                                                name="attendance_{{ student.id }}"
+                                                value="3"
+
+                                                {% if student.attendance_status == 3 %}
+                                                    checked
+                                                {% endif %}
+                                            >
+
+                                            Late
+
+                                        </label>
+
+
+                                        <!-- Leave -->
+
+                                        <label>
+
+                                            <input
+                                                type="radio"
+                                                name="attendance_{{ student.id }}"
+                                                value="4"
+
+                                                {% if student.attendance_status == 4 %}
+                                                    checked
+                                                {% endif %}
+                                            >
+
+                                            Leave
+
+                                        </label>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                            {% empty %}
+
+                            <tr>
+
+                                <td
+                                    colspan="4"
+                                    class="text-center py-4"
+                                >
+                                    No students found in this class.
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            {% if students %}
+
+            <div class="card-footer text-end">
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Save Attendance
+                </button>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<script>
+
+document
+    .getElementById("mark-all-present")
+    .addEventListener("click", function () {
+
+        document
+            .querySelectorAll(
+                'input[type="radio"][value="1"]'
+            )
+            .forEach(function (radio) {
+
+                radio.checked = true;
+
+            });
+
+    });
+
+</script>
+
+{% endblock %}

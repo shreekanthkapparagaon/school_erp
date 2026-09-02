@@ -2,9 +2,11 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path
+from .api import api
 
 urlpatterns = [
     path('admin/', include('admin_honeypot.urls', namespace='admin_honeypot')),
+    path("api/",api.urls),
     path("inlighting/", admin.site.urls),
     path("", include("apps.core.urls")),
     path("accounts/", include("apps.accounts.urls")),
@@ -13,6 +15,7 @@ urlpatterns = [
     path("results/", include("apps.results.urls")),
     path("plans/", include("apps.plans.urls")),
     path("documents/", include("apps.document.urls")),
+    path("attendance/",include("apps.attendance.urls")),
 ]
 
 if settings.DEBUG and settings.MEDIA_URL:

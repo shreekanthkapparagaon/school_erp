@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+
+{% block page_heading %}
+Mark Staff Attendance
+{% endblock %}
+
+{% block content %}
+
+<!-- ===================================================== -->
+<!-- Header                                                -->
+<!-- ===================================================== -->
+
+<div class="section-header">
+
+    <div>
+
+        <p class="eyebrow">
+            Staff Attendance
+        </p>
+
+        <h2>
+            Mark Staff Attendance
+        </h2>
+
+        <p>
+            Record attendance for teachers and heads.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- Back + Date                                           -->
+<!-- ===================================================== -->
+
+<div class="table-actions">
+
+    <a
+        href="{% url 'attendance:staff_home' %}"
+        class="btn btn-muted"
+    >
+
+        <i class="fa-solid fa-arrow-left"></i>
+
+        Back
+
+    </a>
+
+
+    <form
+        method="get"
+        class="table-actions"
+    >
+
+        <input
+            type="date"
+            name="date"
+            value="{{ selected_date|date:'Y-m-d' }}"
+            required
+        >
+
+        <button
+            type="submit"
+            class="btn"
+        >
+
+            <i class="fa-solid fa-calendar-days"></i>
+
+            Load
+
+        </button>
+
+    </form>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- Attendance Form                                       -->
+<!-- ===================================================== -->
+
+<form
+    method="post"
+>
+
+    {% csrf_token %}
+
+
+    <input
+        type="hidden"
+        name="date"
+        value="{{ selected_date|date:'Y-m-d' }}"
+    >
+
+
+    <!-- ================================================= -->
+    <!-- Date                                               -->
+    <!-- ================================================= -->
+
+    <div class="section-header">
+
+        <div>
+
+            <p class="eyebrow">
+                Attendance Date
+            </p>
+
+            <h3>
+                {{ selected_date|date:"M d, Y" }}
+            </h3>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- Staff Table                                        -->
+    <!-- ================================================= -->
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>
+                    #
+                </th>
+
+                <th>
+                    Staff
+                </th>
+
+                <th>
+                    Role
+                </th>
+
+                <th>
+                    Attendance
+                </th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            {% for member in staff %}
+
+            <tr>
+
+                <td>
+                    {{ forloop.counter }}
+                </td>
+
+
+                <td>
+
+                    {{ member }}
+
+                </td>
+
+
+                <td>
+
+                    {{ member.get_role_display }}
+
+                </td>
+
+
+                <td>
+
+                    <div class="attendance-options">
+
+                        <!-- Present -->
+
+                        <label>
+
+                            <input
+                                type="radio"
+                                name="attendance_{{ member.id }}"
+                                value="1"
+
+                                {% if member.attendance_status == 1 %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            Present
+
+                        </label>
+
+
+                        <!-- Absent -->
+
+                        <label>
+
+                            <input
+                                type="radio"
+                                name="attendance_{{ member.id }}"
+                                value="2"
+
+                                {% if member.attendance_status == 2 %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            Absent
+
+                        </label>
+
+
+                        <!-- Late -->
+
+                        <label>
+
+                            <input
+                                type="radio"
+                                name="attendance_{{ member.id }}"
+                                value="3"
+
+                                {% if member.attendance_status == 3 %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            Late
+
+                        </label>
+
+
+                        <!-- Leave -->
+
+                        <label>
+
+                            <input
+                                type="radio"
+                                name="attendance_{{ member.id }}"
+                                value="4"
+
+                                {% if member.attendance_status == 4 %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            Leave
+
+                        </label>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+
+            {% empty %}
+
+            <tr>
+
+                <td colspan="4">
+
+                    No staff members found.
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+
+    {% if staff %}
+
+    <!-- ================================================= -->
+    <!-- Save                                               -->
+    <!-- ================================================= -->
+
+    <div class="table-actions">
+
+        <a
+            href="{% url 'attendance:staff_home' %}"
+            class="btn btn-muted"
+        >
+
+            Cancel
+
+        </a>
+
+
+        <button
+            type="submit"
+            class="btn"
+        >
+
+            <i class="fa-solid fa-floppy-disk"></i>
+
+            Save Attendance
+
+        </button>
+
+    </div>
+
+    {% endif %}
+
+</form>
+
+{% endblock %}

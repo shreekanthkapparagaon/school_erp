@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Attendance APIKeys {% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/api_key.css' %}" />
+{% endblock %}
+
+{% block content %}
+    <section class="api-key-page">
+        <!-- =================================================
+        PAGE HEADER
+        ================================================= -->
+
+        <div class="page-header api-key-list-header">
+
+            <div>
+
+                <p class="eyebrow">
+                    Attendance Management
+                </p>
+
+                <h1>
+                    Attendance API Keys
+                </h1>
+
+                <p>
+                    Manage API credentials used by attendance devices.
+                </p>
+
+            </div>
+
+
+            <div class="page-actions">
+
+                <a
+                    href="{% url 'attendance:api_key_create' %}"
+                    class="btn"
+                >
+
+                    <i class="fa-solid fa-plus"></i>
+
+                    Create API Key
+
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- =================================================
+                API KEY TABLE
+                ================================================= -->
+
+        <div class="profile-card api-key-table-card">
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <!-- =========================================
+                                TABLE HEADER
+                                ========================================= -->
+
+                    <thead>
+                    <tr>
+                        <th>School</th>
+
+                        <th>API Key</th>
+
+                        <th>Status</th>
+
+                        <th>Created</th>
+
+                        <th>Updated</th>
+
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+
+                    <!-- =========================================
+                                TABLE BODY
+                                ========================================= -->
+
+                    <tbody>
+                    {% for api_key in api_keys %}
+
+                    <tr>
+                        <!-- =================================
+                                        SCHOOL
+                                        ================================= -->
+
+                        <td class="school-column">
+                        <strong> {{ api_key.school.name }} </strong>
+
+                        <small> {{ api_key.school.code }} </small>
+                        </td>
+
+                        <!-- =================================
+                                        API KEY
+                                        ================================= -->
+
+                        <td>
+                        <code class="masked-api-key">
+                            {{ api_key.key|slice:":6" }}••••••••••••
+                        </code>
+                        </td>
+
+                        <!-- =================================
+                                        STATUS
+                                        ================================= -->
+
+                        <td>
+                        {% if api_key.is_active %}
+
+                        <span class="status-badge success">
+                            <i class="fa-solid fa-circle-check"></i>
+
+                            Active
+                        </span>
+
+                        {% else %}
+
+                        <span class="status-badge danger">
+                            <i class="fa-solid fa-circle-xmark"></i>
+
+                            Inactive
+                        </span>
+
+                        {% endif %}
+                        </td>
+
+                        <!-- =================================
+                                        CREATED
+                                        ================================= -->
+
+                        <td>{{ api_key.created_at|date:"M d, Y" }}</td>
+
+                        <!-- =================================
+                                        UPDATED
+                                        ================================= -->
+
+                        <td>{{ api_key.updated_at|date:"M d, Y" }}</td>
+
+                        <!-- =================================
+                                        ACTIONS
+                                        ================================= -->
+
+                        <td>
+                        <div class="table-actions">
+                            <a
+                            href="{% url 'attendance:api_key_detail' api_key.pk %}"
+                            class="btn btn-sm"
+                            >
+                            <i class="fa-solid fa-eye"></i>
+
+                            View
+                            </a>
+
+                            <form
+                            method="post"
+                            action="{% url 'attendance:api_key_toggle' api_key.pk %}"
+                            >
+                            {% csrf_token %} {% if api_key.is_active %}
+
+                            <button type="submit" class="btn btn-sm btn-muted">
+                                <i class="fa-solid fa-ban"></i>
+
+                                Disable
+                            </button>
+
+                            {% else %}
+
+                            <button type="submit" class="btn btn-sm">
+                                <i class="fa-solid fa-check"></i>
+
+                                Activate
+                            </button>
+
+                            {% endif %}
+                            </form>
+                        </div>
+                        </td>
+                    </tr>
+
+                    {% empty %}
+
+                    <!-- =====================================
+                                    EMPTY STATE
+                                    ===================================== -->
+
+                    <tr>
+                        <td colspan="6" class="empty-table">
+                        <i class="fa-solid fa-key"></i>
+
+                        <h3>No Attendance API Keys</h3>
+
+                        <p>
+                            Create an API key for a school to connect attendance devices.
+                        </p>
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- =================================================
+        PAGINATION
+        ================================================= -->
+
+        {% if page_obj.has_other_pages %}
+
+            <div class="api-key-pagination">
+            <!-- =============================================
+            PAGINATION INFO
+            ============================================= -->
+
+                <div class="pagination-info">
+                    Showing
+
+                    <strong> {{ page_obj.start_index }} </strong>
+
+                    to
+
+                    <strong> {{ page_obj.end_index }} </strong>
+
+                    of
+
+                    <strong> {{ paginator.count }} </strong>
+
+                    API keys
+                </div>
+
+                <!-- =============================================
+                PAGINATION CONTROLS
+                ============================================= -->
+
+                <div class="pagination-controls">
+                    <!-- Previous -->
+
+                    {% if page_obj.has_previous %}
+
+                        <a
+                        href="?page={{ page_obj.previous_page_number }}"
+                        class="pagination-btn"
+                        aria-label="Previous page"
+                        >
+                        <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+
+                    {% else %}
+
+                        <span class="pagination-btn disabled">
+                        <i class="fa-solid fa-chevron-left"></i>
+                        </span>
+
+                    {% endif %}
+
+                    <!-- Page Numbers -->
+
+                    {% for number in page_obj.paginator.page_range %}
+                        {% if number == page_obj.number %}
+
+                        <span class="pagination-btn active"> {{ number }} </span>
+
+                        {% elif number >= page_obj.number|add:"-2" and number <= page_obj.number|add:"2" %}
+
+                        <a href="?page={{ number }}" class="pagination-btn"> {{ number }} </a>
+
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- Next -->
+
+                    {% if page_obj.has_next %}
+                        <a
+                        href="?page={{ page_obj.next_page_number }}"
+                        class="pagination-btn"
+                        aria-label="Next page"
+                        >
+                        <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    {% else %}
+                        <span class="pagination-btn disabled">
+                        <i class="fa-solid fa-chevron-right"></i>
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+        {% endif %}
+    </section>
+{% endblock %}

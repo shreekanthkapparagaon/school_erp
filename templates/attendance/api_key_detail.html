@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Attendance API Key
+{% endblock %}
+
+{% block extra_css %}
+<link
+    rel="stylesheet"
+    href="{% static 'css/api_key.css' %}"
+>
+{% endblock %}
+
+{% block content %}
+
+<div class="api-key-detail-page">
+
+    <!-- =================================================
+         HEADER
+         ================================================= -->
+
+    <div class="page-header">
+
+        <div>
+
+            <p class="eyebrow">
+                Attendance Management
+            </p>
+
+            <h1>
+                Attendance API Key
+            </h1>
+
+            <p>
+                API credentials for {{ api_key.school.name }}.
+            </p>
+
+        </div>
+
+        <div class="page-actions">
+
+            <a
+                href="{% url 'attendance:api_key_list' %}"
+                class="btn btn-muted"
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+                Back
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         CARD
+         ================================================= -->
+
+    <div class="profile-card api-key-detail-card">
+
+        <div class="api-key-detail-content">
+
+            <div class="school-icon">
+
+                <i class="fa-solid fa-school"></i>
+
+            </div>
+
+            <h2>
+                {{ api_key.school.name }}
+            </h2>
+
+            <p class="school-code">
+                {{ api_key.school.code }}
+            </p>
+
+
+            {% if new_key %}
+
+                <div class="new-key-warning">
+
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+
+                    <div>
+
+                        <strong>
+                            Save this API key now
+                        </strong>
+
+                        <p>
+                            This key is shown because it was
+                            just generated. Store it securely.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="api-key-display">
+
+                    <code id="api-key-value">
+                        {{ new_key }}
+                    </code>
+
+                    <button
+                        type="button"
+                        class="btn"
+                        onclick="copyAPIKey(this)"
+                    >
+                        <i class="fa-regular fa-copy"></i>
+                        Copy
+                    </button>
+
+                </div>
+
+            {% else %}
+
+                <div class="api-key-hidden">
+
+                    <i class="fa-solid fa-lock"></i>
+
+                    <span>
+                        API key is securely stored.
+                    </span>
+
+                </div>
+
+            {% endif %}
+
+
+            <div class="api-key-meta">
+
+                <div>
+
+                    <span>
+                        Status
+                    </span>
+
+                    {% if api_key.is_active %}
+
+                        <strong class="text-success">
+                            Active
+                        </strong>
+
+                    {% else %}
+
+                        <strong class="text-danger">
+                            Inactive
+                        </strong>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Created
+                    </span>
+
+                    <strong>
+                        {{ api_key.created_at|date:"M d, Y H:i" }}
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Last Updated
+                    </span>
+
+                    <strong>
+                        {{ api_key.updated_at|date:"M d, Y H:i" }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="api-key-actions">
+
+                <form
+                    method="post"
+                    action="{% url 'attendance:api_key_regenerate' api_key.pk %}"
+                    onsubmit="return confirm(
+                        'Regenerate this API key? The existing key will immediately stop working.'
+                    );"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="btn btn-warning"
+                    >
+                        <i class="fa-solid fa-rotate"></i>
+                        Regenerate Key
+                    </button>
+
+                </form>
+
+
+                <form
+                    method="post"
+                    action="{% url 'attendance:api_key_toggle' api_key.pk %}"
+                >
+
+                    {% csrf_token %}
+
+                    {% if api_key.is_active %}
+
+                        <button
+                            type="submit"
+                            class="btn btn-muted"
+                        >
+                            <i class="fa-solid fa-ban"></i>
+                            Disable
+                        </button>
+
+                    {% else %}
+
+                        <button
+                            type="submit"
+                            class="btn"
+                        >
+                            <i class="fa-solid fa-check"></i>
+                            Activate
+                        </button>
+
+                    {% endif %}
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+function copyAPIKey(button) {
+
+    const key = document.getElementById(
+        "api-key-value"
+    ).innerText.trim();
+
+    navigator.clipboard.writeText(key).then(() => {
+
+        const original = button.innerHTML;
+
+        button.innerHTML =
+            '<i class="fa-solid fa-check"></i> Copied';
+
+        setTimeout(() => {
+            button.innerHTML = original;
+        }, 1800);
+
+    });
+
+}
+</script>
+
+{% endblock %}

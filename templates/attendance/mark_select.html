@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block page_heading %}
+Mark Attendance
+{% endblock %}
+
+{% block content %}
+
+<div class="section-header">
+
+    <div>
+
+        <p class="eyebrow">
+            Attendance
+        </p>
+
+        <h2>
+            Mark Attendance
+        </h2>
+
+        <p>
+            Select a date and class to record student attendance.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- Date Selection -->
+
+<div class="table-actions">
+
+    <a
+        href="{% url 'attendance:home' %}"
+        class="btn btn-muted"
+    >
+        <i class="fa-solid fa-arrow-left"></i>
+        Back
+    </a>
+
+
+    <form method="get">
+
+        <input
+            type="date"
+            name="date"
+            value="{{ attendance_date|date:'Y-m-d' }}"
+            required
+        >
+
+        <button
+            type="submit"
+            class="btn"
+        >
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Check Classes
+        </button>
+
+    </form>
+
+</div>
+
+
+<!-- Available Classes -->
+
+{% if classes %}
+
+    <div class="section-header">
+
+        <div>
+
+            <p class="eyebrow">
+                Available Classes
+            </p>
+
+            <h2>
+                Select a Class
+            </h2>
+
+            <p>
+                Attendance has not yet been recorded for these classes
+                on {{ attendance_date|date:"M d, Y" }}.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="stat-grid">
+
+        {% for school_class in classes %}
+
+            <a
+                href="{% url 'attendance:mark' school_class.id %}?date={{ attendance_date|date:'Y-m-d' }}"
+                class="stat-card"
+            >
+
+                <i class="fa-solid fa-users module-icon"></i>
+
+                <span>
+                    {{ school_class.name }}
+
+                    {% if school_class.section %}
+                        - {{ school_class.section }}
+                    {% endif %}
+                </span>
+
+                <small>
+                    Mark attendance
+                </small>
+
+            </a>
+
+        {% endfor %}
+
+    </div>
+
+
+{% else %}
+
+    <div class="table-actions">
+
+        <span>
+            Attendance has already been recorded for all classes
+            on {{ attendance_date|date:"M d, Y" }}.
+        </span>
+
+    </div>
+
+{% endif %}
+
+{% endblock %}

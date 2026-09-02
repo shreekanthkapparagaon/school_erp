@@ -1,0 +1,396 @@
+{% extends "base.html" %}
+{% load static %}
+{% block page_heading %} My Attendance {% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+{% block content %}
+
+<div class="section-header">
+  <div>
+    <p class="eyebrow">Attendance</p>
+
+    <h2>My Attendance</h2>
+
+    <p>View your daily attendance and attendance summary.</p>
+  </div>
+</div>
+
+<!-- ======================================================
+     ATTENDANCE SUMMARY
+     ====================================================== -->
+
+<div class="profile-card">
+  <div class="profile-card-header">
+    <div class="profile-card-heading">
+      <span class="profile-card-icon">
+        <i class="fa-solid fa-calendar-check"></i>
+      </span>
+
+      <div>
+        <p class="profile-card-eyebrow">Attendance Overview</p>
+
+        <h3 class="profile-card-title">Attendance Summary</h3>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-overview">
+    <!-- Attendance Percentage -->
+
+    <div class="result-score">
+      <div class="score-circle">
+        <strong> {{ attendance_percentage }}% </strong>
+
+        <span> Attendance </span>
+      </div>
+    </div>
+
+    <!-- Summary -->
+
+    <div class="result-summary">
+      <div class="summary-item">
+        <span>
+          <i class="fa-solid fa-calendar-days"></i>
+          Total Days
+        </span>
+
+        <strong> {{ attendance_records|length }} </strong>
+      </div>
+
+      <div class="summary-item">
+        <span>
+          <i class="fa-solid fa-circle-check"></i>
+          Present
+        </span>
+
+        <strong> {{ present_count }} </strong>
+      </div>
+
+      <div class="summary-item">
+        <span>
+          <i class="fa-solid fa-circle-xmark"></i>
+          Absent
+        </span>
+
+        <strong> {{ absent_count }} </strong>
+      </div>
+
+      <div class="summary-item">
+        <span>
+          <i class="fa-solid fa-clock"></i>
+          Late
+        </span>
+
+        <strong> {{ late_count }} </strong>
+      </div>
+
+      <div class="summary-item">
+        <span>
+          <i class="fa-solid fa-person-walking-arrow-right"></i>
+          Leave
+        </span>
+
+        <strong> {{ leave_count }} </strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================
+     CALENDAR
+     ====================================================== -->
+
+<div class="profile-card attendance-calendar-card">
+  <div class="profile-card-header">
+    <div class="profile-card-heading">
+      <span class="profile-card-icon">
+        <i class="fa-solid fa-calendar-days"></i>
+      </span>
+
+      <div>
+        <p class="profile-card-eyebrow">Attendance Calendar</p>
+
+        <h3 class="profile-card-title" id="calendar-title"></h3>
+      </div>
+    </div>
+
+    <div class="calendar-navigation">
+      <button type="button" class="btn btn-muted btn-sm" id="previous-month">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+
+      <button type="button" class="btn btn-muted btn-sm" id="today-month">
+        Today
+      </button>
+
+      <button type="button" class="btn btn-muted btn-sm" id="next-month">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="profile-card-divider"></div>
+
+  <!-- Calendar -->
+
+  <div class="attendance-calendar">
+    <div class="calendar-weekdays">
+      <span>Sun</span>
+      <span>Mon</span>
+      <span>Tue</span>
+      <span>Wed</span>
+      <span>Thu</span>
+      <span>Fri</span>
+      <span>Sat</span>
+    </div>
+
+    <div class="calendar-days" id="attendance-calendar-days"></div>
+  </div>
+</div>
+<div class="attendance-calendar-legend">
+
+    <span>
+        <i class="attendance-legend-dot present"></i>
+        Present
+    </span>
+
+    <span>
+        <i class="attendance-legend-dot absent"></i>
+        Absent
+    </span>
+
+    <span>
+        <i class="attendance-legend-dot late"></i>
+        Late
+    </span>
+
+    <span>
+        <i class="attendance-legend-dot leave"></i>
+        Leave
+    </span>
+
+</div>
+
+<!-- ======================================================
+     ATTENDANCE DATA
+     ====================================================== -->
+
+<script id="attendance-data" type="application/json">
+  [
+      {% for attendance in attendance_records %}
+
+      {
+          "date": "{{ attendance.date|date:'Y-m-d' }}",
+          "status": "{{ attendance.status }}"
+      }
+
+      {% if not forloop.last %},{% endif %}
+
+      {% endfor %}
+  ]
+</script>
+
+<!-- ======================================================
+     CALENDAR JAVASCRIPT
+     ====================================================== -->
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const calendar = document.getElementById("attendance-calendar-days");
+
+    const title = document.getElementById("calendar-title");
+
+    const previous = document.getElementById("previous-month");
+
+    const next = document.getElementById("next-month");
+
+    const todayButton = document.getElementById("today-month");
+
+    const dataElement = document.getElementById("attendance-data");
+
+    if (!calendar || !title || !dataElement) {
+      return;
+    }
+
+    const attendanceData = JSON.parse(dataElement.textContent);
+
+    const attendanceMap = {};
+
+    attendanceData.forEach(function (record) {
+      attendanceMap[record.date] = record.status;
+    });
+
+    const today = new Date();
+
+    let currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    function pad(value) {
+      return String(value).padStart(2, "0");
+    }
+
+    function getDateKey(year, month, day) {
+      return year + "-" + pad(month + 1) + "-" + pad(day);
+    }
+
+    function getStatusClass(status) {
+      switch (String(status)) {
+        case "1":
+          return "present";
+
+        case "2":
+          return "absent";
+
+        case "3":
+          return "late";
+
+        case "4":
+          return "leave";
+
+        default:
+          return "";
+      }
+    }
+
+    function getStatusText(status) {
+      switch (String(status)) {
+        case "1":
+          return "Present";
+
+        case "2":
+          return "Absent";
+
+        case "3":
+          return "Late";
+
+        case "4":
+          return "Leave";
+
+        default:
+          return "";
+      }
+    }
+
+    function renderCalendar() {
+      calendar.innerHTML = "";
+
+      const year = currentDate.getFullYear();
+
+      const month = currentDate.getMonth();
+
+      title.textContent = new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        year: "numeric",
+      }).format(currentDate);
+
+      /*
+       * First day of month.
+       */
+
+      const firstDay = new Date(year, month, 1).getDay();
+
+      /*
+       * Number of days.
+       */
+
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      /*
+       * Empty cells before
+       * first day.
+       */
+
+      for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement("div");
+
+        empty.className = "calendar-day calendar-day-empty";
+
+        calendar.appendChild(empty);
+      }
+
+      /*
+       * Days.
+       */
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cell = document.createElement("div");
+
+        cell.className = "calendar-day";
+
+        const dateKey = getDateKey(year, month, day);
+
+        const status = attendanceMap[dateKey];
+
+        /*
+         * Today.
+         */
+
+        if (
+          year === today.getFullYear() &&
+          month === today.getMonth() &&
+          day === today.getDate()
+        ) {
+          cell.classList.add("calendar-day-today");
+        }
+
+        /*
+         * Day number.
+         */
+
+        const number = document.createElement("span");
+
+        number.className = "calendar-day-number";
+
+        number.textContent = day;
+
+        cell.appendChild(number);
+
+        /*
+         * Attendance status.
+         */
+
+        if (status) {
+          const statusClass = getStatusClass(status);
+
+          const statusText = getStatusText(status);
+
+          cell.classList.add("calendar-day-" + statusClass);
+
+          const dot = document.createElement("span");
+
+          dot.className = "attendance-dot " + statusClass;
+
+          dot.title = statusText;
+
+          cell.appendChild(dot);
+
+          cell.title = dateKey + " - " + statusText;
+        }
+
+        calendar.appendChild(cell);
+      }
+    }
+
+    previous.addEventListener("click", function () {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+
+      renderCalendar();
+    });
+
+    next.addEventListener("click", function () {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+
+      renderCalendar();
+    });
+
+    todayButton.addEventListener("click", function () {
+      currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
+
+      renderCalendar();
+    });
+
+    renderCalendar();
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,339 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Register RFID Card{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/rfid_create.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="rfid-create-page">
+
+    <div class="page-header">
+
+        <div>
+            <span class="eyebrow">
+                Attendance Management
+            </span>
+
+            <h1>
+                Register RFID Card
+            </h1>
+
+            <p>
+                Assign an RFID card to a student or staff member.
+            </p>
+        </div>
+
+        <div class="page-actions">
+
+            <a
+                href="{% url 'attendance:rfid_card_list' %}"
+                class="btn btn-muted"
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+                Back
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="rfid-page-card profile-card">
+
+        <div class="profile-card-header">
+
+            <div class="profile-card-heading">
+
+                <div class="profile-card-icon">
+                    <i class="fa-solid fa-id-card"></i>
+                </div>
+
+                <div>
+                    <span class="profile-card-eyebrow">
+                        RFID Registration
+                    </span>
+
+                    <h2 class="profile-card-title">
+                        Assign RFID Card
+                    </h2>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="profile-card-divider"></div>
+
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="form-errors">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+
+            <div class="rfid-form-grid">
+
+                <div class="form-group">
+
+                    <label for="school">
+                        School
+                    </label>
+
+                    <div class="rfid-school-row">
+
+                        <select
+                            id="school"
+                            name="school"
+                            class="rfid-school-select"
+                            required
+                        >
+                            <option value="">
+                                Select School
+                            </option>
+
+                            {% for school in schools %}
+
+                                <option
+                                    value="{{ school.id }}"
+                                    {% if selected_school == school.id|stringformat:"s" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ school.name }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+
+                        <button
+                            type="button"
+                            id="fetch-users"
+                            class="btn rfid-fetch-btn"
+                            {% if not selected_school %}
+                                disabled
+                            {% endif %}
+                        >
+                            <i class="fa-solid fa-users"></i>
+                            Fetch Users
+                        </button>
+
+                    </div>
+
+                    <div
+                        id="fetch-status"
+                        class="rfid-fetch-status"
+                    ></div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="user">
+                        User
+                    </label>
+
+                    <select
+                        id="user"
+                        name="user"
+                        required
+                        {% if not users %}
+                            disabled
+                        {% endif %}
+                    >
+
+                        {% if users %}
+
+                            <option value="">
+                                Select User
+                            </option>
+
+                            {% for user in users %}
+
+                                <option
+                                    value="{{ user.id }}"
+                                    {% if form.user.value|stringformat:"s" == user.id|stringformat:"s" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ user.get_full_name|default:user.email }}
+                                    — {{ user.get_role_display }}
+                                </option>
+
+                            {% endfor %}
+
+                        {% else %}
+
+                            <option value="">
+                                Select school and fetch users
+                            </option>
+
+                        {% endif %}
+
+                    </select>
+
+                    <small>
+                        Select a school and click Fetch Users.
+                    </small>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="uid">
+                        RFID UID
+                    </label>
+
+                    <input
+                        type="text"
+                        id="uid"
+                        name="uid"
+                        value="{{ form.uid.value|default:'' }}"
+                        placeholder="Example: A37F192C"
+                        maxlength="32"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <small>
+                        Enter or scan the UID of the RFID card.
+                    </small>
+
+                    {% for error in form.uid.errors %}
+                        <small class="form-error">
+                            {{ error }}
+                        </small>
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Card Status
+                    </label>
+
+                    <div>
+                        <span class="status-badge success">
+                            <i class="fa-solid fa-circle-check"></i>
+                            Active
+                        </span>
+                    </div>
+
+                    <small>
+                        New RFID cards are active by default.
+                    </small>
+
+                </div>
+
+
+                <div class="rfid-form-full">
+
+                    <div class="alert alert-info">
+
+                        <i class="fa-solid fa-circle-info"></i>
+
+                        <div>
+                            <strong>
+                                RFID Attendance
+                            </strong>
+
+                            <p>
+                                Once registered, this card can be
+                                used by the attendance device to
+                                identify the selected user.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-card-divider"></div>
+
+
+            <div class="rfid-form-actions">
+
+                <a
+                    href="{% url 'attendance:rfid_card_list' %}"
+                    class="btn btn-muted"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn"
+                    {% if not selected_school or not users %}
+                        disabled
+                    {% endif %}
+                >
+                    <i class="fa-solid fa-id-card"></i>
+                    Register RFID Card
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const school = document.getElementById("school");
+    const fetchButton = document.getElementById("fetch-users");
+
+    if (!school || !fetchButton) {
+        return;
+    }
+
+    school.addEventListener("change", function () {
+        fetchButton.disabled = !this.value;
+    });
+
+    fetchButton.addEventListener("click", function () {
+
+        if (!school.value) {
+            return;
+        }
+
+        fetchButton.disabled = true;
+
+        fetchButton.innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin"></i> Fetching...';
+
+        const url = new URL(window.location.href);
+
+        url.searchParams.set(
+            "school",
+            school.value
+        );
+
+        window.location.href = url.toString();
+    });
+
+});
+</script>
+
+{% endblock %}

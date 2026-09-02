@@ -1,0 +1,471 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- ===================================================== -->
+<!-- Page Header                                           -->
+<!-- ===================================================== -->
+<div class="page-header rfid-page-header">
+
+    <div class="rfid-page-header-content">
+
+        <p class="eyebrow">
+            Attendance Management
+        </p>
+
+        <h1>
+            RFID Cards
+        </h1>
+
+        <p>
+            Manage RFID cards registered to students and staff.
+        </p>
+
+    </div>
+
+    <div class="page-actions">
+
+        <a
+            href="{% url 'attendance:rfid_export' %}"
+            class="btn btn-muted"
+        >
+            <i class="fa-solid fa-file-export"></i>
+            Export RFID
+        </a>
+
+        <a
+            href="{% url 'attendance:rfid_card_create' %}"
+            class="btn"
+        >
+            <i class="fa-solid fa-plus"></i>
+            Register RFID Card
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- RFID Card List                                        -->
+<!-- ===================================================== -->
+
+<div class="profile-card rfid-page-card">
+    <div class="rfid-table-wrapper">
+        <table class="rfid-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>School</th>
+                    <th>RFID UID</th>
+                    <th>Status</th>
+                    <th>Registered</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+
+            <tbody>
+
+                {% for card in page_obj %}
+
+                <tr>
+
+                    <!-- ========================================= -->
+                    <!-- User                                      -->
+                    <!-- ========================================= -->
+
+                    <td>
+
+                        <strong>
+                            {{ card.user }}
+                        </strong>
+
+
+                        {% if card.user.email %}
+
+                            <div class="meta">
+
+                                <small>
+                                    {{ card.user.email }}
+                                </small>
+
+                            </div>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- ========================================= -->
+                    <!-- Role                                      -->
+                    <!-- ========================================= -->
+
+                    <td>
+
+                        {{ card.user.get_role_display }}
+
+                    </td>
+
+
+                    <!-- ========================================= -->
+                    <!-- School                                    -->
+                    <!-- ========================================= -->
+
+                    <td>
+
+                        {{ card.school }}
+
+                    </td>
+
+
+                    <!-- ========================================= -->
+                    <!-- RFID UID                                  -->
+                    <!-- ========================================= -->
+
+                    <td>
+                        <span
+                            class="status-badge"
+                            style="
+                                display:inline-flex;
+                                align-items:center;
+                                gap:6px;
+                                padding:5px 9px;
+                                border-radius:7px;
+                                background:#FBEC5D;
+                                color:#111827;
+                                font-size:12px;
+                                font-weight:600;
+                            "
+                        >{{ card.uid }}
+                        </span>
+                    </td>
+
+
+                    <!-- ========================================= -->
+                    <!-- Status                                    -->
+                    <!-- ========================================= -->
+
+                    <td>
+
+                        {% if card.is_active %}
+                            <span
+                                class="status-badge"
+                                style="
+                                    display:inline-flex;
+                                    align-items:center;
+                                    gap:6px;
+                                    padding:5px 9px;
+                                    border-radius:7px;
+                                    background:#d1e7dd;
+                                    color:#0f5132;
+                                    font-size:12px;
+                                    font-weight:600;
+                                "
+                            >Active
+                            </span>
+
+                        {% else %}
+                            <span
+                                class="status-badge"
+                                style="
+                                    display:inline-flex;
+                                    align-items:center;
+                                    gap:6px;
+                                    padding:5px 9px;
+                                    border-radius:7px;
+                                    background:#f8d7da;
+                                    color:#842029;
+                                    font-size:12px;
+                                    font-weight:600;
+                                "
+                            >Inactive
+                            </span>
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- ========================================= -->
+                    <!-- Registered                                -->
+                    <!-- ========================================= -->
+
+                    <td>
+
+                        {{ card.created_at|date:"M d, Y" }}
+
+                    </td>
+
+
+                    <!-- ========================================= -->
+                    <!-- Actions                                   -->
+                    <!-- ========================================= -->
+
+                    <td>
+
+                        <div
+                            class="row-actions"
+                            style="
+                                display:flex;
+                                align-items:center;
+                                gap:6px;
+                                flex-wrap:wrap;
+                            "
+                        >
+
+                            <!-- ========================================= -->
+                            <!-- Copy RFID UID                             -->
+                            <!-- ========================================= -->
+
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-muted"
+                                onclick="copyRFID('{{ card.uid|escapejs }}', this)"
+                                title="Copy RFID UID"
+                            >
+
+                                <i class="fa-regular fa-copy"></i>
+
+                                Copy
+
+                            </button>
+
+
+                            <!-- ========================================= -->
+                            <!-- Update                                    -->
+                            <!-- ========================================= -->
+
+                            <a
+                                href="{% url 'attendance:rfid_card_update' card.pk %}"
+                                class="btn btn-sm"
+                            >
+
+                                <i class="fa-solid fa-pen"></i>
+
+                                Update
+
+                            </a>
+
+
+                            <!-- ========================================= -->
+                            <!-- Activate / Deactivate                     -->
+                            <!-- ========================================= -->
+
+                            <form
+                                method="post"
+                                action="{% url 'attendance:rfid_card_toggle' card.pk %}"
+                                style="display:inline;"
+                            >
+
+                                {% csrf_token %}
+
+
+                                {% if card.is_active %}
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-sm btn-muted"
+                                    >
+
+                                        <i class="fa-solid fa-ban"></i>
+
+                                        Disable
+
+                                    </button>
+
+                                {% else %}
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-sm"
+                                    >
+
+                                        <i class="fa-solid fa-check"></i>
+
+                                        Activate
+
+                                    </button>
+
+                                {% endif %}
+
+                            </form>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="7">
+
+                        No RFID cards registered.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+</div>
+<!-- ================================================= -->
+<!-- Pagination                                         -->
+<!-- ================================================= -->
+
+{% if page_obj.has_other_pages %}
+    <div class="rfid-pagination-card">
+
+        <div class="rfid-pagination">
+
+            <div class="rfid-pagination-info">
+                Showing
+                <strong>{{ page_obj.start_index }}</strong>
+                –
+                <strong>{{ page_obj.end_index }}</strong>
+                of
+                <strong>{{ page_obj.paginator.count }}</strong>
+            </div>
+
+            <div class="rfid-pagination-actions">
+
+                {% if page_obj.has_previous %}
+                    <a
+                        href="?page=1"
+                        class="pagination-btn pagination-nav"
+                    >
+                        <i class="fa-solid fa-angles-left"></i>
+                    </a>
+
+                    <a
+                        href="?page={{ page_obj.previous_page_number }}"
+                        class="pagination-btn pagination-nav"
+                    >
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </a>
+                {% else %}
+                    <span class="pagination-btn pagination-nav disabled">
+                        <i class="fa-solid fa-angles-left"></i>
+                    </span>
+
+                    <span class="pagination-btn pagination-nav disabled">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </span>
+                {% endif %}
+
+
+                {% for page_number in page_obj.paginator.get_elided_page_range %}
+
+                    {% if page_number == page_obj.paginator.ELLIPSIS %}
+
+                        <span class="pagination-ellipsis">
+                            {{ page_number }}
+                        </span>
+
+                    {% elif page_number == page_obj.number %}
+
+                        <span class="pagination-btn active">
+                            {{ page_number }}
+                        </span>
+
+                    {% else %}
+
+                        <a
+                            href="?page={{ page_number }}"
+                            class="pagination-btn"
+                        >
+                            {{ page_number }}
+                        </a>
+
+                    {% endif %}
+
+                {% endfor %}
+
+
+                {% if page_obj.has_next %}
+
+                    <a
+                        href="?page={{ page_obj.next_page_number }}"
+                        class="pagination-btn pagination-nav"
+                    >
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+
+                    <a
+                        href="?page={{ page_obj.paginator.num_pages }}"
+                        class="pagination-btn pagination-nav"
+                    >
+                        <i class="fa-solid fa-angles-right"></i>
+                    </a>
+
+                {% else %}
+
+                    <span class="pagination-btn pagination-nav disabled">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </span>
+
+                    <span class="pagination-btn pagination-nav disabled">
+                        <i class="fa-solid fa-angles-right"></i>
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+{% endif %}
+
+
+<script>
+
+    function copyRFID(uid, button) {
+
+        navigator.clipboard.writeText(uid)
+            .then(function () {
+
+                const originalHTML =
+                    button.innerHTML;
+
+
+                button.innerHTML =
+                    '<i class="fa-solid fa-check"></i> Copied';
+
+
+                button.title =
+                    "RFID UID copied";
+
+
+                setTimeout(function () {
+
+                    button.innerHTML =
+                        originalHTML;
+
+                    button.title =
+                        "Copy RFID UID";
+
+                }, 1500);
+
+            })
+            .catch(function () {
+
+                alert(
+                    "Unable to copy RFID UID."
+                );
+
+            });
+
+    }
+
+</script>
+
+{% endblock %}

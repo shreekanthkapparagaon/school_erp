@@ -1,0 +1,927 @@
+{% extends "base.html" %}
+{% load static %}
+{% block page_heading %}
+View Attendance
+{% endblock %}
+
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="section-header">
+
+    <div>
+
+        <p class="eyebrow">
+            Attendance
+        </p>
+
+        <h2>
+            View Attendance
+        </h2>
+
+        <p>
+            View recorded attendance by class and date.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- Date Navigation                                       -->
+<!-- ===================================================== -->
+{% if not selected_class %}
+<div class="table-actions">
+
+    <a
+        href="{% url 'attendance:home' %}"
+        class="btn btn-muted"
+    >
+        <i class="fa-solid fa-arrow-left"></i>
+        Back
+    </a>
+
+
+    <form method="get">
+
+        <input
+            type="date"
+            name="date"
+            value="{{ selected_date|date:'Y-m-d' }}"
+            required
+        >
+
+        <button
+            type="submit"
+            class="btn"
+        >
+            <i class="fa-solid fa-magnifying-glass"></i>
+            View Classes
+        </button>
+
+    </form>
+
+</div>
+{% endif %}
+
+{% if not selected_class %}
+
+
+<!-- ===================================================== -->
+<!-- Classes With Attendance                               -->
+<!-- ===================================================== -->
+
+<div class="section-header">
+
+    <div>
+
+        <p class="eyebrow">
+            Recorded Attendance
+        </p>
+
+        <h2>
+            Classes
+        </h2>
+
+        <p>
+            Classes with attendance recorded for
+            {{ selected_date|date:"M d, Y" }}.
+        </p>
+
+    </div>
+
+</div>
+
+
+{% if classes %}
+
+    <div class="stat-grid">
+
+        {% for school_class in classes %}
+
+            <a
+                href="{% url 'attendance:view' %}?class_id={{ school_class.id }}&date={{ selected_date|date:'Y-m-d' }}"
+                class="stat-card success"
+            >
+
+                <i class="fa-solid fa-users module-icon"></i>
+
+                <span>
+
+                    {{ school_class.name }}
+
+                    {% if school_class.section %}
+                        - {{ school_class.section }}
+                    {% endif %}
+
+                </span>
+
+                <small>
+                    View attendance
+                </small>
+
+            </a>
+
+        {% endfor %}
+
+    </div>
+
+
+{% else %}
+
+    <div class="table-actions">
+
+        <span>
+
+            <i class="fa-solid fa-circle-info"></i>
+
+            No attendance has been recorded for any class
+            on {{ selected_date|date:"M d, Y" }}.
+
+        </span>
+
+    </div>
+
+{% endif %}
+
+
+{% else %}
+
+
+<!-- ===================================================== -->
+<!-- Selected Class                                        -->
+<!-- ===================================================== -->
+
+<div class="section-header">
+
+    <div>
+
+        <p class="eyebrow">
+            Attendance Records
+        </p>
+
+        <h2>
+
+            {{ selected_class.name }}
+
+            {% if selected_class.section %}
+                - {{ selected_class.section }}
+            {% endif %}
+
+        </h2>
+
+        <p>
+            Attendance for {{ selected_date|date:"M d, Y" }}.
+        </p>
+
+    </div>
+
+
+    <div>
+
+        <a
+            href="{% url 'attendance:view' %}?date={{ selected_date|date:'Y-m-d' }}"
+            class="btn btn-muted"
+        >
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Classes
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- Statistics                                            -->
+<!-- ===================================================== -->
+
+<div class="profile-card">
+
+    <!-- ================================================= -->
+    <!-- Header                                            -->
+    <!-- ================================================= -->
+
+    <div class="profile-card-header">
+
+        <div class="profile-card-heading">
+
+            <span class="profile-card-icon">
+                <i class="fa-solid fa-calendar-check"></i>
+            </span>
+
+            <div>
+
+                <p class="profile-card-eyebrow">
+                    Attendance Performance
+                </p>
+
+                <h3 class="profile-card-title">
+
+                    {{ selected_class.name }}
+
+                    {% if selected_class.section %}
+                        - {{ selected_class.section }}
+                    {% endif %}
+
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- Overview                                          -->
+    <!-- ================================================= -->
+
+    <div class="result-overview">
+
+        <!-- Attendance Percentage -->
+
+        <div class="result-score">
+
+            <div class="score-circle">
+
+                <strong>
+                    {{ attendance_percentage }}%
+                </strong>
+
+                <span>
+                    Attendance
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- Summary -->
+
+        <div class="result-summary">
+
+            <!-- Present -->
+
+            <div class="summary-item">
+
+                <span>
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                    Present
+
+                </span>
+
+                <strong>
+                    {{ summary.present }}
+                </strong>
+
+            </div>
+
+
+            <!-- Absent -->
+
+            <div class="summary-item">
+
+                <span>
+
+                    <i class="fa-solid fa-circle-xmark"></i>
+
+                    Absent
+
+                </span>
+
+                <strong>
+                    {{ summary.absent }}
+                </strong>
+
+            </div>
+
+
+            <!-- Late -->
+
+            <div class="summary-item">
+
+                <span>
+
+                    <i class="fa-solid fa-clock"></i>
+
+                    Late
+
+                </span>
+
+                <strong>
+                    {{ summary.late }}
+                </strong>
+
+            </div>
+
+
+            <!-- Leave -->
+
+            <div class="summary-item">
+
+                <span>
+
+                    <i class="fa-solid fa-person-walking-arrow-right"></i>
+
+                    Leave
+
+                </span>
+
+                <strong>
+                    {{ summary.leave }}
+                </strong>
+
+            </div>
+
+
+            <!-- Not Marked -->
+
+            <div class="summary-item">
+
+                <span>
+
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                    Not Marked
+
+                </span>
+
+                <strong>
+                    {{ summary.not_marked }}
+                </strong>
+
+            </div>
+
+
+            <!-- Date -->
+
+            <div class="summary-item">
+
+                <span>
+
+                    <i class="fa-solid fa-calendar-days"></i>
+
+                    Date
+
+                </span>
+
+                <strong>
+                    {{ selected_date|date:"M d, Y" }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="profile-card-divider"></div>
+
+
+    <!-- ================================================= -->
+    <!-- Attendance Status                                 -->
+    <!-- ================================================= -->
+
+    <div class="result-history">
+
+        <div class="section-header">
+
+            <h4>
+                Attendance Overview
+            </h4>
+
+            <span>
+                {{ students|length }} Students
+            </span>
+
+        </div>
+
+
+        <div class="result-item">
+
+            <div class="result-item-left">
+
+                <div class="result-icon">
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                </div>
+
+                <div>
+
+                    <strong>
+                        Present
+                    </strong>
+
+                    <small>
+                        Students present today
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="result-item-center">
+
+                <div class="result-score-mini">
+                    {{ summary.present }}
+                </div>
+
+            </div>
+
+
+            <div class="result-item-right">
+
+                <span class="status-paid">
+                    Present
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="result-item">
+
+            <div class="result-item-left">
+
+                <div class="result-icon">
+
+                    <i class="fa-solid fa-circle-xmark"></i>
+
+                </div>
+
+                <div>
+
+                    <strong>
+                        Absent
+                    </strong>
+
+                    <small>
+                        Students absent today
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="result-item-center">
+
+                <div class="result-score-mini">
+                    {{ summary.absent }}
+                </div>
+
+            </div>
+
+
+            <div class="result-item-right">
+
+                <span class="status-pending">
+                    Absent
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="result-item">
+
+            <div class="result-item-left">
+
+                <div class="result-icon">
+
+                    <i class="fa-solid fa-clock"></i>
+
+                </div>
+
+                <div>
+
+                    <strong>
+                        Late
+                    </strong>
+
+                    <small>
+                        Students arriving late
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="result-item-center">
+
+                <div class="result-score-mini">
+                    {{ summary.late }}
+                </div>
+
+            </div>
+
+
+            <div class="result-item-right">
+
+                <span class="status-pending">
+                    Late
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="result-item">
+
+            <div class="result-item-left">
+
+                <div class="result-icon">
+
+                    <i class="fa-solid fa-person-walking-arrow-right"></i>
+
+                </div>
+
+                <div>
+
+                    <strong>
+                        Leave
+                    </strong>
+
+                    <small>
+                        Students on leave
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="result-item-center">
+
+                <div class="result-score-mini">
+                    {{ summary.leave }}
+                </div>
+
+            </div>
+
+
+            <div class="result-item-right">
+
+                <span class="status-paid">
+                    Leave
+                </span>
+
+            </div>
+
+        </div>
+
+
+        {% if summary.not_marked %}
+
+        <div class="result-item">
+
+            <div class="result-item-left">
+
+                <div class="result-icon">
+
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                </div>
+
+                <div>
+
+                    <strong>
+                        Not Marked
+                    </strong>
+
+                    <small>
+                        Students requiring attention
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="result-item-center">
+
+                <div class="result-score-mini">
+                    {{ summary.not_marked }}
+                </div>
+
+            </div>
+
+
+            <div class="result-item-right">
+
+                <span class="status-pending">
+                    Attention
+                </span>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- Student Search                                        -->
+<!-- ===================================================== -->
+
+<div class="table-actions">
+
+    <input
+        type="text"
+        id="student-search"
+        placeholder="Search students..."
+    >
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- Student Table                                         -->
+<!-- ===================================================== -->
+
+<table>
+
+    <thead>
+
+        <tr>
+
+            <th>
+                Student
+            </th>
+
+            <th>
+                Email
+            </th>
+
+            <th>
+                Status
+            </th>
+
+            <th>
+                Recorded By
+            </th>
+
+        </tr>
+
+    </thead>
+
+
+    <tbody>
+
+        {% for student in students %}
+
+        <tr>
+
+            <td>
+                {{ student }}
+            </td>
+
+
+            <td>
+                {{ student.email }}
+            </td>
+
+
+            <td>
+
+                {% if student.attendance %}
+
+                    {% if student.attendance.status == 1 %}
+
+                        <span
+                            class="status-badge"
+                            style="
+                                background:#d1e7dd;
+                                color:#0f5132;
+                            "
+                        >
+                            <i class="bi bi-check-circle-fill"></i>
+                            Present
+                        </span>
+
+                    {% elif student.attendance.status == 2 %}
+
+                        <span
+                            class="status-badge"
+                            style="
+                                background:#f8d7da;
+                                color:#842029;
+                            "
+                        >
+                            <i class="bi bi-x-circle-fill"></i>
+                            Absent
+                        </span>
+
+                    {% elif student.attendance.status == 3 %}
+
+                        <span
+                            class="status-badge"
+                            style="
+                                background:#fff3cd;
+                                color:#664d03;
+                            "
+                        >
+                            <i class="bi bi-clock-fill"></i>
+                            Late
+                        </span>
+
+                    {% elif student.attendance.status == 4 %}
+
+                        <span
+                            class="status-badge"
+                            style="
+                                background:#cff4fc;
+                                color:#055160;
+                            "
+                        >
+                            <i class="bi bi-calendar-minus-fill"></i>
+                            Leave
+                        </span>
+
+                    {% endif %}
+
+                {% else %}
+
+                    <span
+                        class="status-badge"
+                        style="
+                            background:#fff3cd;
+                            color:#664d03;
+                        "
+                    >
+                        <i class="bi bi-exclamation-circle-fill"></i>
+                        Not Marked
+                    </span>
+
+                {% endif %}
+
+            </td>
+
+
+            <td>
+
+                {% if student.attendance %}
+
+                    {% if student.attendance.created_by %}
+
+                        {{ student.attendance.created_by }}
+
+                    {% else %}
+
+                        <span
+                            class="status-badge"
+                            style="
+                                background:#cff4fc;
+                                color:#055160;
+                            "
+                        >
+                            <i class="bi bi-person-badge"></i>
+                            RFID Device
+                        </span>
+
+                    {% endif %}
+
+                {% else %}
+
+                    -
+
+                {% endif %}
+
+            </td>
+
+        </tr>
+
+
+        {% empty %}
+
+        <tr>
+
+            <td colspan="4">
+                No records found.
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+{% if page_obj.paginator.num_pages > 1 %}
+    <div class="pagination">
+
+        {% if page_obj.has_previous %}
+
+            <a
+                class="btn btn-sm"
+                href="?class_id={{ selected_class.id }}&date={{ selected_date|date:'Y-m-d' }}&page=1"
+            >
+                First
+            </a>
+
+            <a
+                class="btn btn-sm"
+                href="?class_id={{ selected_class.id }}&date={{ selected_date|date:'Y-m-d' }}&page={{ page_obj.previous_page_number }}"
+            >
+                Previous
+            </a>
+
+        {% endif %}
+
+
+        <span>
+            Page
+            {{ page_obj.number }}
+            of
+            {{ page_obj.paginator.num_pages }}
+        </span>
+
+
+        {% if page_obj.has_next %}
+
+            <a
+                class="btn btn-sm"
+                href="?class_id={{ selected_class.id }}&date={{ selected_date|date:'Y-m-d' }}&page={{ page_obj.next_page_number }}"
+            >
+                Next
+            </a>
+
+            <a
+                class="btn btn-sm"
+                href="?class_id={{ selected_class.id }}&date={{ selected_date|date:'Y-m-d' }}&page={{ page_obj.paginator.num_pages }}"
+            >
+                Last
+            </a>
+
+        {% endif %}
+
+    </div>
+{% endif %}
+
+<script>
+
+const searchInput =
+    document.getElementById("student-search");
+
+const tableBody =
+    document.getElementById("student-table-body");
+
+
+if (searchInput && tableBody) {
+
+    searchInput.addEventListener(
+        "input",
+        function () {
+
+            const search =
+                this.value
+                    .toLowerCase()
+                    .trim();
+
+            const rows =
+                tableBody.querySelectorAll("tr");
+
+
+            rows.forEach(function (row) {
+
+                const text =
+                    row.textContent
+                        .toLowerCase();
+
+                row.style.display =
+                    text.includes(search)
+                        ? ""
+                        : "none";
+
+            });
+
+        }
+    );
+
+}
+
+</script>
+
+{% endif %}
+
+{% endblock %}
