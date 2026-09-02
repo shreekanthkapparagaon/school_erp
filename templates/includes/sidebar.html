@@ -1,7 +1,28 @@
+{% load static %}
+<style>
+  .brand-mark {
+      width: 42px;
+      height: 42px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      overflow: hidden;
+  }
+
+  .brand-mark img {
+      width: 100%;
+      height: 100%;
+
+      object-fit: contain;
+  }
+</style>
+
 <aside class="sidebar">
   <a href="{% url 'core:home' %}" class="brand">
     <div class="brand-mark">
-      <i class="fa-solid fa-graduation-cap"></i>
+        <img src="{% static 'images/logo.png' %}" alt="School ERP">
     </div>
 
     <div class="brand-text">
@@ -12,333 +33,758 @@
   </a>
 
   <nav class="side-nav">
+
+    <!-- ===================================================== -->
+    <!-- MAIN                                                  -->
+    <!-- ===================================================== -->
+
     <div class="nav-group">
-      <div class="nav-title">MAIN</div>
+
+      <div class="nav-title">
+        MAIN
+      </div>
 
       <a href="{% url 'core:home' %}">
         <i class="fa-solid fa-house"></i>
 
-        <span>Home</span>
+        <span>
+          Home
+        </span>
       </a>
 
       {% if user.is_authenticated and user.role != "not_given" %}
 
-      <a href="{% url 'accounts:role_redirect' %}">
-        <i class="fa-solid fa-table-columns"></i>
+        <a href="{% url 'accounts:role_redirect' %}">
+          <i class="fa-solid fa-table-columns"></i>
 
-        <span>Dashboard</span>
-      </a>
+          <span>
+            Dashboard
+          </span>
+        </a>
 
-      <a href="{% url 'accounts:profile' %}">
-        <i class="fa-solid fa-user"></i>
+        <a href="{% url 'accounts:profile' %}">
+          <i class="fa-solid fa-user"></i>
 
-        <span>My Profile</span>
-      </a>
+          <span>
+            My Profile
+          </span>
+        </a>
 
       {% endif %}
+
     </div>
+
+
+    <!-- ===================================================== -->
+    <!-- MANAGER                                               -->
+    <!-- ===================================================== -->
 
     {% if user.is_authenticated and user.role == "manager" %}
 
-    <div class="nav-group">
-      <div class="nav-title">MANAGEMENT</div>
+      <div class="nav-group">
 
-      <a href="{% url 'schools:school_list' %}">
-        <i class="fa-solid fa-school"></i>
+        <!-- ================================================= -->
+        <!-- MANAGEMENT                                        -->
+        <!-- ================================================= -->
 
-        <span>Schools</span>
-      </a>
+        <div class="nav-title">
+          MANAGEMENT
+        </div>
 
-      <a href="{% url 'accounts:user_list' 'principal' %}">
-        <i class="fa-solid fa-user-tie"></i>
 
-        <span>Principals</span>
-      </a>
+        <!-- Schools -->
 
-      <a href="{% url 'plans:service_management' %}">
-        <i class="fa-solid fa-layer-group"></i>
+        <a href="{% url 'schools:school_list' %}">
+          <i class="fa-solid fa-school"></i>
+          <span>Schools</span>
+        </a>
 
-        <span>Services</span>
-      </a>
 
-      <a href="{% url 'plans:plan_list' %}">
-        <i class="fa-solid fa-cubes"></i>
+        <!-- Principals -->
 
-        <span>Plans</span>
-      </a>
+        <a href="{% url 'accounts:user_list' 'principal' %}">
+          <i class="fa-solid fa-user-tie"></i>
+          <span>Principals</span>
+        </a>
 
-      <a href="{% url 'plans:subscription_create' %}">
-        <i class="fa-solid fa-credit-card"></i>
 
-        <span>Subscriptions</span>
-      </a>
+        <!-- Services -->
 
-      <a href="{% url 'document:document_list' %}">
-        <i class="fa-solid fa-folder-open"></i>
+        <a href="{% url 'plans:service_management' %}">
+          <i class="fa-solid fa-layer-group"></i>
+          <span>Services</span>
+        </a>
 
-        <span>Documents</span>
-      </a>
 
-      <a href="{% url 'core:contact_requests' %}">
-        <i class="fa-solid fa-envelope-open-text"></i>
+        <!-- Plans -->
 
-        <span>Contact Requests</span>
-      </a>
-    </div>
+        <a href="{% url 'plans:plan_list' %}">
+          <i class="fa-solid fa-cubes"></i>
+          <span>Plans</span>
+        </a>
 
-    {% endif %} {% if user.is_authenticated and user.role == "principal" %}
 
-    <div class="nav-group">
-      <div class="nav-title">ACADEMICS</div>
+        <!-- Subscriptions -->
 
-      {% if perms.plans.feature_student_management %}
+        <a href="{% url 'plans:subscription_create' %}">
+          <i class="fa-solid fa-credit-card"></i>
+          <span>Subscriptions</span>
+        </a>
 
-      <a href="{% url 'accounts:user_list' 'student' %}">
-        <i class="fa-solid fa-user-graduate"></i>
 
-        <span>Students</span>
-      </a>
+        <!-- Documents -->
 
-      <a href="{% url 'accounts:user_list' 'head' %}">
-        <i class="fa-solid fa-user-shield"></i>
+        <a href="{% url 'document:document_list' %}">
+          <i class="fa-solid fa-folder-open"></i>
+          <span>Documents</span>
+        </a>
 
-        <span>Heads</span>
-      </a>
 
-      <a href="{% url 'accounts:user_list' 'teacher' %}">
-        <i class="fa-solid fa-chalkboard-user"></i>
+        <!-- Contact Requests -->
 
-        <span>Teachers</span>
-      </a>
+        <a href="{% url 'core:contact_requests' %}">
+          <i class="fa-solid fa-envelope-open-text"></i>
+          <span>Contact Requests</span>
+        </a>
 
-      <a href="{% url 'schools:subject_list' %}">
-        <i class="fa-solid fa-book"></i>
 
-        <span>Subjects</span>
-      </a>
+        <!-- ================================================= -->
+        <!-- ATTENDANCE                                        -->
+        <!-- ================================================= -->
 
-      <a href="{% url 'schools:class_list' %}">
-        <i class="fa-solid fa-people-group"></i>
+        <div class="nav-title">
+          ATTENDANCE
+        </div>
 
-        <span>Classes</span>
-      </a>
 
-      <a href="{% url 'schools:promote_class' %}">
-        <i class="fa-solid fa-arrow-up-right-dots"></i>
+        <!-- RFID Cards -->
 
-        <span>Promotions</span>
-      </a>
+        <a href="{% url 'attendance:rfid_card_list' %}">
+          <i class="fa-solid fa-id-card"></i>
+          <span>RFID Cards</span>
+        </a>
 
-      <a href="{% url 'schools:assignment_list' %}">
-        <i class="fa-solid fa-clipboard-list"></i>
 
-        <span>Assignments</span>
-      </a>
+        <!-- Register RFID -->
 
-      {% endif %} {% if perms.plans.feature_fees %}
+        <a href="{% url 'attendance:rfid_card_create' %}">
+          <i class="fa-solid fa-id-card-clip"></i>
+          <span>Register RFID</span>
+        </a>
 
-      <div class="nav-title">FINANCE</div>
 
-      <a href="{% url 'fees:fee_list' %}">
-        <i class="fa-solid fa-money-bill-wave"></i>
+        <!-- Attendance API Keys -->
 
-        <span>Student Fees</span>
-      </a>
+        <a href="{% url 'attendance:api_key_list' %}">
+          <i class="fa-solid fa-key"></i>
+          <span>API Keys</span>
+        </a>
 
-      {% endif %} {% if perms.plans.feature_teacher_management %}
-
-      <a href="{% url 'fees:salary_list' %}">
-        <i class="fa-solid fa-wallet"></i>
-
-        <span>Teacher Salaries</span>
-      </a>
-
-      {% endif %} {% if perms.plans.feature_results %}
-
-      <div class="nav-title">EXAMINATION</div>
-
-      <a href="{% url 'results:home' %}">
-        <i class="fa-solid fa-square-poll-vertical"></i>
-
-        <span>Results</span>
-      </a>
-
-      {% endif %} {% if perms.plans.feature_documents %}
-
-      <div class="nav-title">RESOURCES</div>
-
-      <a href="{% url 'document:document_list' %}">
-        <i class="fa-solid fa-folder-open"></i>
-
-        <span>Documents</span>
-      </a>
-
-      {% endif %}
-    </div>
-
-    {% endif %} {% if user.is_authenticated and user.role == "head" %}
-
-    <div class="nav-group">
-      <div class="nav-title">ACADEMICS</div>
-
-      {% if perms.plans.feature_student_management %}
-
-      <a href="{% url 'accounts:user_list' 'student' %}">
-        <i class="fa-solid fa-user-graduate"></i>
-
-        <span>Students</span>
-      </a>
-
-      <a href="{% url 'accounts:user_list' 'teacher' %}">
-        <i class="fa-solid fa-chalkboard-user"></i>
-
-        <span>Teachers</span>
-      </a>
-
-      <a href="{% url 'schools:subject_list' %}">
-        <i class="fa-solid fa-book-open"></i>
-
-        <span>Subjects</span>
-      </a>
-
-      <a href="{% url 'schools:class_list' %}">
-        <i class="fa-solid fa-school"></i>
-
-        <span>Classes</span>
-      </a>
-
-      <a href="{% url 'schools:promote_class' %}">
-        <i class="fa-solid fa-arrow-up-right-dots"></i>
-
-        <span>Promote Classes</span>
-      </a>
-
-      <a href="{% url 'schools:assignment_list' %}">
-        <i class="fa-solid fa-list-check"></i>
-
-        <span>Assignments</span>
-      </a>
-
-      {% endif %} {% if perms.plans.feature_fees %}
-
-      <div class="nav-title">FINANCE</div>
-
-      <a href="{% url 'fees:fee_list' %}">
-        <i class="fa-solid fa-money-bill-wave"></i>
-
-        <span>Student Fees</span>
-      </a>
-
-      {% endif %} {% if perms.plans.feature_results %}
-
-      <div class="nav-title">EXAMINATION</div>
-
-      <a href="{% url 'results:home' %}">
-        <i class="fa-solid fa-chart-column"></i>
-
-        <span>Results</span>
-      </a>
-
-      {% endif %} {% if perms.plans.feature_documents %}
-
-      <div class="nav-title">RESOURCES</div>
-
-      <a href="{% url 'document:document_list' %}">
-        <i class="fa-solid fa-folder-open"></i>
-
-        <span>Documents</span>
-      </a>
-
-      {% endif %}
-    </div>
-
-    {% endif %} {% if user.is_authenticated and user.role == "teacher" %}
-
-    <div class="nav-group">
-      <div class="nav-title">TEACHING</div>
-
-      {% if perms.plans.feature_student_management %}
-
-      <a href="{% url 'schools:class_list' %}">
-        <i class="fa-solid fa-school"></i>
-
-        <span>Classes</span>
-      </a>
-
-      {% endif %} {% if perms.plans.feature_results %}
-
-      <a href="{% url 'results:home' %}">
-        <i class="fa-solid fa-chart-column"></i>
-
-        <span>Results</span>
-      </a>
-
-      {% endif %} {% if perms.plans.feature_documents %}
-
-      <a href="{% url 'document:document_list' %}">
-        <i class="fa-solid fa-folder-open"></i>
-
-        <span>Documents</span>
-      </a>
-
-      {% endif %}
-    </div>
-
-    {% endif %} {% if user.is_authenticated and user.role == "student" %}
-
-    <div class="nav-group">
-      <div class="nav-title">MY ACCOUNT</div>
-
-      {% if perms.plans.feature_fees %}
-
-      <a href="{% url 'fees:fee_list' %}">
-        <i class="fa-solid fa-wallet"></i>
-
-        <span>My Fees</span>
-      </a>
-
-      {% endif %} {% if perms.plans.feature_results %}
-
-      <a href="{% url 'results:home' %}">
-        <i class="fa-solid fa-square-poll-vertical"></i>
-
-        <span>My Results</span>
-      </a>
-
-      {% endif %} {% if perms.plans.feature_documents %}
-
-      <a href="{% url 'document:document_list' %}">
-        <i class="fa-solid fa-folder-open"></i>
-
-        <span>Documents</span>
-      </a>
-
-      {% endif %}
-    </div>
+      </div>
 
     {% endif %}
 
+
+    <!-- ===================================================== -->
+    <!-- PRINCIPAL                                             -->
+    <!-- ===================================================== -->
+
+    {% if user.is_authenticated and user.role == "principal" %}
+
+      <div class="nav-group">
+
+        <!-- Academics -->
+
+        <div class="nav-title">
+          ACADEMICS
+        </div>
+
+        {% if perms.plans.feature_student_management %}
+
+          <a href="{% url 'accounts:user_list' 'student' %}">
+            <i class="fa-solid fa-user-graduate"></i>
+
+            <span>
+              Students
+            </span>
+          </a>
+
+          <a href="{% url 'accounts:user_list' 'head' %}">
+            <i class="fa-solid fa-user-shield"></i>
+
+            <span>
+              Heads
+            </span>
+          </a>
+
+          <a href="{% url 'accounts:user_list' 'teacher' %}">
+            <i class="fa-solid fa-chalkboard-user"></i>
+
+            <span>
+              Teachers
+            </span>
+          </a>
+
+          <a href="{% url 'schools:subject_list' %}">
+            <i class="fa-solid fa-book"></i>
+
+            <span>
+              Subjects
+            </span>
+          </a>
+
+          <a href="{% url 'schools:class_list' %}">
+            <i class="fa-solid fa-people-group"></i>
+
+            <span>
+              Classes
+            </span>
+          </a>
+
+          <a href="{% url 'schools:assignment_list' %}">
+            <i class="fa-solid fa-clipboard-list"></i>
+
+            <span>
+              Assignments
+            </span>
+          </a>
+
+        {% endif %}
+
+
+        <!-- Attendance -->
+
+        {% if perms.plans.feature_attendance %}
+
+          <div class="nav-title">
+            ATTENDANCE
+          </div>
+
+          <!-- Student Attendance -->
+
+          <a href="{% url 'attendance:home' %}">
+            <i class="fa-solid fa-calendar-check"></i>
+
+            <span>
+              Attendance
+            </span>
+          </a>
+
+          <a href="{% url 'attendance:mark_select' %}">
+            <i class="fa-solid fa-user-check"></i>
+
+            <span>
+              Mark Student Attendance
+            </span>
+          </a>
+
+          <a href="{% url 'attendance:view' %}">
+            <i class="fa-solid fa-calendar-days"></i>
+
+            <span>
+              View Student Attendance
+            </span>
+          </a>
+
+
+          <!-- Staff Attendance -->
+
+          <div class="nav-title">
+            STAFF ATTENDANCE
+          </div>
+
+          <a href="{% url 'attendance:staff_home' %}">
+            <i class="fa-solid fa-users"></i>
+
+            <span>
+              Staff Attendance
+            </span>
+          </a>
+
+          <a href="{% url 'attendance:staff_mark' %}">
+            <i class="fa-solid fa-user-check"></i>
+
+            <span>
+              Mark Staff Attendance
+            </span>
+          </a>
+
+          <a href="{% url 'attendance:staff_view' %}">
+            <i class="fa-solid fa-calendar-days"></i>
+
+            <span>
+              View Staff Attendance
+            </span>
+          </a>
+
+        {% endif %}
+
+
+        <!-- Finance -->
+
+        {% if perms.plans.feature_fees %}
+
+          <div class="nav-title">
+            FINANCE
+          </div>
+
+          <a href="{% url 'fees:fee_list' %}">
+            <i class="fa-solid fa-money-bill-wave"></i>
+
+            <span>
+              Student Fees
+            </span>
+          </a>
+          {% if perms.plans.feature_teacher_management %}
+  
+            <a href="{% url 'fees:salary_list' %}">
+              <i class="fa-solid fa-wallet"></i>
+  
+              <span>
+                Teacher Salaries
+              </span>
+            </a>
+  
+          {% endif %}
+
+        {% endif %}
+
+
+
+
+        <!-- Examination -->
+
+        {% if perms.plans.feature_results %}
+
+          <div class="nav-title">
+            EXAMINATION
+          </div>
+
+          <a href="{% url 'results:home' %}">
+            <i class="fa-solid fa-square-poll-vertical"></i>
+
+            <span>
+              Results
+            </span>
+          </a>
+
+        {% endif %}
+
+
+        <!-- Resources -->
+
+        {% if perms.plans.feature_documents %}
+
+          <div class="nav-title">
+            RESOURCES
+          </div>
+
+          <a href="{% url 'document:document_list' %}">
+            <i class="fa-solid fa-folder-open"></i>
+
+            <span>
+              Documents
+            </span>
+          </a>
+
+        {% endif %}
+
+      </div>
+
+    {% endif %}
+
+
+    <!-- ===================================================== -->
+    <!-- HEAD                                                  -->
+    <!-- ===================================================== -->
+
+    {% if user.is_authenticated and user.role == "head" %}
+
+      <div class="nav-group">
+
+        <!-- Academics -->
+
+        <div class="nav-title">
+          ACADEMICS
+        </div>
+
+        {% if perms.plans.feature_student_management %}
+
+          <a href="{% url 'accounts:user_list' 'student' %}">
+            <i class="fa-solid fa-user-graduate"></i>
+
+            <span>
+              Students
+            </span>
+          </a>
+
+          <a href="{% url 'accounts:user_list' 'teacher' %}">
+            <i class="fa-solid fa-chalkboard-user"></i>
+
+            <span>
+              Teachers
+            </span>
+          </a>
+
+          <a href="{% url 'schools:subject_list' %}">
+            <i class="fa-solid fa-book-open"></i>
+
+            <span>
+              Subjects
+            </span>
+          </a>
+
+          <a href="{% url 'schools:class_list' %}">
+            <i class="fa-solid fa-school"></i>
+
+            <span>
+              Classes
+            </span>
+          </a>
+
+          <a href="{% url 'schools:assignment_list' %}">
+            <i class="fa-solid fa-list-check"></i>
+
+            <span>
+              Assignments
+            </span>
+          </a>
+
+        {% endif %}
+
+
+        <!-- Attendance -->
+
+        {% if perms.plans.feature_attendance %}
+
+          <div class="nav-title">
+            ATTENDANCE
+          </div>
+
+          <!-- Student Attendance -->
+
+          <a href="{% url 'attendance:home' %}">
+            <i class="fa-solid fa-calendar-check"></i>
+
+            <span>
+              Attendance
+            </span>
+          </a>
+
+          <a href="{% url 'attendance:mark_select' %}">
+            <i class="fa-solid fa-user-check"></i>
+
+            <span>
+              Mark Student Attendance
+            </span>
+          </a>
+
+          <a href="{% url 'attendance:view' %}">
+            <i class="fa-solid fa-calendar-days"></i>
+
+            <span>
+              View Student Attendance
+            </span>
+          </a>
+
+
+          <!-- Staff Attendance -->
+
+          <div class="nav-title">
+            STAFF ATTENDANCE
+          </div>
+
+          <a href="{% url 'attendance:staff_home' %}">
+            <i class="fa-solid fa-users"></i>
+
+            <span>
+              Staff Attendance
+            </span>
+          </a>
+
+          <a href="{% url 'attendance:staff_mark' %}">
+            <i class="fa-solid fa-user-check"></i>
+
+            <span>
+              Mark Staff Attendance
+            </span>
+          </a>
+
+          <a href="{% url 'attendance:staff_view' %}">
+            <i class="fa-solid fa-calendar-days"></i>
+
+            <span>
+              View Staff Attendance
+            </span>
+          </a>
+
+        {% endif %}
+
+
+        <!-- Finance -->
+
+        {% if perms.plans.feature_fees %}
+
+          <div class="nav-title">
+            FINANCE
+          </div>
+
+          <a href="{% url 'fees:fee_list' %}">
+            <i class="fa-solid fa-money-bill-wave"></i>
+
+            <span>
+              Student Fees
+            </span>
+          </a>
+
+        {% endif %}
+
+
+        <!-- Examination -->
+
+        {% if perms.plans.feature_results %}
+
+          <div class="nav-title">
+            EXAMINATION
+          </div>
+
+          <a href="{% url 'results:home' %}">
+            <i class="fa-solid fa-chart-column"></i>
+
+            <span>
+              Results
+            </span>
+          </a>
+
+        {% endif %}
+
+
+        <!-- Resources -->
+
+        {% if perms.plans.feature_documents %}
+
+          <div class="nav-title">
+            RESOURCES
+          </div>
+
+          <a href="{% url 'document:document_list' %}">
+            <i class="fa-solid fa-folder-open"></i>
+
+            <span>
+              Documents
+            </span>
+          </a>
+
+        {% endif %}
+
+      </div>
+
+    {% endif %}
+
+
+    <!-- ===================================================== -->
+    <!-- TEACHER                                               -->
+    <!-- ===================================================== -->
+
+    {% if user.is_authenticated and user.role == "teacher" %}
+
+      <div class="nav-group">
+
+        <div class="nav-title">
+          TEACHING
+        </div>
+
+        {% if perms.plans.feature_student_management %}
+
+          <a href="{% url 'schools:class_list' %}">
+            <i class="fa-solid fa-school"></i>
+
+            <span>
+              Classes
+            </span>
+          </a>
+
+        {% endif %}
+
+
+        <!-- Attendance -->
+
+        {% if perms.plans.feature_attendance %}
+
+          <div class="nav-title">
+            ATTENDANCE
+          </div>
+
+          <a href="{% url 'attendance:home' %}">
+            <i class="fa-solid fa-calendar-check"></i>
+
+            <span>
+              Attendance
+            </span>
+          </a>
+
+          <a href="{% url 'attendance:mark_select' %}">
+            <i class="fa-solid fa-user-check"></i>
+
+            <span>
+              Mark Student Attendance
+            </span>
+          </a>
+
+          <a href="{% url 'attendance:view' %}">
+            <i class="fa-solid fa-calendar-days"></i>
+
+            <span>
+              View Student Attendance
+            </span>
+          </a>
+
+        {% endif %}
+
+
+        {% if perms.plans.feature_results %}
+
+          <a href="{% url 'results:home' %}">
+            <i class="fa-solid fa-chart-column"></i>
+
+            <span>
+              Results
+            </span>
+          </a>
+
+        {% endif %}
+
+
+        {% if perms.plans.feature_documents %}
+
+          <a href="{% url 'document:document_list' %}">
+            <i class="fa-solid fa-folder-open"></i>
+
+            <span>
+              Documents
+            </span>
+          </a>
+
+        {% endif %}
+
+      </div>
+
+    {% endif %}
+
+
+    <!-- ===================================================== -->
+    <!-- STUDENT                                               -->
+    <!-- ===================================================== -->
+
+    {% if user.is_authenticated and user.role == "student" %}
+
+      <div class="nav-group">
+
+        <div class="nav-title">
+          MY ACCOUNT
+        </div>
+
+
+        <!-- Attendance -->
+
+        {% if perms.plans.feature_attendance %}
+
+          <a href="{% url 'attendance:student_view' %}">
+            <i class="fa-solid fa-calendar-check"></i>
+
+            <span>
+              My Attendance
+            </span>
+          </a>
+
+        {% endif %}
+
+
+        <!-- Fees -->
+
+        {% if perms.plans.feature_fees %}
+
+          <a href="{% url 'fees:fee_list' %}">
+            <i class="fa-solid fa-wallet"></i>
+
+            <span>
+              My Fees
+            </span>
+          </a>
+
+        {% endif %}
+
+
+        <!-- Results -->
+
+        {% if perms.plans.feature_results %}
+
+          <a href="{% url 'results:home' %}">
+            <i class="fa-solid fa-square-poll-vertical"></i>
+
+            <span>
+              My Results
+            </span>
+          </a>
+
+        {% endif %}
+
+
+        <!-- Documents -->
+
+        {% if perms.plans.feature_documents %}
+
+          <a href="{% url 'document:document_list' %}">
+            <i class="fa-solid fa-folder-open"></i>
+
+            <span>
+              Documents
+            </span>
+          </a>
+
+        {% endif %}
+
+      </div>
+
+    {% endif %}
+
+
+    <!-- ===================================================== -->
+    <!-- INFORMATION                                           -->
+    <!-- ===================================================== -->
+
     <div class="nav-group">
-      <div class="nav-title">INFORMATION</div>
+
+      <div class="nav-title">
+        INFORMATION
+      </div>
 
       <a href="{% url 'core:about' %}">
         <i class="fa-solid fa-circle-info"></i>
 
-        <span>About</span>
+        <span>
+          About
+        </span>
       </a>
 
       <a href="{% url 'core:contact' %}">
         <i class="fa-solid fa-envelope"></i>
 
-        <span>Contact</span>
+        <span>
+          Contact
+        </span>
       </a>
 
       <a href="{% url 'plans:pricing' %}">
         <i class="fa-solid fa-tags"></i>
 
-        <span>Pricing</span>
+        <span>
+          Pricing
+        </span>
       </a>
+
     </div>
+
   </nav>
 
   <div class="sidebar-footer">
