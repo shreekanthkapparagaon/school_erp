@@ -1,41 +1,18 @@
 {% load humanize %}
 
 <div class="profile-card">
+
     <div class="profile-card-header">
-
         <div class="profile-card-heading">
-
             <span class="profile-card-icon">
                 <i class="fa-solid fa-wallet"></i>
             </span>
 
             <div>
-
-                <p class="profile-card-eyebrow">
-                    Finance
-                </p>
-
-                <h3 class="profile-card-title">
-                    Financial Summary
-                </h3>
-
+                <p class="profile-card-eyebrow">Finance</p>
+                <h3 class="profile-card-title">Financial Summary</h3>
             </div>
-
         </div>
-
-        {% if card.context.view_url %}
-
-            <a href="{% url card.context.view_url %}"
-            class="btn btn-outline-primary btn-sm">
-
-                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-
-                {{ card.context.view_label }}
-
-            </a>
-
-        {% endif %}
-
     </div>
 
     {% if card.context.type == "student" %}
@@ -43,376 +20,240 @@
         <div class="finance-overview">
 
             <div class="finance-balance">
-
                 <span class="finance-label">
-
-                    Outstanding Balance
-
+                    Total Fees
                 </span>
 
                 <h2>
-
-                    ₹{{ card.context.balance|intcomma }}
-
+                    ₹{{ card.context.total_amount|floatformat:2|intcomma }}
                 </h2>
 
                 {% if card.context.balance == 0 %}
-
                     <span class="status-paid">
-
                         <i class="fa-solid fa-circle-check"></i>
-
                         Fully Paid
-
                     </span>
-
                 {% elif card.context.total_paid > 0 %}
-
                     <span class="status-partial">
-
                         <i class="fa-solid fa-clock"></i>
-
                         Partial Payment
-
                     </span>
-
                 {% else %}
-
                     <span class="status-unpaid">
-
                         <i class="fa-solid fa-triangle-exclamation"></i>
-
                         Payment Pending
-
                     </span>
-
                 {% endif %}
-
             </div>
-
 
 
             <div class="finance-summary">
 
-                <div class="finance-summary-item">
-
+                <div class="finance-summary-item paid">
                     <span>
-
-                        <i class="fa-solid fa-file-invoice-dollar"></i>
-
-                        Total Fees
-
+                        <i class="fa-solid fa-circle-check"></i>
+                        Paid
                     </span>
 
                     <strong>
-
-                        ₹{{ card.context.total_amount|intcomma }}
-
+                        ₹{{ card.context.total_paid|floatformat:2|intcomma }}
                     </strong>
-
                 </div>
 
-                <div class="finance-summary-item">
 
+                <div class="finance-summary-item due">
                     <span>
-
-                        <i class="fa-solid fa-circle-check"></i>
-
-                        Amount Paid
-
-                    </span>
-
-                    <strong class="text-success">
-
-                        ₹{{ card.context.total_paid|intcomma }}
-
-                    </strong>
-
-                </div>
-
-                <div class="finance-summary-item">
-
-                    <span>
-
                         <i class="fa-solid fa-scale-balanced"></i>
-
                         Balance Due
-
                     </span>
 
-                    <strong class="text-danger">
-
-                        ₹{{ card.context.balance|intcomma }}
-
+                    <strong>
+                        ₹{{ card.context.balance|floatformat:2|intcomma }}
                     </strong>
-
                 </div>
 
             </div>
 
         </div>
 
-
-
         <div class="profile-card-divider"></div>
+        
 
+        <div class="section-header finance-section-header">
+            {% if card.context.type == "student" %}
+                <div>
+                    <h4>Recent Fee Records</h4>
+                    <span>Latest fee records</span>
+                </div>
 
-
-        <div class="section-header">
-
-            <h4>
-
-                Recent Fee Records
-
-            </h4>
-
-            <span>
-
-                {{ card.context.recent_fees|length }}
-
-                Records
-
-            </span>
-
+                <a href="{% url 'fees:fee_list' %}" class="finance-view-all">
+                    View All
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            {% elif card.context.type == "salary" %}
+                <div>
+                    <h4>Recent Fee Records</h4>
+                    <span>Latest fee records</span>
+                </div>
+                <a href="{% url 'fees:salary_list' %}"
+                class="btn btn-outline-primary btn-sm">
+                    <span>
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        View All Salery Records
+                    </span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>                
+            {% endif %}
+            
+            
         </div>
-
-
 
         {% if card.context.recent_fees %}
 
-            <div class="finance-history">
+            <ul class="finance-list">
 
-                {% for fee in card.context.recent_fees %}
+                {% for fee in card.context.recent_fees|slice:":3" %}
 
-                <div class="finance-item">
+                    <li class="finance-list-item">
 
-                    <div class="finance-item-left">
+                        <div class="finance-list-info">
+                            <span class="finance-list-icon">
+                                <i class="fa-solid fa-receipt"></i>
+                            </span>
 
-                        <div class="finance-item-icon">
+                            <div class="finance-list-name">
+                                <strong>{{ fee.title }}</strong>
+                                <small>{{ fee.academic_year }}</small>
+                            </div>
+                        </div>
 
-                            <i class="fa-solid fa-receipt"></i>
+                        <div class="finance-list-amount">
+                            ₹{{ fee.total_amount|floatformat:2|intcomma }}
+                        </div>
+
+                        <div class="finance-list-status">
+
+                            {% if fee.payment_status == "Paid" %}
+                                <span class="finance-status paid">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    Paid
+                                </span>
+                            {% elif fee.payment_status == "Partial" %}
+                                <span class="finance-status partial">
+                                    <i class="fa-solid fa-clock"></i>
+                                    Partial
+                                </span>
+                            {% else %}
+                                <span class="finance-status unpaid">
+                                    <i class="fa-solid fa-circle-xmark"></i>
+                                    Unpaid
+                                </span>
+                            {% endif %}
 
                         </div>
 
-                        <div>
+                        <a href="{% url 'fees:fee_detail' fee.id %}"
+                           class="finance-view-button">
+                            <i class="fa-solid fa-eye"></i>
+                            View
+                        </a>
 
-                            <strong>
-
-                                {{ fee.title }}
-
-                            </strong>
-
-                            <small>
-
-                                {{ fee.academic_year }}
-
-                            </small>
-
-                        </div>
-
-                    </div>
-
-                    <div class="finance-item-center">
-
-                        ₹{{ fee.total_amount|intcomma }}
-
-                    </div>
-
-                    <div class="finance-item-right">
-
-                        {% if fee.payment_status == "Paid" %}
-
-                            <span class="status-paid">
-
-                                Paid
-
-                            </span>
-
-                        {% elif fee.payment_status == "Partial" %}
-
-                            <span class="status-partial">
-
-                                Partial
-
-                            </span>
-
-                        {% else %}
-
-                            <span class="status-unpaid">
-
-                                Unpaid
-
-                            </span>
-
-                        {% endif %}
-
-                    </div>
-
-                </div>
+                    </li>
 
                 {% endfor %}
 
-            </div>
+            </ul>
 
         {% else %}
 
             <div class="profile-empty-state">
-
                 <i class="fa-solid fa-wallet"></i>
-
-                <h4>
-
-                    No Fee Records
-
-                </h4>
-
-                <p>
-
-                    Fee information will appear here once records are created.
-
-                </p>
-
+                <h4>No Fee Records</h4>
+                <p>Fee information will appear here once records are created.</p>
             </div>
 
         {% endif %}
+
     {% elif card.context.type == "salary" %}
 
         <div class="finance-overview">
 
             <div class="finance-balance">
-
                 <span class="finance-label">
-
                     Monthly Salary
-
                 </span>
 
                 <h2>
-
                     {% if card.context.salary %}
-
-                        ₹{{ card.context.salary.amount|intcomma }}
-
+                        ₹{{ card.context.salary.amount|floatformat:2|intcomma }}
                     {% else %}
-
                         —
-
                     {% endif %}
-
                 </h2>
 
                 {% if card.context.salary %}
-
                     {% if card.context.salary.status == "paid" %}
-
                         <span class="status-paid">
-
                             <i class="fa-solid fa-circle-check"></i>
-
                             Salary Credited
-
                         </span>
-
                     {% else %}
-
                         <span class="status-unpaid">
-
                             <i class="fa-solid fa-clock"></i>
-
                             Awaiting Payment
-
                         </span>
-
                     {% endif %}
-
                 {% endif %}
-
             </div>
-
 
 
             <div class="finance-summary">
 
                 <div class="finance-summary-item">
-
                     <span>
-
                         <i class="fa-solid fa-calendar-days"></i>
-
-                        Salary Month
-
+                        Month
                     </span>
 
                     <strong>
-
                         {% if card.context.salary %}
-
-                            {{ card.context.salary.salary_month|date:"F Y" }}
-
+                            {{ card.context.salary.salary_month|date:"M Y" }}
                         {% else %}
-
                             —
-
                         {% endif %}
-
                     </strong>
-
                 </div>
 
 
-
-                <div class="finance-summary-item">
-
+                <div class="finance-summary-item salary-status">
                     <span>
-
                         <i class="fa-solid fa-wallet"></i>
-
-                        Payment Status
-
+                        Status
                     </span>
 
                     <strong>
-
                         {% if card.context.salary %}
-
                             {{ card.context.salary.get_status_display }}
-
                         {% else %}
-
                             —
-
                         {% endif %}
-
                     </strong>
-
                 </div>
 
 
-
                 <div class="finance-summary-item">
-
                     <span>
-
                         <i class="fa-solid fa-money-check-dollar"></i>
-
                         Paid On
-
                     </span>
 
                     <strong>
-
                         {% if card.context.salary and card.context.salary.paid_on %}
-
                             {{ card.context.salary.paid_on|date:"d M Y" }}
-
                         {% else %}
-
                             Pending
-
                         {% endif %}
-
                     </strong>
-
                 </div>
 
             </div>
@@ -420,90 +261,86 @@
         </div>
 
 
-
         <div class="profile-card-divider"></div>
-
-
-
-        <div class="section-header">
-
-            <h4>
-
-                Salary Details
-
-            </h4>
-
-            <span>
-
-                Latest Record
-
-            </span>
-
-        </div>
-
 
 
         {% if card.context.salary %}
 
-            <div class="finance-history">
+            <ul class="finance-list">
 
-                <div class="finance-item">
+                <li class="finance-list-item">
 
-                    <div class="finance-item-left">
+                    <a
+                        href="{% url 'fees:salary_detail' card.context.salary.id %}"
+                        class="finance-list-info finance-list-link"
+                    >
 
-                        <div class="finance-item-icon">
-
+                        <span class="finance-list-icon">
                             <i class="fa-solid fa-money-check-dollar"></i>
+                        </span>
 
-                        </div>
-
-                        <div>
+                        <div class="finance-list-name">
 
                             <strong>
-
                                 {{ card.context.salary.salary_month|date:"F Y" }}
-
                             </strong>
 
                             <small>
-
                                 Monthly Salary Payment
-
                             </small>
 
                         </div>
 
+                    </a>
+
+
+                    <div class="finance-list-amount">
+
+                        ₹{{ card.context.salary.amount|floatformat:2|intcomma }}
+
                     </div>
 
-                    <div class="finance-item-center">
 
-                        ₹{{ card.context.salary.amount|intcomma }}
-
-                    </div>
-
-                    <div class="finance-item-right">
+                    <div class="finance-list-status">
 
                         {% if card.context.salary.status == "paid" %}
 
-                            <span class="status-paid">
-
+                            <span class="finance-status paid">
+                                <i class="fa-solid fa-circle-check"></i>
                                 Paid
-
                             </span>
 
                         {% else %}
 
-                            <span class="status-unpaid">
-
+                            <span class="finance-status unpaid">
+                                <i class="fa-solid fa-clock"></i>
                                 Pending
-
                             </span>
 
                         {% endif %}
 
                     </div>
 
-                </div>
+                </li>
+
+            </ul>
+
+
+            <div class="finance-list-footer">
+
+                <a
+                    href="{% url 'fees:salary_list' %}"
+                    class="finance-view-all-button"
+                >
+
+                    <span>
+                        <i class="fa-solid fa-wallet"></i>
+                        View All Salary Records
+                    </span>
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </a>
 
             </div>
 
@@ -514,15 +351,11 @@
                 <i class="fa-solid fa-wallet"></i>
 
                 <h4>
-
                     No Salary Records
-
                 </h4>
 
                 <p>
-
                     Salary information will appear here once processed.
-
                 </p>
 
             </div>
@@ -530,5 +363,5 @@
         {% endif %}
 
     {% endif %}
-</div>
 
+</div>

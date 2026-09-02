@@ -1,4 +1,5 @@
 from django import forms
+from datetime import datetime
 
 from ..models import (
     Profile,
@@ -152,72 +153,193 @@ class ProfileAdminForm(forms.ModelForm):
 
         return profile
 
-
 class ProfileUpdateForm(forms.ModelForm):
     """
     User profile update form.
 
-    Includes:
-    - User fields
+    Handles:
+    - Basic user fields
+    - Profile image
     - Dynamic profile fields
     """
 
-    first_name = forms.CharField(required=True)
-    last_name = forms.CharField(required=False)
-    email = forms.EmailField(required=True)
-    phone = forms.CharField(required=False)
+    first_name = forms.CharField(
+        required=True,
+    )
+
+    last_name = forms.CharField(
+        required=False,
+    )
+
+    email = forms.EmailField(
+        required=True,
+    )
+
+    phone = forms.CharField(
+        required=False,
+    )
 
     profile_image = forms.ImageField(
         required=False,
         label="Profile Picture",
     )
 
+    MAX_PROFILE_IMAGE_SIZE = 1 * 1024 * 1024  # 1 MB
+
     class Meta:
         model = Profile
         fields = ()
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    # =====================================================
+    # INIT
+    # =====================================================
+
+    def __init__(
+        self,
+        *args,
+        section=None,
+        **kwargs,
+    ):
+
+        super().__init__(
+            *args,
+            **kwargs,
+        )
+
+        self.section = (
+            section or ""
+        ).lower()
 
         user = self.instance.user
 
-        self.fields["first_name"].initial = user.first_name
-        self.fields["last_name"].initial = user.last_name
-        self.fields["email"].initial = user.email
-        self.fields["phone"].initial = user.phone
-        self.fields["profile_image"].initial = self.instance.profile_image
+        # =================================================
+        # BASIC USER FIELDS
+        # =================================================
+
+        self.fields["first_name"].initial = (
+            user.first_name
+        )
+
+        self.fields["last_name"].initial = (
+            user.last_name
+        )
+
+        self.fields["email"].initial = (
+            user.email
+        )
+
+        self.fields["phone"].initial = (
+            user.phone
+        )
+
+        # =================================================
+        # PROFILE IMAGE
+        # =================================================
+
+        self.fields["profile_image"].initial = (
+            self.instance.profile_image
+        )
+
+        # =================================================
+        # DYNAMIC PROFILE FIELDS
+        # =================================================
 
         profile_fields = (
-            ProfileField.objects.filter(
+            ProfileField.objects
+            .filter(
                 role=user.role,
                 active=True,
             )
-            .order_by("order", "name")
+            .order_by(
+                "order",
+                "name",
+            )
         )
 
-        existing = {
+        existing_values = {
             value.field_id: value
-            for value in self.instance.values.select_related("field")
+            for value in (
+                self.instance.values
+                .select_related("field")
+            )
         }
 
-        for pf in profile_fields:
+        for profile_field in profile_fields:
 
             initial = None
 
-            if pf.id in existing:
-                obj = existing[pf.id]
+            profile_value = existing_values.get(
+                profile_field.id
+            )
 
-                if pf.field_type == "file":
-                    initial = obj.file
+            # ---------------------------------------------
+            # Existing value
+            # ---------------------------------------------
+
+            if profile_value:
+
+                # -----------------------------------------
+                # File
+                # -----------------------------------------
+
+                if (
+                    profile_field.field_type == "file"
+                    and profile_value.file
+                ):
+
+                    initial = profile_value.file
+
+                # -----------------------------------------
+                # Date
+                # -----------------------------------------
+
+                elif (
+                    profile_field.field_type == "date"
+                    and profile_value.value
+                ):
+
+                    try:
+
+                        initial = datetime.strptime(
+                            str(profile_value.value),
+                            "%Y-%m-%d",
+                        ).date()
+
+                    except (
+                        ValueError,
+                        TypeError,
+                    ):
+
+                        initial = None
+
+                # -----------------------------------------
+                # Other fields
+                # -----------------------------------------
+
                 else:
-                    initial = obj.value
 
-            self.fields[f"profile_{pf.id}"] = self.build_field(
-                pf,
+                    initial = profile_value.value
+
+            # ---------------------------------------------
+            # Build field
+            # ---------------------------------------------
+
+            self.fields[
+                f"profile_{profile_field.id}"
+            ] = self.build_field(
+                profile_field,
                 initial,
             )
 
-    def build_field(self, profile_field, initial):
+    # =====================================================
+    # BUILD DYNAMIC FIELD
+    # =====================================================
+
+    def build_field(
+        self,
+        profile_field,
+        initial,
+    ):
 
         common = {
             "label": profile_field.name,
@@ -228,38 +350,96 @@ class ProfileUpdateForm(forms.ModelForm):
 
         match profile_field.field_type:
 
-            case "text":
-                return forms.CharField(**common)
+            # ---------------------------------------------
+            # TEXT
+            # ---------------------------------------------
 
-            case "textarea":
+            case "text":
+
                 return forms.CharField(
-                    widget=forms.Textarea(attrs={"rows": 4}),
                     **common,
                 )
 
-            case "number":
-                return forms.DecimalField(**common)
+            # ---------------------------------------------
+            # TEXTAREA
+            # ---------------------------------------------
 
-            case "date":
-                return forms.DateField(
-                    widget=forms.DateInput(
-                        attrs={"type": "date"},
+            case "textarea":
+
+                return forms.CharField(
+                    widget=forms.Textarea(
+                        attrs={
+                            "rows": 4,
+                        }
                     ),
                     **common,
                 )
 
+            # ---------------------------------------------
+            # NUMBER
+            # ---------------------------------------------
+
+            case "number":
+
+                return forms.DecimalField(
+                    **common,
+                )
+
+            # ---------------------------------------------
+            # DATE
+            # ---------------------------------------------
+
+            case "date":
+
+                return forms.DateField(
+                    input_formats=[
+                        "%Y-%m-%d",
+                    ],
+                    widget=forms.DateInput(
+                        format="%Y-%m-%d",
+                        attrs={
+                            "type": "date",
+                        },
+                    ),
+                    **common,
+                )
+
+            # ---------------------------------------------
+            # EMAIL
+            # ---------------------------------------------
+
             case "email":
-                return forms.EmailField(**common)
+
+                return forms.EmailField(
+                    **common,
+                )
+
+            # ---------------------------------------------
+            # FILE
+            # ---------------------------------------------
 
             case "file":
-                return forms.FileField(**common)
+
+                return forms.FileField(
+                    **common,
+                )
+
+            # ---------------------------------------------
+            # SELECT
+            # ---------------------------------------------
 
             case "select":
 
                 choices = [
-                    (c.strip(), c.strip())
-                    for c in profile_field.choices.split(",")
-                    if c.strip()
+                    (
+                        choice.strip(),
+                        choice.strip(),
+                    )
+                    for choice in (
+                        profile_field.choices
+                        .split(",")
+                    )
+                    if choice.strip()
                 ]
 
                 return forms.ChoiceField(
@@ -267,68 +447,278 @@ class ProfileUpdateForm(forms.ModelForm):
                     **common,
                 )
 
+            # ---------------------------------------------
+            # FALLBACK
+            # ---------------------------------------------
+
             case _:
-                return forms.CharField(**common)
 
-    MAX_PROFILE_IMAGE_SIZE = 1 * 1024 * 1024  # 1 MB
+                return forms.CharField(
+                    **common,
+                )
 
-    def save(self, commit=True):
+    # =====================================================
+    # CLEAN
+    # =====================================================
+
+    def clean(self):
+
+        cleaned_data = super().clean()
+
+        # =================================================
+        # BASIC EDIT
+        # =================================================
+
+        if self.section == "basic":
+
+            # Ignore validation errors from
+            # dynamic/custom fields.
+
+            for field_name in list(
+                self.errors
+            ):
+
+                if field_name.startswith(
+                    "profile_"
+                ):
+
+                    self.errors.pop(
+                        field_name,
+                        None,
+                    )
+
+            # Profile image is not part of
+            # basic editing.
+
+            self.errors.pop(
+                "profile_image",
+                None,
+            )
+
+        # =================================================
+        # ADDITIONAL EDIT
+        # =================================================
+
+        elif self.section == "additional":
+
+            # Ignore validation errors from
+            # basic fields.
+
+            for field_name in (
+                "first_name",
+                "last_name",
+                "email",
+                "phone",
+            ):
+
+                self.errors.pop(
+                    field_name,
+                    None,
+                )
+
+            # Profile image is not part of
+            # additional editing.
+
+            self.errors.pop(
+                "profile_image",
+                None,
+            )
+
+        # =================================================
+        # PHOTO EDIT
+        # =================================================
+
+        elif self.section == "photo":
+
+            # Ignore all fields except image.
+
+            for field_name in list(
+                self.errors
+            ):
+
+                if field_name != "profile_image":
+
+                    self.errors.pop(
+                        field_name,
+                        None,
+                    )
+
+        return cleaned_data
+
+    # =====================================================
+    # SAVE
+    # =====================================================
+
+    def save(
+        self,
+        commit=True,
+    ):
 
         profile = self.instance
         user = profile.user
 
-        user.first_name = self.cleaned_data["first_name"]
-        user.last_name = self.cleaned_data["last_name"]
-        user.email = self.cleaned_data["email"]
-        user.phone = self.cleaned_data["phone"]
+        # =================================================
+        # BASIC INFORMATION
+        # =================================================
 
-        image = self.cleaned_data.get("profile_image")
+        if self.section == "basic":
 
-        if image:
-            profile.profile_image = image
-
-        if commit:
-            user.save()
-            profile.save()
-
-        profile_fields = ProfileField.objects.filter(
-            role=user.role,
-            active=True,
-        )
-
-        for pf in profile_fields:
-
-            field_name = f"profile_{pf.id}"
-
-            if field_name not in self.cleaned_data:
-                continue
-
-            value = self.cleaned_data[field_name]
-
-            pfv, _ = ProfileFieldValue.objects.get_or_create(
-                profile=profile,
-                field=pf,
+            user.first_name = self.cleaned_data.get(
+                "first_name",
+                user.first_name,
             )
 
-            if pf.field_type == "file":
+            user.last_name = self.cleaned_data.get(
+                "last_name",
+                user.last_name,
+            )
 
-                if value:
-                    pfv.file = value
+            user.email = self.cleaned_data.get(
+                "email",
+                user.email,
+            )
 
-            else:
-                pfv.value = value
+            user.phone = self.cleaned_data.get(
+                "phone",
+                user.phone,
+            )
 
             if commit:
-                pfv.save()
+
+                user.save()
+
+        # =================================================
+        # PROFILE PHOTO
+        # =================================================
+
+        elif self.section == "photo":
+
+            image = self.cleaned_data.get(
+                "profile_image"
+            )
+
+            if image:
+
+                profile.profile_image = image
+
+                if commit:
+
+                    profile.save(
+                        update_fields=[
+                            "profile_image",
+                        ]
+                    )
+
+        # =================================================
+        # ADDITIONAL / CUSTOM FIELDS
+        # =================================================
+
+        elif self.section == "additional":
+
+            profile_fields = (
+                ProfileField.objects
+                .filter(
+                    role=user.role,
+                    active=True,
+                )
+                .order_by(
+                    "order",
+                    "name",
+                )
+            )
+
+            for profile_field in profile_fields:
+
+                field_name = (
+                    f"profile_{profile_field.id}"
+                )
+
+                if field_name not in self.cleaned_data:
+
+                    continue
+
+                value = self.cleaned_data.get(
+                    field_name
+                )
+
+                profile_value, _ = (
+                    ProfileFieldValue.objects
+                    .get_or_create(
+                        profile=profile,
+                        field=profile_field,
+                    )
+                )
+
+                # -----------------------------------------
+                # FILE
+                # -----------------------------------------
+
+                if (
+                    profile_field.field_type
+                    == "file"
+                ):
+
+                    if value:
+
+                        profile_value.file = value
+
+                # -----------------------------------------
+                # DATE
+                # -----------------------------------------
+
+                elif (
+                    profile_field.field_type
+                    == "date"
+                ):
+
+                    if value:
+
+                        profile_value.value = (
+                            value.strftime(
+                                "%Y-%m-%d"
+                            )
+                        )
+
+                    else:
+
+                        profile_value.value = ""
+
+                # -----------------------------------------
+                # OTHER
+                # -----------------------------------------
+
+                else:
+
+                    profile_value.value = (
+                        str(value)
+                        if value is not None
+                        else ""
+                    )
+
+                profile_value.save()
 
         return profile
 
-    def clean_profile_image(self):
-        image = self.cleaned_data.get("profile_image")
+    # =====================================================
+    # PROFILE IMAGE VALIDATION
+    # =====================================================
 
-        if image and image.size > self.MAX_PROFILE_IMAGE_SIZE:
+    def clean_profile_image(self):
+
+        image = self.cleaned_data.get(
+            "profile_image"
+        )
+
+        if (
+            image
+            and image.size
+            > self.MAX_PROFILE_IMAGE_SIZE
+        ):
+
             raise forms.ValidationError(
                 "Profile image must be smaller than 1 MB."
             )
 
         return image
+
+

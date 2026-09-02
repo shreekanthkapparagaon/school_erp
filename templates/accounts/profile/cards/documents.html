@@ -1,4 +1,12 @@
+<!-- =====================================================
+     DOCUMENT CENTER
+     ===================================================== -->
+
 <div class="profile-card">
+
+    <!-- =================================================
+         CARD HEADER
+         ================================================= -->
 
     <div class="profile-card-header">
 
@@ -13,25 +21,24 @@
             <div>
 
                 <p class="profile-card-eyebrow">
-
                     Documents
-
                 </p>
 
                 <h3 class="profile-card-title">
-
                     Document Center
-
                 </h3>
 
             </div>
 
         </div>
 
+
         {% if card.context.view_url %}
 
-        <a href="{{ card.context.view_url }}"
-           class="btn btn-outline-primary btn-sm">
+        <a
+            href="{{ card.context.view_url }}"
+            class="btn btn-outline-primary btn-sm"
+        >
 
             <i class="fa-solid fa-arrow-up-right-from-square"></i>
 
@@ -44,25 +51,23 @@
     </div>
 
 
+    <!-- =================================================
+         DOCUMENT OVERVIEW
+         ================================================= -->
 
     <div class="document-overview">
 
         <div class="document-total">
 
             <span>
-
                 Total Documents
-
             </span>
 
             <h2>
-
                 {{ card.context.total_documents }}
-
             </h2>
 
         </div>
-
 
 
         <div class="document-summary">
@@ -78,12 +83,11 @@
                 </span>
 
                 <strong>
-
                     {{ card.context.approved_documents }}
-
                 </strong>
 
             </div>
+
 
             <div class="document-summary-item">
 
@@ -96,12 +100,11 @@
                 </span>
 
                 <strong>
-
                     {{ card.context.pending_documents }}
-
                 </strong>
 
             </div>
+
 
             <div class="document-summary-item">
 
@@ -114,9 +117,7 @@
                 </span>
 
                 <strong>
-
                     {{ card.context.rejected_documents }}
-
                 </strong>
 
             </div>
@@ -126,135 +127,145 @@
     </div>
 
 
-
     <div class="profile-card-divider"></div>
+    <!-- =====================================================
+        RECENT DOCUMENTS
+        ===================================================== -->
 
+    <div class="section-header document-section-header">
 
+        <div>
 
-    <div class="section-header">
+            <h4>
+                Recent Documents
+            </h4>
 
-        <h4>
+            <span>
+                Latest uploaded documents
+            </span>
 
-            Recent Documents
+        </div>
 
-        </h4>
+        <a
+            href="{% url 'document:document_list' %}"
+            class="document-view-all"
+        >
 
-        <span>
+            View All
 
-            {{ card.context.recent_documents|length }}
+            <i class="fa-solid fa-arrow-right"></i>
 
-            Files
-
-        </span>
+        </a>
 
     </div>
-
 
 
     {% if card.context.recent_documents %}
 
-    <div class="document-history">
+        <ul class="document-list">
 
-        {% for document in card.context.recent_documents %}
+            {% for document in card.context.recent_documents|slice:":3" %}
 
-        <div class="document-item">
+                <li class="document-list-item">
 
-            <div class="document-item-left">
+                    <!-- =============================================
+                        DOCUMENT INFORMATION
+                        ============================================= -->
 
-                <div class="document-icon">
+                    <div class="document-list-info">
 
-                    {% if document.get_status_display == "Approved" %}
+                        <span class="document-list-icon">
 
-                        <i class="fa-solid fa-file-circle-check"></i>
+                            <i class="fa-solid fa-file-lines"></i>
 
-                    {% elif document.get_status_display == "Pending" %}
-
-                        <i class="fa-solid fa-file-circle-question"></i>
-
-                    {% else %}
-
-                        <i class="fa-solid fa-file-circle-xmark"></i>
-
-                    {% endif %}
-
-                </div>
-
-                <div>
-
-                    <strong>
-
-                        {{ document.document_type.name }}
-
-                    </strong>
-
-                    <small>
-
-                        {{ document.created_at|date:"d M Y" }}
-
-                    </small>
-
-                </div>
-
-            </div>
+                        </span>
 
 
+                        <div class="document-list-name">
 
-            <div class="document-item-right">
+                            <strong>
+                                {{ document.document_type.name }}
+                            </strong>
 
-                {% if document.get_status_display == "Approved" %}
+                            <small>
 
-                    <span class="status-paid">
+                                <i class="fa-regular fa-calendar"></i>
 
-                        Approved
+                                {{ document.created_at|date:"d M Y" }}
 
-                    </span>
+                            </small>
 
-                {% elif document.get_status_display == "Pending" %}
+                        </div>
 
-                    <span class="status-partial">
+                    </div>
 
-                        Pending
 
-                    </span>
+                    <!-- =============================================
+                        STATUS
+                        ============================================= -->
 
-                {% else %}
+                    <div class="document-list-status">
 
-                    <span class="status-unpaid">
+                        {% if document.get_status_display == "Approved" %}
 
-                        Rejected
+                            <span class="document-status approved">
 
-                    </span>
+                                <i class="fa-solid fa-circle-check"></i>
 
-                {% endif %}
+                                Approved
 
-            </div>
+                            </span>
 
-        </div>
+                        {% elif document.get_status_display == "Pending" %}
 
-        {% endfor %}
+                            <span class="document-status pending">
 
-    </div>
+                                <i class="fa-solid fa-clock"></i>
 
+                                Pending
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="document-status rejected">
+
+                                <i class="fa-solid fa-circle-xmark"></i>
+
+                                Rejected
+
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- =============================================
+                        VIEW
+                        ============================================= -->
+
+                    <a
+                        href="{% url 'document:document_list' %}"
+                        class="document-view-button"
+                    >
+
+                        <i class="fa-solid fa-eye"></i>
+
+                        View
+
+                    </a>
+
+                </li>
+
+            {% endfor %}
+
+        </ul>
     {% else %}
-
-    <div class="profile-empty-state">
-
-        <i class="fa-solid fa-folder-open"></i>
-
-        <h4>
-
-            No Documents Uploaded
-
-        </h4>
-
-        <p>
-
-            Uploaded documents will appear here.
-
-        </p>
-
-    </div>
-
+        <div class="profile-empty-state">
+            <i class="fa-solid fa-folder-open"></i>
+            <h4>No Documents Uploaded</h4>
+            <p>Uploaded documents will appear here.</p>
+        </div>
     {% endif %}
-
 </div>

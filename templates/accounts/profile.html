@@ -341,27 +341,6 @@
     <br>
 {% endfor %}
 
-{% if edit_mode %}
-    <div class="card">
-        <div class="form-actions">
-
-            <a
-                href="{% url 'accounts:profile' %}"
-                class="btn btn-muted">
-                Cancel
-            </a>
-
-            <button
-                type="submit"
-                name="section"
-                value="{{ edit_section }}">
-                Save Changes
-            </button>
-
-        </div>
-    </div>
-{% endif %}
-
 </form>
 
 {% if edit_mode %}
