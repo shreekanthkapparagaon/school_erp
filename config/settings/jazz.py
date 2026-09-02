@@ -54,6 +54,11 @@ JAZZMIN_SETTINGS = {
             "name": "Plans",
             "permissions": ["plans.view_plan"],
         },
+        {
+            "app": "attendance",
+            "name": "Attendance",
+            "permissions": ["attendance.view_attendance"],
+        },
     ],
 
 
@@ -78,141 +83,131 @@ JAZZMIN_SETTINGS = {
     #     apps.accounts
     #
 
-    "order_with_respect_to": [
-        "accounts",
-        "schools",
-        "fees",
-        "results",
-        "document",
-        "plans",
-        "core",
-        "auth",
-    ],
+"order_with_respect_to": [
+    "accounts",
+    "schools",
+    "plans",
+    "attendance",
+    "fees",
+    "results",
+    "document",
+    "core",
+    "auth",
+],
+
+"icons": {
+
+    # =====================================================================
+    # Django
+    # =====================================================================
+
+    "admin": "fas fa-cogs",
+
+    "auth": "fas fa-user-shield",
+    "auth.group": "fas fa-users-cog",
+    "auth.permission": "fas fa-key",
+
+    "contenttypes": "fas fa-database",
+    "contenttypes.contenttype": "fas fa-table",
+
+    "sessions": "fas fa-clock",
+    "sessions.session": "fas fa-user-clock",
 
 
-    # -------------------------------------------------------------------------
-    # Icons
-    # -------------------------------------------------------------------------
+    # =====================================================================
+    # ACCOUNTS
+    # =====================================================================
 
-    "icons": {
+    "accounts": "fas fa-users",
 
-        # =====================================================================
-        # Django
-        # =====================================================================
-
-        "admin": "fas fa-cogs",
-
-        "auth": "fas fa-user-shield",
-        "auth.group": "fas fa-users-cog",
-        "auth.permission": "fas fa-key",
-
-        "contenttypes": "fas fa-database",
-        "contenttypes.contenttype": "fas fa-table",
-
-        "sessions": "fas fa-clock",
-        "sessions.session": "fas fa-user-clock",
+    "accounts.user": "fas fa-user",
+    "accounts.profile": "fas fa-id-card",
+    "accounts.profilefield": "fas fa-list-alt",
+    "accounts.profilefieldvalue": "fas fa-edit",
 
 
-        # =====================================================================
-        # ACCOUNTS
-        # =====================================================================
+    # =====================================================================
+    # SCHOOLS
+    # =====================================================================
 
-        "accounts": "fas fa-users",
+    "schools": "fas fa-school",
 
-        "accounts.user": "fas fa-user",
-
-        "accounts.profile": "fas fa-id-card",
-
-        "accounts.profilefield": "fas fa-list-alt",
-
-        "accounts.profilefieldvalue": "fas fa-edit",
+    "schools.school": "fas fa-school",
+    "schools.subject": "fas fa-book",
+    "schools.schoolclass": "fas fa-chalkboard",
+    "schools.teachersubjectassignment": "fas fa-chalkboard-teacher",
 
 
-        # =====================================================================
-        # SCHOOLS
-        # =====================================================================
+    # =====================================================================
+    # ATTENDANCE
+    # =====================================================================
 
-        "schools": "fas fa-school",
+    "attendance": "fas fa-calendar-check",
 
-        "schools.school": "fas fa-school",
-
-        "schools.subject": "fas fa-book",
-
-        "schools.schoolclass": "fas fa-chalkboard",
-
-        "schools.teachersubjectassignment": "fas fa-chalkboard-teacher",
+    "attendance.attendance": "fas fa-calendar-check",
+    "attendance.attendanceapikey": "fas fa-key",
+    "attendance.rfidcard": "fas fa-id-card",
 
 
-        # =====================================================================
-        # FEES
-        # =====================================================================
+    # =====================================================================
+    # FEES
+    # =====================================================================
 
-        "fees": "fas fa-money-check-alt",
+    "fees": "fas fa-money-check-alt",
 
-        "fees.feestructure": "fas fa-file-invoice-dollar",
-
-        "fees.studentfee": "fas fa-money-bill-wave",
-
-        "fees.feepayment": "fas fa-receipt",
-
-        "fees.teachersalary": "fas fa-hand-holding-usd",
+    "fees.feestructure": "fas fa-file-invoice-dollar",
+    "fees.studentfee": "fas fa-money-bill-wave",
+    "fees.feepayment": "fas fa-receipt",
+    "fees.teachersalary": "fas fa-hand-holding-usd",
 
 
-        # =====================================================================
-        # RESULTS
-        # =====================================================================
+    # =====================================================================
+    # RESULTS
+    # =====================================================================
 
-        "results": "fas fa-graduation-cap",
+    "results": "fas fa-graduation-cap",
 
-        "results.exam": "fas fa-file-alt",
-
-        "results.result": "fas fa-chart-line",
-
-
-        # =====================================================================
-        # DOCUMENTS
-        # =====================================================================
-
-        "document": "fas fa-folder-open",
-
-        "document.documenttype": "fas fa-file-signature",
-
-        "document.document": "fas fa-file-alt",
+    "results.exam": "fas fa-file-alt",
+    "results.result": "fas fa-chart-line",
 
 
-        # =====================================================================
-        # PLANS / SUBSCRIPTIONS
-        # =====================================================================
+    # =====================================================================
+    # DOCUMENTS
+    # =====================================================================
 
-        "plans": "fas fa-crown",
+    "document": "fas fa-folder-open",
 
-        "plans.feature": "fas fa-puzzle-piece",
-
-        "plans.plan": "fas fa-layer-group",
-
-        "plans.planfeature": "fas fa-link",
-
-        "plans.subscription": "fas fa-credit-card",
+    "document.documenttype": "fas fa-file-signature",
+    "document.document": "fas fa-file-alt",
 
 
-        # =====================================================================
-        # CORE
-        # =====================================================================
+    # =====================================================================
+    # PLANS / SUBSCRIPTIONS
+    # =====================================================================
 
-        "core": "fas fa-cogs",
+    "plans": "fas fa-crown",
 
-        "core.contact": "fas fa-address-book",
+    "plans.feature": "fas fa-puzzle-piece",
+    "plans.plan": "fas fa-layer-group",
+    "plans.planfeature": "fas fa-link",
+    "plans.subscription": "fas fa-credit-card",
 
 
-        # =====================================================================
-        # ADMIN HONEYPOT
-        # =====================================================================
+    # =====================================================================
+    # CORE
+    # =====================================================================
 
-        "admin_honeypot": "fas fa-shield-alt",
+    "core": "fas fa-cogs",
+    "core.contact": "fas fa-address-book",
 
-        "admin_honeypot.loginattempt": "fas fa-user-secret",
-    },
 
+    # =====================================================================
+    # ADMIN HONEYPOT
+    # =====================================================================
+
+    "admin_honeypot": "fas fa-shield-alt",
+    "admin_honeypot.loginattempt": "fas fa-user-secret",
+},
 
     # -------------------------------------------------------------------------
     # Default icons

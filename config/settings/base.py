@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "apps.document",
     "apps.plans",
     "apps.core",
+    "apps.attendance",
 
 
     "admin_honeypot",
@@ -118,8 +119,8 @@ LOGOUT_REDIRECT_URL = "core:home"
 
 # django-auto-logout package
 AUTO_LOGOUT = {
-    'IDLE_TIME': timedelta(minutes=5),
-    'SESSION_TIME': timedelta(hours=1),
+    'IDLE_TIME': timedelta(minutes=90),
+    'SESSION_TIME': timedelta(hours=12),
     'MESSAGE': 'Your session has expired due to inactivity. Please login again to continue.',
     'REDIRECT_TO_LOGIN_IMMEDIATELY': True,
 }
@@ -169,5 +170,61 @@ DEFAULT_FROM_EMAIL = os.getenv(
 )
 
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+#--- Logging settings
+LOG_DIR = BASE_DIR / "logs"
+
+LOG_DIR.mkdir(
+    parents=True,
+    exist_ok=True,
+)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+
+    "formatters": {
+        "seed": {
+            "format": "{asctime} | {levelname} | {message}",
+            "style": "{",
+        },
+    },
+
+    "handlers": {
+        "seed_users_file": {
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "logs" / "seed_users.log",
+            "formatter": "seed",
+            "level": "INFO",
+        },
+
+        "seed_documents_file": {
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "logs" / "seed_documents.log",
+            "formatter": "seed",
+            "level": "INFO",
+        },
+    },
+
+    "loggers": {
+        "seed_users": {
+            "handlers": [
+                "seed_users_file",
+            ],
+            "level": "INFO",
+            "propagate": False,
+        },
+
+        "seed_documents": {
+            "handlers": [
+                "seed_documents_file",
+            ],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
+
+
 
 from .jazz import *
