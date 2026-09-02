@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 from django.conf import settings
@@ -8,6 +9,9 @@ from django.db import transaction
 from apps.accounts.models import User
 from apps.document.models import Document, DocumentType
 from apps.schools.models import School
+
+
+logger = logging.getLogger("seed_documents")
 
 
 class Command(BaseCommand):
@@ -29,7 +33,19 @@ class Command(BaseCommand):
     @transaction.atomic
     def handle(self, *args, **options):
 
-        self.stdout.write(self.style.NOTICE("Seeding documents..."))
+        self.stdout.write(
+            self.style.NOTICE(
+                "Seeding documents..."
+            )
+        )
+
+        logger.info("=" * 60)
+        logger.info("Starting document seeding")
+        logger.info("=" * 60)
+
+        # =================================================
+        # Demo Files
+        # =================================================
 
         demo_files = (
             Path(settings.BASE_DIR)
@@ -39,95 +55,254 @@ class Command(BaseCommand):
         )
 
         if not demo_files.exists():
-            self.stdout.write(
-                self.style.ERROR(
-                    f"Demo folder not found: {demo_files}"
-                )
+
+            message = (
+                f"Demo folder not found: {demo_files}"
             )
+
+            self.stdout.write(
+                self.style.ERROR(message)
+            )
+
+            logger.error(message)
+
             return
 
+        # =================================================
+        # Validate Demo Files
+        # =================================================
+
+        available_files = {}
+
+        for slug, filename in self.FILE_MAP.items():
+
+            file_path = demo_files / filename
+
+            if not file_path.exists():
+
+                logger.warning(
+                    "Missing demo file: %s",
+                    filename,
+                )
+
+                continue
+
+            available_files[slug] = file_path
+
+        # =================================================
+        # Schools
+        # =================================================
+
+        schools = (
+            School.objects
+            .only(
+                "id",
+                "name",
+            )
+            .order_by("id")
+        )
+
         total = 0
+        skipped = 0
 
-        for school in School.objects.all():
+        # =================================================
+        # Process Schools
+        # =================================================
 
-            self.stdout.write(
-                self.style.NOTICE(f"\n{school.name}")
+        for school in schools:
+
+            logger.info(
+                "Processing school: %s [%s]",
+                school.name,
+                school.id,
             )
 
+            # -------------------------------------------------
+            # Principal
+            # -------------------------------------------------
+
             principal = (
-                User.objects.filter(
+                User.objects
+                .filter(
                     school=school,
                     role=User.Role.PRINCIPAL,
-                ).first()
+                )
+                .only("id")
+                .first()
             )
 
             if principal is None:
-                self.stdout.write(
-                    self.style.WARNING(
-                        "  Principal not found. Skipping."
-                    )
+
+                logger.warning(
+                    "Principal not found for school: %s",
+                    school.name,
                 )
+
+                skipped += 1
+
                 continue
 
-            document_types = DocumentType.objects.filter(
-                school=school,
-                active=True,
+            # -------------------------------------------------
+            # Document Types
+            # -------------------------------------------------
+
+            document_types = list(
+                DocumentType.objects
+                .filter(
+                    school=school,
+                    active=True,
+                )
+                .only(
+                    "id",
+                    "name",
+                    "slug",
+                    "roles",
+                )
             )
 
-            users = User.objects.filter(school=school)
+            # -------------------------------------------------
+            # Users
+            # -------------------------------------------------
+
+            users = (
+                User.objects
+                .filter(
+                    school=school,
+                )
+                .only(
+                    "id",
+                    "email",
+                    "role",
+                )
+                .order_by("id")
+            )
+
+            school_total = 0
+
+            # -------------------------------------------------
+            # Documents
+            # -------------------------------------------------
 
             for user in users:
 
                 for document_type in document_types:
 
-                    if user.role not in document_type.roles:
+                    # -----------------------------------------
+                    # Role Check
+                    # -----------------------------------------
+
+                    if user.role not in (
+                        document_type.roles
+                    ):
                         continue
 
-                    filename = self.FILE_MAP.get(document_type.slug)
+                    # -----------------------------------------
+                    # File
+                    # -----------------------------------------
 
-                    if filename is None:
+                    file_path = available_files.get(
+                        document_type.slug
+                    )
+
+                    if file_path is None:
                         continue
 
-                    file_path = demo_files / filename
-
-                    if not file_path.exists():
-                        self.stdout.write(
-                            self.style.WARNING(
-                                f"Missing file: {filename}"
-                            )
-                        )
-                        continue
+                    # -----------------------------------------
+                    # Existing Document
+                    # -----------------------------------------
 
                     if Document.objects.filter(
-                        user=user,
-                        document_type=document_type,
+                        user_id=user.id,
+                        document_type_id=(
+                            document_type.id
+                        ),
                     ).exists():
+
                         continue
 
-                    with open(file_path, "rb") as fp:
+                    # -----------------------------------------
+                    # Create Document
+                    # -----------------------------------------
 
-                        document = Document(
-                            role=user.role,
-                            user=user,
-                            document_type=document_type,
-                            uploaded_by=principal,
-                        )
+                    try:
 
-                        document.file.save(
-                            filename,
-                            File(fp),
-                            save=False,
-                        )
+                        with file_path.open("rb") as fp:
 
-                        document.save()
+                            document = Document(
+                                role=user.role,
+                                user_id=user.id,
+                                document_type_id=(
+                                    document_type.id
+                                ),
+                                uploaded_by_id=principal.id,
+                            )
+
+                            document.file.save(
+                                file_path.name,
+                                File(fp),
+                                save=False,
+                            )
+
+                            document.save()
 
                         total += 1
+                        school_total += 1
 
-                        self.stdout.write(
-                            f"  ✓ {user.email} -> {document_type.name}"
+                        logger.info(
+                            "Created document | "
+                            "school=%s | "
+                            "user=%s | "
+                            "email=%s | "
+                            "role=%s | "
+                            "document_type=%s | "
+                            "file=%s",
+                            school.name,
+                            user.id,
+                            user.email,
+                            user.role,
+                            document_type.name,
+                            file_path.name,
                         )
 
+                    except Exception:
+
+                        logger.exception(
+                            "Failed document creation | "
+                            "school=%s | "
+                            "user=%s | "
+                            "email=%s | "
+                            "document_type=%s",
+                            school.name,
+                            user.id,
+                            user.email,
+                            document_type.name,
+                        )
+
+                        raise
+
+            logger.info(
+                "Completed school | "
+                "school=%s | "
+                "documents_created=%s",
+                school.name,
+                school_total,
+            )
+
+        # =================================================
+        # Summary
+        # =================================================
+
+        logger.info("=" * 60)
+        logger.info(
+            "Document seeding completed | "
+            "created=%s | skipped=%s",
+            total,
+            skipped,
+        )
+        logger.info("=" * 60)
+
         self.stdout.write("")
+
         self.stdout.write(
             self.style.SUCCESS(
                 f"Created {total} demo documents."

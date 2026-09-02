@@ -8,7 +8,9 @@ class Command(BaseCommand):
     CORE_COMMANDS = [
         "seed_plans",
         "seed_schools",
-        "seed_users",          # Manager, Principal, Head, Teachers
+        "seed_users",
+        "seed_profile_fields",
+        "seed_contacts",
         "seed_subscriptions",
     ]
 
@@ -19,8 +21,13 @@ class Command(BaseCommand):
         "seed_results",
     ]
 
+    ATTENDANCE_COMMANDS = [
+        "seed_attendance",
+    ]
+
     FINANCE_COMMANDS = [
         "seed_fee_structures",
+        "seed_student_fees",
         "seed_fee_payments",
         "seed_teacher_salaries",
     ]
@@ -33,6 +40,7 @@ class Command(BaseCommand):
     COMMANDS = (
         CORE_COMMANDS
         + ACADEMIC_COMMANDS
+        + ATTENDANCE_COMMANDS
         + FINANCE_COMMANDS
         + DOCUMENT_COMMANDS
     )
@@ -40,26 +48,28 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         self.stdout.write(
-            self.style.NOTICE(
-                "=" * 60
-            )
+            self.style.NOTICE("=" * 60)
         )
+
         self.stdout.write(
             self.style.NOTICE(
                 "Starting School ERP demo data seeding..."
             )
         )
+
         self.stdout.write(
-            self.style.NOTICE(
-                "=" * 60
-            )
+            self.style.NOTICE("=" * 60)
         )
 
         total = len(self.COMMANDS)
 
-        for index, command in enumerate(self.COMMANDS, start=1):
+        for index, command in enumerate(
+            self.COMMANDS,
+            start=1,
+        ):
 
             self.stdout.write("")
+
             self.stdout.write(
                 self.style.NOTICE(
                     f"[{index}/{total}] Running {command}..."
@@ -68,6 +78,7 @@ class Command(BaseCommand):
 
             try:
                 call_command(command)
+
             except Exception as exc:
                 self.stdout.write(
                     self.style.ERROR(
@@ -83,18 +94,17 @@ class Command(BaseCommand):
             )
 
         self.stdout.write("")
+
         self.stdout.write(
-            self.style.SUCCESS(
-                "=" * 60
-            )
+            self.style.SUCCESS("=" * 60)
         )
+
         self.stdout.write(
             self.style.SUCCESS(
                 "School ERP demo database seeded successfully."
             )
         )
+
         self.stdout.write(
-            self.style.SUCCESS(
-                "=" * 60
-            )
+            self.style.SUCCESS("=" * 60)
         )
